@@ -1,0 +1,28 @@
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand-block">
+      <p class="brand-kicker">Operations desk</p>
+      <h2 class="logo">HireHelper</h2>
+      <p class="brand-copy">Manage listings, track requests, and move quickly through your work.</p>
+    </div>
+
+    <nav>
+      <a routerLink="/dashboard" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Dashboard</a>
+      <a routerLink="/feed" routerLinkActive="active-link">Feed</a>
+      <a routerLink="/my-tasks" routerLinkActive="active-link">My Tasks</a>
+      <a routerLink="/my-requests" routerLinkActive="active-link">My Requests</a>
+      <a routerLink="/requests" routerLinkActive="active-link">Requests</a>
+      <a routerLink="/add-task" routerLinkActive="active-link">Add Task</a>
+      <a routerLink="/notifications" routerLinkActive="active-link">Notifications <span class="badge" *ngIf="notificationCount > 0">({{ notificationCount }})</span></a>
+      <a routerLink="/profile" routerLinkActive="active-link">Profile</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout" (click)="logout()">Logout</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <router-outlet></router-outlet>
+  </main>
+</div>

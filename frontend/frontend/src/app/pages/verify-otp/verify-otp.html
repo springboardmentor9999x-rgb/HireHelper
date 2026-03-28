@@ -1,0 +1,41 @@
+<div class="otp-wrapper">
+  <div class="otp-card">
+    <div class="otp-topbar"></div>
+    <p class="otp-eyebrow">Secure Verification</p>
+    <h2>Verify Your Email</h2>
+    <p class="otp-subtitle">Enter the 6-digit OTP sent to your email address.</p>
+
+    <form (ngSubmit)="verifyOtp()" class="otp-form">
+      <label for="email" class="field-label">Email Address</label>
+      <input
+        id="email"
+        type="email"
+        [(ngModel)]="email_id"
+        name="email"
+        placeholder="you@example.com"
+        required
+      />
+
+      <label for="otp" class="field-label">One-Time Password</label>
+      <input
+        id="otp"
+        type="text"
+        [(ngModel)]="otp"
+        name="otp"
+        class="otp-input"
+        placeholder="_ _ _ _ _ _"
+        maxlength="6"
+        inputmode="numeric"
+        pattern="[0-9]{6}"
+        required
+      />
+
+      <button type="submit">Verify Account</button>
+    </form>
+
+    <p class="otp-help">Tip: Check spam/junk folder if the OTP is delayed.</p>
+    <p class="otp-link-row">Back to <a routerLink="/register">Register</a> or <a routerLink="/login">Login</a></p>
+
+    <p class="error" *ngIf="error">{{ error }}</p>
+  </div>
+</div>

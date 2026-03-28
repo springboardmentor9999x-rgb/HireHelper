@@ -1,0 +1,51 @@
+<app-workspace-header
+  sectionLabel=""
+  title=""
+  subtitle="Stay up to date on requests and task activity."
+  panelLabel="Notifications"
+  [panelValue]="notifications.length">
+</app-workspace-header>
+
+<section class="content">
+  <div class="toolbar">
+    <div class="summary-card">
+      <span>Total updates</span>
+      <strong>{{ notifications.length }}</strong>
+    </div>
+    <a class="ghost-link" routerLink="/feed">Go to feed</a>
+  </div>
+
+  <p class="state-message" *ngIf="loading">Loading notifications...</p>
+  <p class="error-banner" *ngIf="!loading && error">{{ error }}</p>
+
+  <div class="empty-state" *ngIf="!loading && !error && notifications.length === 0">
+    <h3>No notifications yet</h3>
+    <p>When requests or status updates happen, they will appear here.</p>
+    <a class="primary-link" routerLink="/feed">Explore tasks</a>
+  </div>
+
+  <div class="notification-grid-wrapper" *ngIf="!loading && !error && notifications.length > 0">
+    <div class="toolbar">
+      <span class="summary-card">
+        <strong>{{ notifications.length }}</strong> notifications
+      </span>
+      <button class="clear-all-btn" (click)="deleteAllNotifications()">
+        🗑️ Clear All
+      </button>
+    </div>
+    <div class="notification-grid">
+      <article class="notification-card" *ngFor="let notification of notifications; trackBy: trackById">
+        <div class="card-glow"></div>
+        <div class="notification-content">
+          <p class="notification-message">{{ notification.message }}</p>
+          <div class="notification-footer">
+            <span class="notification-time">{{ notification.created_at | date:'medium' }}</span>
+            <button class="delete-btn" (click)="deleteNotification(notification.id)">
+              🗑️
+            </button>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

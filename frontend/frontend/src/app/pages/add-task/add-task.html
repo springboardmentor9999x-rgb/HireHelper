@@ -1,0 +1,65 @@
+<app-workspace-header
+  sectionLabel=""
+  title="Add Task"
+  subtitle="Post a clear task with time and location so other users can discover it quickly.">
+</app-workspace-header>
+<!-- //frontend  -->
+<section class="content">
+  <form class="task-form" [formGroup]="taskForm" (ngSubmit)="addTask()">
+    <div class="form-grid">
+      <label class="full">
+        <span>Title *</span>
+        <input type="text" formControlName="title" placeholder="Need help moving a sofa" />
+        <small class="field-error" *ngIf="f.title.touched && f.title.invalid">Title is required.</small>
+      </label>
+
+      <label class="full">
+        <span>Description *</span>
+        <textarea formControlName="description" rows="4" placeholder="Add the task details, expected effort, and any useful notes."></textarea>
+        <small class="field-error" *ngIf="f.description.touched && f.description.invalid">Description is required.</small>
+      </label>
+
+      <label>
+        <span>Location *</span>
+        <input type="text" formControlName="location" placeholder="Indore, Vijay Nagar" />
+        <small class="field-error" *ngIf="f.location.touched && f.location.invalid">Location is required.</small>
+      </label>
+
+      <label>
+        <span>Start Time *</span>
+        <input type="datetime-local" formControlName="start_time" />
+        <small class="field-error" *ngIf="f.start_time.touched && f.start_time.invalid">Start time is required.</small>
+      </label>
+
+      <label>
+        <span>End Time</span>
+        <input type="datetime-local" formControlName="end_time" />
+      </label>
+
+      <label>
+        <span>Picture URL *</span>
+        <input type="url" formControlName="picture" placeholder="https://example.com/image.jpg" />
+        <small class="field-error" *ngIf="f.picture.touched && f.picture.invalid">Picture URL is required.</small>
+      </label>
+    </div>
+
+    <div class="actions" (click)="$event.stopPropagation()">
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Creating...' : 'Create Task' }}
+      </button>
+      <p class="muted">Required fields are marked with *.</p>
+    </div>
+  </form>
+
+  <div class="info-card">
+    <p class="info-kicker">Posting notes</p>
+    <h3>Before you post</h3>
+    <ul>
+      <li>Use a specific title so the task is easy to scan.</li>
+      <li>Describe the work clearly and include any constraints.</li>
+      <li>Set an accurate start time. End time can stay optional.</li>
+    </ul>
+  </div>
+
+  <p class="error-banner" *ngIf="error">{{ error }}</p>
+</section>

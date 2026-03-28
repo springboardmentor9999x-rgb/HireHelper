@@ -1,0 +1,47 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="brand-row">
+      <span class="brand-dot"></span>
+      <span class="brand-text">HireHelper</span>
+    </div>
+
+    <h2>Welcome Back</h2>
+    <p class="subtitle">Sign in to continue to your dashboard.</p>
+
+    <form (ngSubmit)="login()">
+      <input
+        type="email"
+        placeholder="Work Email"
+        [(ngModel)]="email"
+        name="email"
+        autocomplete="email"
+        required
+      />
+
+      <input
+        type="password"
+        placeholder="Password"
+        [(ngModel)]="password"
+        name="password"
+        autocomplete="current-password"
+        required
+      />
+
+      <button type="submit" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Signing In...' : 'Sign In' }}
+      </button>
+    </form>
+
+    <p class="switch">
+      Forgot your password?
+      <a routerLink="/forgot-password">Reset it</a>
+    </p>
+
+    <p class="switch">
+      Don't have an account?
+      <a routerLink="/register">Create Account</a>
+    </p>
+
+    <p class="error" *ngIf="error">{{ error }}</p>
+  </div>
+</div>

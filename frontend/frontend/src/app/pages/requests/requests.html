@@ -1,0 +1,64 @@
+<app-workspace-header
+  sectionLabel=""
+  title=""
+  subtitle="Review incoming requests for the tasks you posted and follow up quickly."
+  panelLabel="Incoming requests"
+  [panelValue]="requests.length">
+</app-workspace-header>
+
+<section class="content">
+  <div class="toolbar">
+    <div class="summary-card">
+      <span>Total incoming</span>
+      <strong>{{ requests.length }}</strong>
+    </div>
+    <a class="ghost-link" routerLink="/my-tasks">View my tasks</a>
+  </div>
+
+  <p class="state-message" *ngIf="loading">Loading incoming requests...</p>
+  <p class="success-banner" *ngIf="!loading && actionMessage">{{ actionMessage }}</p>
+  <p class="error-banner" *ngIf="!loading && error">{{ error }}</p>
+
+  <div class="empty-state" *ngIf="!loading && !error && requests.length === 0">
+    <h3>No incoming requests</h3>
+    <p>You have not received any requests yet.</p>
+    <a class="primary-link" routerLink="/feed">Explore the feed</a>
+  </div>
+
+  <div class="request-grid" *ngIf="!loading && !error && requests.length > 0">
+    <article class="request-card" *ngFor="let request of requests">
+      <div class="card-glow"></div>
+      <div class="request-head">
+        <div>
+          <p class="request-overline">Incoming request</p>
+          <h3>{{ request.title }}</h3>
+        </div>
+        <span class="status-chip">{{ request.status || 'PENDING' }}</span>
+      </div>
+      <dl class="request-meta">
+        <div>
+          <dt>Requester</dt>
+          <dd>{{ request.first_name || 'User' }}</dd>
+        </div>
+        <div>
+          <dt>Requested</dt>
+          <dd>{{ request.created_at | date:'mediumDate' }}</dd>
+        </div>
+      </dl>
+      <div class="request-actions">
+        <button
+          class="action-btn accept"
+          [disabled]="request.status !== 'PENDING'"
+          (click)="respondToRequest(request.id, 'ACCEPTED')">
+          {{ request.status === 'ACCEPTED' ? 'Accepted' : 'Accept' }}
+        </button>
+        <button
+          class="action-btn reject"
+          [disabled]="request.status !== 'PENDING'"
+          (click)="respondToRequest(request.id, 'REJECTED')">
+          {{ request.status === 'REJECTED' ? 'Rejected' : 'Reject' }}
+        </button>
+      </div>
+    </article>
+  </div>
+</section>

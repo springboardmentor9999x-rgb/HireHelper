@@ -1,0 +1,41 @@
+# dependencies
+node_modules/
+
+# env files
+.env
+
+# logs
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# build
+dist/
+build/
+
+# Angular
+.angular/
+dist/
+node_modules/
+
+# Nested frontend
+frontend/frontend/node_modules/
+frontend/frontend/.angular/
+frontend/frontend/dist/
+
+# Python
+uenv/
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Angular
+.angular/
+node_modules/
+dist/
+
+# General
+.env

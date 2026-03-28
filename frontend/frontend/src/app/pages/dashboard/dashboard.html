@@ -1,0 +1,30 @@
+<app-workspace-header
+  sectionLabel=""
+  title="">
+</app-workspace-header>
+
+<section class="content">
+  <div class="hero-card">
+    <p class="hero-kicker">Welcome back</p>
+    <h3>{{userName}}</h3>
+    <p>Pick what you want to do next from the shortcuts below.</p>
+  </div>
+
+  <div class="quick-grid">
+    <a class="quick-card" routerLink="/add-task">
+      <span>Create</span>
+      <strong>Add a task</strong>
+      <p>Publish a clear listing with timing, location, and a useful description.</p>
+    </a>
+    <a class="quick-card" routerLink="/my-tasks">
+      <span>Review</span>
+      <strong>Manage my tasks</strong>
+      <p>Check live statuses and monitor which tasks are already requested.</p>
+    </a>
+    <a class="quick-card" routerLink="/feed">
+      <span>Explore</span>
+      <strong>Browse feed</strong>
+      <p>See what other users have posted and request work that fits you.</p>
+    </a>
+  </div>
+</section>

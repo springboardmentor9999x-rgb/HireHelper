@@ -1,0 +1,71 @@
+<app-workspace-header
+  sectionLabel=""
+  title=""
+  subtitle="Browse tasks created by other users and preview requests from one place."
+  panelLabel="Open opportunities"
+  [panelValue]="tasks.length">
+</app-workspace-header>
+
+<section class="content">
+  <div class="toolbar">
+    <div class="summary-card">
+      <span>Available tasks</span>
+      <strong>{{ tasks.length }}</strong>
+    </div>
+    <a class="ghost-link" routerLink="/my-tasks">Review my posted tasks</a>
+  </div>
+
+  <p class="success-banner" *ngIf="!loading && actionMessage">{{ actionMessage }}</p>
+  <p class="state-message" *ngIf="loading">Loading feed...</p>
+  <p class="error-banner" *ngIf="!loading && error">{{ error }}</p>
+
+  <div class="empty-state" *ngIf="!loading && !error && tasks.length === 0">
+    <h3>No tasks available</h3>
+    <p>No tasks from other users are available yet.</p>
+  </div>
+
+  <div class="task-grid" *ngIf="!loading && !error && tasks.length > 0">
+    <article class="task-card" *ngFor="let task of tasks">
+      <div class="card-glow"></div>
+      <img *ngIf="task.picture" class="task-image" [src]="task.picture" [alt]="task.title" />
+      <div class="task-head">
+        <div>
+          <p class="task-overline">Community task</p>
+          <h3>{{ task.title }}</h3>
+        </div>
+        <span class="status-chip">{{ task.status || 'OPEN' }}</span>
+      </div>
+      <p class="task-copy">{{ task.description }}</p>
+      <dl class="task-meta">
+        <div>
+          <dt>Location</dt>
+          <dd>{{ task.location }}</dd>
+        </div>
+        <div>
+          <dt>Start</dt>
+          <dd>{{ task.start_time | date:'medium' }}</dd>
+        </div>
+        <div *ngIf="task.end_time">
+          <dt>End</dt>
+          <dd>{{ task.end_time | date:'medium' }}</dd>
+        </div>
+        <div>
+          <dt>Posted</dt>
+          <dd>{{ task.created_at | date:'mediumDate' }}</dd>
+        </div>
+      </dl>
+      <button
+        class="request-btn"
+        [disabled]="requestingTaskId === task.id || isRequestDisabled(task)"
+        (click)="requestTask(task)">
+        {{
+          requestingTaskId === task.id
+            ? 'Sending...'
+            : isRequestDisabled(task)
+              ? (task.status !== 'OPEN' ? 'Closed' : 'Requested')
+              : 'Request'
+        }}
+      </button>
+    </article>
+  </div>
+</section>

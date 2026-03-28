@@ -1,0 +1,57 @@
+<header class="header">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="title-block">
+        <p class="section-label">{{ sectionLabel }}</p>
+        <h2>{{ title }}</h2>
+      </div>
+
+      <div class="topbar-panel" *ngIf="panelLabel">
+        <span class="panel-label">{{ panelLabel }}</span>
+        <strong>{{ panelValue }}</strong>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <div class="notification-wrap">
+        <button type="button" class="notification-button" (click)="toggleNotifications()">
+          <span class="notification-icon"></span>
+          <span class="notification-text">
+            <small>Alerts</small>
+            <strong>Notifications</strong>
+          </span>
+          <span class="notification-count" *ngIf="notifications.length">{{ notifications.length }}</span>
+        </button>
+
+        <div class="notification-panel" *ngIf="showNotifications">
+          <p class="notification-title">Recent updates</p>
+          <p class="notification-empty" *ngIf="notifications.length === 0">No notifications yet.</p>
+
+          <div class="notification-list" *ngIf="notifications.length > 0">
+            <article class="notification-item" *ngFor="let notification of notifications">
+              <p>{{ notification.message }}</p>
+              <span>{{ notification.created_at | date:'medium' }}</span>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <a
+        class="profile-card"
+        [class.profile-card-compact]="compactProfile"
+        routerLink="/profile"
+        aria-label="Open profile">
+        <div class="profile-copy" *ngIf="!compactProfile">
+          <span class="profile-label">Signed in as</span>
+          <strong>{{ userName }}</strong>
+          <small>{{ user?.email_id || 'Open profile details' }}</small>
+        </div>
+        <img *ngIf="user?.profile_picture" class="avatar" [src]="user!.profile_picture" [alt]="userName" />
+        <span *ngIf="!user?.profile_picture" class="avatar">{{ userInitial }}</span>
+
+      </a>
+    </div>
+  </div>
+
+  <p class="subtitle" *ngIf="subtitle">{{ subtitle }}</p>
+</header>

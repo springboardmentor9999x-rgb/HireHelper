@@ -1,0 +1,49 @@
+<app-workspace-header
+  sectionLabel=""
+  title=""
+  subtitle="Track every help request you have sent and see what is still pending."
+  panelLabel="Sent requests"
+  [panelValue]="requests.length">
+</app-workspace-header>
+
+<section class="content">
+  <div class="toolbar">
+    <div class="summary-card">
+      <span>Total requests</span>
+      <strong>{{ requests.length }}</strong>
+    </div>
+    <a class="ghost-link" routerLink="/feed">Browse open tasks</a>
+  </div>
+
+  <p class="state-message" *ngIf="loading">Loading your requests...</p>
+  <p class="error-banner" *ngIf="!loading && error">{{ error }}</p>
+
+  <div class="empty-state" *ngIf="!loading && !error && requests.length === 0">
+    <h3>No requests yet</h3>
+    <p>You have not requested to help on any tasks.</p>
+    <a class="primary-link" routerLink="/feed">Find tasks to help</a>
+  </div>
+
+  <div class="request-grid" *ngIf="!loading && !error && requests.length > 0">
+    <article class="request-card" *ngFor="let request of requests">
+      <div class="card-glow"></div>
+      <div class="request-head">
+        <div>
+          <p class="request-overline">Requested task</p>
+          <h3>{{ request.title }}</h3>
+        </div>
+        <span class="status-chip">{{ request.status || 'PENDING' }}</span>
+      </div>
+      <dl class="request-meta">
+        <div>
+          <dt>Location</dt>
+          <dd>{{ request.location }}</dd>
+        </div>
+        <div>
+          <dt>Requested</dt>
+          <dd>{{ request.created_at | date:'mediumDate' }}</dd>
+        </div>
+      </dl>
+    </article>
+  </div>
+</section>

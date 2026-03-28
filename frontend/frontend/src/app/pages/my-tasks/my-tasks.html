@@ -1,0 +1,75 @@
+<app-workspace-header
+  sectionLabel=""
+  title=""
+  subtitle="Track the tasks you posted, review current status, and see the latest first."
+  panelLabel="Published now"
+  [panelValue]="tasks.length">
+</app-workspace-header>
+
+<section class="content">
+  <div class="toolbar">
+    <div class="summary-card">
+      <span>Total posted</span>
+      <strong>{{ tasks.length }}</strong>
+    </div>
+    <a class="primary-link" routerLink="/add-task">Create another task</a>
+  </div>
+
+  <p class="state-message" *ngIf="loading">Loading tasks...</p>
+  <p class="error-banner" *ngIf="!loading && error">{{ error }}</p>
+
+  <div class="empty-state" *ngIf="!loading && tasks.length === 0">
+    <h3>No tasks created yet</h3>
+    <p>Your posted tasks will appear here once you create one.</p>
+    <a class="primary-link" routerLink="/add-task">Add your first task</a>
+  </div>
+
+  <div class="task-grid" *ngIf="!loading && tasks.length > 0">
+    <article class="task-card" *ngFor="let task of tasks">
+      <div class="card-glow"></div>
+      <img *ngIf="task.picture" class="task-image" [src]="task.picture" [alt]="task.title" />
+      <div class="task-head">
+        <div>
+          <p class="task-overline">Published task</p>
+          <h3>{{ task.title }}</h3>
+        </div>
+        <span class="status-chip">{{ task.status || 'OPEN' }}</span>
+      </div>
+      <p class="task-copy">{{ task.description }}</p>
+      <dl class="task-meta">
+        <div>
+          <dt>Location</dt>
+          <dd>{{ task.location }}</dd>
+        </div>
+        <div>
+          <dt>Start</dt>
+          <dd>{{ task.start_time | date:'medium' }}</dd>
+        </div>
+        <div *ngIf="task.end_time">
+          <dt>End</dt>
+          <dd>{{ task.end_time | date:'medium' }}</dd>
+        </div>
+        <div>
+          <dt>Created</dt>
+          <dd>{{ task.created_at | date:'mediumDate' }}</dd>
+        </div>
+      </dl>
+      <div class="task-actions">
+        <button class="action-btn edit" (click)="editTask(task)">Edit</button>
+        <button
+          class="action-btn close"
+          *ngIf="task.status !== 'CANCELLED'"
+          (click)="closeTask(task)">
+          Close
+        </button>
+        <button
+          class="action-btn reopen"
+          *ngIf="task.status === 'CANCELLED'"
+          (click)="reopenTask(task)">
+          Reopen
+        </button>
+        <button class="action-btn delete" (click)="deleteTask(task)">Delete</button>
+      </div>
+    </article>
+  </div>
+</section>

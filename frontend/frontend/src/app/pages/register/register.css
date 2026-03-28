@@ -1,0 +1,35 @@
+@import '../login/login.css';
+
+.phone-row {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 10px;
+}
+
+.phone-row select,
+.phone-row input {
+  width: 100%;
+}
+
+.auth-card select {
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.auth-card select:focus {
+  border-color: #0ea5e9;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.18);
+}
+
+@media (max-width: 480px) {
+  .phone-row {
+    grid-template-columns: 1fr;
+  }
+}

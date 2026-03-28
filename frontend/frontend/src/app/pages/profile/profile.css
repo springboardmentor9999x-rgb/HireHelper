@@ -1,0 +1,218 @@
+@import '../dashboard/dashboard.css';
+
+.content {
+  display: grid;
+  gap: 18px;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.detail-card {
+  padding: 24px;
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 24px 48px rgba(2, 6, 23, 0.45);
+}
+
+.detail-card span {
+  display: block;
+  margin-bottom: 12px;
+  color: #94a3b8;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.detail-card strong {
+  color: #f8fafc;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.error-banner {
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: rgba(127, 29, 29, 0.5);
+  color: #fecaca;
+}
+
+.password-section {
+  padding: 24px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h3 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.toggle-btn {
+  background: none;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 8px;
+  color: #94a3b8;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.toggle-btn:hover {
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #f87171;
+}
+
+.password-section label {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.password-section label.full {
+  grid-column: 1 / -1;
+}
+
+.password-section span {
+  display: block;
+  margin-bottom: 8px;
+  color: #94a3b8;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.password-section input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.8);
+  color: #f8fafc;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.password-section input:focus {
+  outline: none;
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+  background: rgba(15, 23, 42, 0.95);
+}
+
+.password-section input::placeholder {
+  color: #64748b;
+}
+
+.pwd-error {
+  background: rgba(127, 29, 29, 0.4);
+  color: #fecaca;
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin: 12px 0;
+  font-size: 0.9rem;
+}
+
+.pwd-success {
+  background: rgba(34, 197, 94, 0.3);
+  color: #86efac;
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin: 12px 0;
+  font-size: 0.9rem;
+}
+
+.form-actions {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.form-actions button {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 12px 28px rgba(16, 185, 129, 0.3);
+}
+
+.form-actions button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 32px rgba(16, 185, 129, 0.4);
+}
+
+.form-actions button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.detail-card .change-pwd-btn {
+  background: none;
+  border: none;
+  color: #edeff3;
+  font-size: 1.1rem;
+  font-weight: normal;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s ease;
+  width: 100%;
+  justify-content: left;
+  line-height: 1.6;
+}
+
+.detail-card .change-pwd-btn:hover {
+  color: #f8fafc;
+}
+
+.change-pwd-preview:hover {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(34, 197, 94, 0.3));
+  border-color: rgba(34, 197, 94, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(16, 185, 129, 0.35);
+}
+
+@media (max-width: 640px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .toggle-btn {
+    align-self: flex-end;
+  }
+}

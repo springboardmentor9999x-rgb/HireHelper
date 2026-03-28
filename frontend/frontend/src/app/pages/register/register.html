@@ -1,0 +1,51 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="brand-row">
+      <span class="brand-dot"></span>
+      <span class="brand-text">HireHelper</span>
+    </div>
+
+    <h2>Create Account</h2>
+    <p class="subtitle">Set up your profile to start using HireHelper.</p>
+
+    <form (ngSubmit)="register()">
+      <input type="text" placeholder="First Name" [(ngModel)]="first_name" name="first_name" required />
+      <input type="text" placeholder="Last Name" [(ngModel)]="last_name" name="last_name" required />
+      <input type="email" placeholder="Work Email" [(ngModel)]="email_id" name="email_id" required />
+      <input type="password" placeholder="Password" [(ngModel)]="password" name="password" required />
+      <label for="profile_picture" class="file-label">
+        <input type="file" id="profile_picture" accept="image/*" [(ngModel)]="profile_picture" name="profile_picture" />
+        <span>📷 Upload your picture</span>
+      </label>
+      <small class="photo-hint">Please upload your photo properly - face recognizable for better experience</small>
+
+      <div class="phone-row">
+        <select [(ngModel)]="country_code" name="country_code" required>
+          <option *ngFor="let item of countryCodes" [value]="item.value">{{ item.label }}</option>
+        </select>
+
+        <input
+          type="tel"
+          placeholder="10-digit phone number"
+          [(ngModel)]="phone_number"
+          (ngModelChange)="onPhoneInput($event)"
+          name="phone_number"
+          maxlength="10"
+          minlength="10"
+          inputmode="numeric"
+          pattern="[0-9]{10}"
+          required
+        />
+      </div>
+
+      <button type="submit">Create Account</button>
+    </form>
+
+    <p class="switch">
+      Already have an account?
+      <a routerLink="/login">Login</a>
+    </p>
+
+    <p class="error" *ngIf="error">{{ error }}</p>
+  </div>
+</div>

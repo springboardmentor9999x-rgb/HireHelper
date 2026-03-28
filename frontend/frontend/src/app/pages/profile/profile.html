@@ -1,0 +1,83 @@
+<app-workspace-header
+  sectionLabel="Account"
+  title="Profile Details"
+  panelLabel="Verification"
+  [panelValue]="user?.is_verified ? 'Verified' : 'Pending'">
+</app-workspace-header>
+
+<section class="content">
+  <p class="error-banner" *ngIf="error">{{ error }}</p>
+
+  <div class="profile-grid" *ngIf="user">
+    <article class="detail-card">
+      <span>First name</span>
+      <strong>{{ user.first_name }}</strong>
+    </article>
+    <article class="detail-card">
+      <span>Last name</span>
+      <strong>{{ user.last_name }}</strong>
+    </article>
+    <article class="detail-card">
+      <span>Email</span>
+      <strong>{{ user.email_id }}</strong>
+    </article>
+    <article class="detail-card">
+      <span>Phone</span>
+      <strong>{{ user.phone_number }}</strong>
+    </article>
+    <article class="detail-card profile-photo-card">
+      <span>Photo</span>
+      <strong class="photo-preview">
+        <img *ngIf="user?.profile_picture" [src]="user.profile_picture" alt="Profile photo" />
+        <span *ngIf="!user?.profile_picture" class="photo-placeholder">{{ userInitial }}</span>
+        <input type="file" #photoInput accept="image/*" (change)="onPhotoSelected($event)" hidden />
+        <button class="change-btn" type="button" (click)="photoInput.click()" [disabled]="photoLoading">
+          {{ photoLoading ? 'Uploading...' : 'Change Photo' }}
+        </button>
+      </strong>
+    </article>
+    <article class="detail-card change-password-card">
+      <span>Password</span>
+      <strong class="change-pwd-preview">
+        <button class="change-pwd-btn" type="button" (click)="togglePasswordForm()">
+          🔒 Change Password
+        </button>
+      </strong>
+    </article>
+    <article class="detail-card">
+      <span>Status</span>
+      <strong>{{ user.is_verified ? 'Verified' : 'Pending verification' }}</strong>
+    </article>
+  </div>
+
+  <article class="detail-card password-section" *ngIf="showPasswordForm">
+    <div class="section-header">
+      <h3>Change Password</h3>
+      <button class="toggle-btn" type="button" (click)="togglePasswordForm()">✕</button>
+    </div>
+
+    <div (ngSubmit)="onPasswordSubmit(); $event.preventDefault()" role="form">
+      <label>
+        <span>Current Password</span>
+        <input type="password" autocomplete="current-password" [(ngModel)]="passwordForm.currentPassword" [ngModelOptions]="{standalone: true}" required />
+      </label>
+      <label>
+        <span>New Password</span>
+        <input type="password" autocomplete="new-password" [(ngModel)]="passwordForm.newPassword" [ngModelOptions]="{standalone: true}" required minlength="6" />
+      </label>
+      <label class="full">
+        <span>Confirm New Password</span>
+        <input type="password" autocomplete="new-password" [(ngModel)]="passwordForm.confirmNewPassword" [ngModelOptions]="{standalone: true}" required />
+      </label>
+
+      <p class="pwd-error" *ngIf="pwdError">{{ pwdError }}</p>
+      <p class="pwd-success" *ngIf="pwdSuccess">{{ pwdSuccess }}</p>
+
+      <div class="form-actions">
+        <button type="button" (click)="onPasswordSubmit()" [disabled]="loading">
+          {{ loading ? 'Updating...' : 'Update Password' }}
+        </button>
+      </div>
+    </div>
+  </article>
+</section>
