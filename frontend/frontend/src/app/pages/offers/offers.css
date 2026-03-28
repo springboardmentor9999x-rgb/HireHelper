@@ -1,0 +1,173 @@
+:host {
+  display: block;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.panel {
+  background: rgba(10, 15, 30, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 18px;
+  padding: 18px;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.38);
+}
+
+.panel-kicker {
+  margin: 0 0 8px;
+  color: #7dd3fc;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.panel h3 {
+  margin: 0 0 14px;
+  color: #f3f4f6;
+  font-size: 1.35rem;
+}
+
+.offer-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.offer-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.offer-form .full {
+  grid-column: 1 / -1;
+}
+
+.offer-form span {
+  color: #cbd5e1;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.offer-form input,
+.offer-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(15, 23, 42, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 10px;
+  color: #f8fafc;
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.offer-form input:focus,
+.offer-form textarea:focus {
+  outline: none;
+  border-color: rgba(56, 189, 248, 0.75);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.16);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.actions button {
+  min-height: 42px;
+  border: none;
+  border-radius: 10px;
+  padding: 0 18px;
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.actions button:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+.offer-list {
+  display: grid;
+  gap: 10px;
+}
+
+.offer-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.offer-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.offer-head h4 {
+  margin: 0;
+  color: #f3f4f6;
+  font-size: 1.02rem;
+}
+
+.discount {
+  background: rgba(16, 185, 129, 0.18);
+  border: 1px solid rgba(16, 185, 129, 0.32);
+  color: #86efac;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.offer-card p {
+  margin: 10px 0;
+  color: #b5c0d4;
+  line-height: 1.5;
+}
+
+.offer-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.offer-meta small {
+  color: #94a3b8;
+}
+
+.offer-meta button {
+  border: none;
+  border-radius: 8px;
+  padding: 7px 10px;
+  background: rgba(239, 68, 68, 0.16);
+  color: #fecaca;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.empty {
+  margin: 0;
+  color: #aeb8c9;
+}
+
+@media (max-width: 980px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .offer-form {
+    grid-template-columns: 1fr;
+  }
+}

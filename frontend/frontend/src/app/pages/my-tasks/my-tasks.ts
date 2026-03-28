@@ -81,67 +81,172 @@ export class MyTasksComponent implements OnInit {
 
   editTask(task: TaskItem): void {
     Swal.fire({
-      title: '✏️ Edit Task Details',
-      icon: 'info',
+      title: 'Edit Task Details',
       html: `
-        <div style="text-align: left;">
-          <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #000000;">📝 Title</label>
-          <input id="edit-title" class="swal2-input" placeholder="Enter task title" value="${this.escapeHtml(task.title)}" style="border-radius: 12px; padding: 12px; color: #000000;">
-          
-          <label style="display: block; margin: 16px 0 8px 0; font-weight: bold; color: #000000;">📄 Description</label>
-          <textarea id="edit-description" class="swal2-textarea" placeholder="Describe the task" style="border-radius: 12px; padding: 12px; height: 100px; color: #000000;">${this.escapeHtml(task.description)}</textarea>
-          
-          <label style="display: block; margin: 16px 0 8px 0; font-weight: bold; color: #000000;">📍 Location</label>
-          <input id="edit-location" class="swal2-input" placeholder="Task location" value="${this.escapeHtml(task.location)}" style="border-radius: 12px; padding: 12px; color: #000000;">
-          
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div>
-              <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #000000;">🕒 Start Time</label>
-              <input id="edit-start" class="swal2-input" type="datetime-local" value="${this.toLocalDatetime(task.start_time)}" style="border-radius: 12px; padding: 12px; color: #000000;">
-            </div>
-            <div>
-              <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #000000;">⏰ End Time (Optional)</label>
-              <input id="edit-end" class="swal2-input" type="datetime-local" value="${task.end_time ? this.toLocalDatetime(task.end_time) : ''}" style="border-radius: 12px; padding: 12px; color: #000000;">
-            </div>
-          </div>
-          
-          <label style="display: block; margin: 16px 0 8px 0; font-weight: bold; color: #000000;">🖼️ Picture URL (Optional)</label>
-          <input id="edit-picture" class="swal2-input" placeholder="https://example.com/image.jpg" value="${this.escapeHtml(task.picture || '')}" style="border-radius: 12px; padding: 12px; color: #000000;">
+        <div class="task-edit-form">
+          <label class="task-edit-field full">
+            <span>Title</span>
+            <input id="edit-title" type="text" placeholder="Enter task title" value="${this.escapeHtml(task.title)}">
+          </label>
+
+          <label class="task-edit-field full">
+            <span>Description</span>
+            <textarea id="edit-description" placeholder="Describe the task">${this.escapeHtml(task.description)}</textarea>
+          </label>
+
+          <label class="task-edit-field">
+            <span>Location</span>
+            <input id="edit-location" type="text" placeholder="Task location" value="${this.escapeHtml(task.location)}">
+          </label>
+
+          <label class="task-edit-field">
+            <span>Category</span>
+            <input id="edit-category" type="text" placeholder="Cleaning" value="${this.escapeHtml(task.category || '')}">
+          </label>
+
+          <label class="task-edit-field">
+            <span>Urgency</span>
+            <select id="edit-urgency">
+              <option value="LOW" ${task.urgency === 'LOW' ? 'selected' : ''}>Low</option>
+              <option value="MEDIUM" ${(task.urgency || 'MEDIUM') === 'MEDIUM' ? 'selected' : ''}>Medium</option>
+              <option value="HIGH" ${task.urgency === 'HIGH' ? 'selected' : ''}>High</option>
+            </select>
+          </label>
+
+          <label class="task-edit-field">
+            <span>Budget (INR)</span>
+            <input id="edit-budget" type="number" min="1" value="${task.budget ?? ''}">
+          </label>
+
+          <label class="task-edit-field">
+            <span>Helpers Needed</span>
+            <input id="edit-helpers-needed" type="number" min="1" value="${task.helpers_needed ?? ''}">
+          </label>
+
+          <label class="task-edit-field">
+            <span>Duration (hours)</span>
+            <input id="edit-duration-hours" type="number" min="0.5" step="0.5" value="${task.duration_hours ?? ''}">
+          </label>
+
+          <label class="task-edit-field">
+            <span>Tools Required</span>
+            <select id="edit-tools-required">
+              <option value="false" ${task.tools_required ? '' : 'selected'}>No</option>
+              <option value="true" ${task.tools_required ? 'selected' : ''}>Yes</option>
+            </select>
+          </label>
+
+          <label class="task-edit-field">
+            <span>Vehicle Required</span>
+            <select id="edit-vehicle-required">
+              <option value="false" ${task.vehicle_required ? '' : 'selected'}>No</option>
+              <option value="true" ${task.vehicle_required ? 'selected' : ''}>Yes</option>
+            </select>
+          </label>
+
+          <label class="task-edit-field">
+            <span>Picture URL</span>
+            <input id="edit-picture" type="url" placeholder="https://example.com/image.jpg" value="${this.escapeHtml(task.picture || '')}">
+          </label>
+
+          <label class="task-edit-field">
+            <span>Contact Method</span>
+            <select id="edit-contact-method">
+              <option value="WhatsApp" ${(task.contact_method || 'WhatsApp') === 'WhatsApp' ? 'selected' : ''}>WhatsApp</option>
+              <option value="Call" ${task.contact_method === 'Call' ? 'selected' : ''}>Call</option>
+              <option value="Phone" ${task.contact_method === 'Phone' ? 'selected' : ''}>Phone</option>
+            </select>
+          </label>
+
+          <label class="task-edit-field">
+            <span>Start Time</span>
+            <input id="edit-start" type="datetime-local" value="${this.toLocalDatetime(task.start_time)}">
+          </label>
+
+          <label class="task-edit-field">
+            <span>End Time (Optional)</span>
+            <input id="edit-end" type="datetime-local" value="${task.end_time ? this.toLocalDatetime(task.end_time) : ''}">
+          </label>
+
+          <label class="task-edit-field full">
+            <span>Special Instructions</span>
+            <textarea id="edit-special-instructions" placeholder="Any special notes">${this.escapeHtml(task.special_instructions || '')}</textarea>
+          </label>
         </div>
       `,
-      width: '700px',
+      customClass: {
+        popup: 'task-edit-popup',
+        title: 'task-edit-title',
+        htmlContainer: 'task-edit-html',
+        confirmButton: 'task-edit-confirm',
+        cancelButton: 'task-edit-cancel'
+      },
+      width: '760px',
       focusConfirm: false,
       showCancelButton: true,
       cancelButtonText: 'Cancel',
-      confirmButtonText: '💾 Save Changes',
-      confirmButtonColor: '#3b82f6',
+      confirmButtonText: 'Save Changes',
       preConfirm: () => {
         const title = (document.getElementById('edit-title') as HTMLInputElement)?.value?.trim();
         const description = (document.getElementById('edit-description') as HTMLTextAreaElement)?.value?.trim();
         const location = (document.getElementById('edit-location') as HTMLInputElement)?.value?.trim();
+        const category = (document.getElementById('edit-category') as HTMLInputElement)?.value?.trim();
+        const urgency = ((document.getElementById('edit-urgency') as HTMLSelectElement)?.value || 'MEDIUM').toUpperCase() as 'LOW' | 'MEDIUM' | 'HIGH';
+        const budget = Number((document.getElementById('edit-budget') as HTMLInputElement)?.value);
+        const helpers_needed = Number((document.getElementById('edit-helpers-needed') as HTMLInputElement)?.value);
+        const duration_hours = Number((document.getElementById('edit-duration-hours') as HTMLInputElement)?.value);
+        const tools_required = ((document.getElementById('edit-tools-required') as HTMLSelectElement)?.value || 'false') === 'true';
+        const vehicle_required = ((document.getElementById('edit-vehicle-required') as HTMLSelectElement)?.value || 'false') === 'true';
         const start_time = (document.getElementById('edit-start') as HTMLInputElement)?.value;
         const end_time = (document.getElementById('edit-end') as HTMLInputElement)?.value;
         const picture = (document.getElementById('edit-picture') as HTMLInputElement)?.value?.trim();
+        const contact_method = (document.getElementById('edit-contact-method') as HTMLSelectElement)?.value?.trim() || 'WhatsApp';
+        const special_instructions = (document.getElementById('edit-special-instructions') as HTMLTextAreaElement)?.value?.trim() || null;
 
-        if (!title || !description || !location || !start_time) {
-          Swal.showValidationMessage(`
-            <div style="text-align: left;">
-              <strong>Required fields missing:</strong><br>
-              • Title<br>
-              • Description<br> 
-              • Location<br>
-              • Start time
-            </div>
-          `);
+        if (!title || !description || !location || !category || !contact_method || !start_time || !picture) {
+          Swal.showValidationMessage(
+            'Please fill all required fields: Title, Description, Location, Category, Contact Method, Start Time, and Picture URL.'
+          );
+          return false;
+        }
+
+        if (!Number.isFinite(budget) || budget <= 0) {
+          Swal.showValidationMessage('Budget must be a positive number.');
+          return false;
+        }
+
+        if (!Number.isInteger(helpers_needed) || helpers_needed <= 0) {
+          Swal.showValidationMessage('Helpers needed must be a positive whole number.');
+          return false;
+        }
+
+        if (!Number.isFinite(duration_hours) || duration_hours <= 0) {
+          Swal.showValidationMessage('Duration must be a positive number of hours.');
           return false;
         }
 
         if (end_time && new Date(end_time) < new Date(start_time)) {
-          Swal.showValidationMessage('End time must be after start time');
+          Swal.showValidationMessage('End time must be after start time.');
           return false;
         }
 
-        return { title, description, location, start_time, end_time: end_time || null, picture } as TaskPayload;
+        return {
+          title,
+          description,
+          location,
+          category,
+          urgency,
+          tools_required,
+          vehicle_required,
+          contact_method,
+          budget,
+          helpers_needed,
+          duration_hours,
+          special_instructions,
+          start_time,
+          end_time: end_time || null,
+          picture
+        } as TaskPayload;
       }
     }).then((result) => {
       if (result.isConfirmed && result.value) {
@@ -151,14 +256,14 @@ export class MyTasksComponent implements OnInit {
             this.cdr.detectChanges();
             Swal.fire({
               icon: 'success',
-              title: '✅ Task Updated!',
+              title: 'Task Updated',
               text: `Task "${response.task.title}" saved successfully.`,
               timer: 2000,
               showConfirmButton: false,
               toast: true,
               position: 'top-end',
               background: 'linear-gradient(135deg, #10b981, #059669)',
-              color: 'white'
+              color: '#ffffff'
             });
           },
           error: (err) => {
@@ -303,3 +408,4 @@ export class MyTasksComponent implements OnInit {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
   }
 }
+

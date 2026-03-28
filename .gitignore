@@ -39,3 +39,4 @@ dist/
 
 # General
 .env
+backend/.env

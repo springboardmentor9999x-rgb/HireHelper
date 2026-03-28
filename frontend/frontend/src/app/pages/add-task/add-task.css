@@ -47,11 +47,19 @@
   top: 0;
   height: 100vh;
   overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
   flex-shrink: 0;
   background: var(--sidebar-bg);
   color: #f8fafc;
   border-right: 1px solid rgba(148, 163, 184, 0.08);
   box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.02);
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 .brand-block {
@@ -261,6 +269,30 @@
   font-size: 0.98rem;
 }
 
+.info-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.info-list li {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.58);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.info-list strong {
+  display: block;
+  color: var(--text-strong);
+  font-size: 0.96rem;
+  margin-bottom: 4px;
+}
+
 .info-strip {
   display: flex;
   flex-wrap: wrap;
@@ -315,6 +347,7 @@
 }
 
 .task-form input,
+.task-form select,
 .task-form textarea {
   width: 100%;
   box-sizing: border-box;
@@ -337,6 +370,7 @@
 }
 
 .task-form input:focus,
+.task-form select:focus,
 .task-form textarea:focus {
   outline: none;
   border-color: rgba(56, 189, 248, 0.6);

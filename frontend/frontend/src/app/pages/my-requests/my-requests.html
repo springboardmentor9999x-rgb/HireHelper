@@ -27,23 +27,61 @@
   <div class="request-grid" *ngIf="!loading && !error && requests.length > 0">
     <article class="request-card" *ngFor="let request of requests">
       <div class="card-glow"></div>
-      <div class="request-head">
-        <div>
-          <p class="request-overline">Requested task</p>
-          <h3>{{ request.title }}</h3>
+      <div class="request-content-scroll">
+        <div class="request-head">
+          <div>
+            <p class="request-overline">Requested task</p>
+            <h3>{{ request.title }}</h3>
+          </div>
+          <span class="status-chip">{{ request.status || 'PENDING' }}</span>
         </div>
-        <span class="status-chip">{{ request.status || 'PENDING' }}</span>
+        <dl class="request-meta">
+          <div *ngIf="request.category">
+            <dt>Category</dt>
+            <dd>{{ request.category }}</dd>
+          </div>
+          <div *ngIf="request.urgency">
+            <dt>Urgency</dt>
+            <dd>{{ request.urgency }}</dd>
+          </div>
+          <div *ngIf="request.tools_required !== undefined && request.tools_required !== null">
+            <dt>Tools Required</dt>
+            <dd>{{ request.tools_required ? 'Yes' : 'No' }}</dd>
+          </div>
+          <div *ngIf="request.vehicle_required !== undefined && request.vehicle_required !== null">
+            <dt>Vehicle Required</dt>
+            <dd>{{ request.vehicle_required ? 'Yes' : 'No' }}</dd>
+          </div>
+          <div *ngIf="request.contact_method">
+            <dt>Contact Method</dt>
+            <dd>{{ request.contact_method }}</dd>
+          </div>
+          <div *ngIf="request.budget !== undefined && request.budget !== null">
+            <dt>Budget</dt>
+            <dd>₹{{ request.budget }}</dd>
+          </div>
+          <div *ngIf="request.helpers_needed !== undefined && request.helpers_needed !== null">
+            <dt>Helpers Needed</dt>
+            <dd>{{ request.helpers_needed }}</dd>
+          </div>
+          <div *ngIf="request.duration_hours !== undefined && request.duration_hours !== null">
+            <dt>Duration</dt>
+            <dd>{{ request.duration_hours }} hour(s)</dd>
+          </div>
+          <div>
+            <dt>Location</dt>
+            <dd>{{ request.location }}</dd>
+          </div>
+          <div>
+            <dt>Requested</dt>
+            <dd>{{ request.created_at | date:'mediumDate' }}</dd>
+          </div>
+          <div *ngIf="request.special_instructions">
+            <dt>Special Instructions</dt>
+            <dd>{{ request.special_instructions }}</dd>
+          </div>
+        </dl>
       </div>
-      <dl class="request-meta">
-        <div>
-          <dt>Location</dt>
-          <dd>{{ request.location }}</dd>
-        </div>
-        <div>
-          <dt>Requested</dt>
-          <dd>{{ request.created_at | date:'mediumDate' }}</dd>
-        </div>
-      </dl>
     </article>
   </div>
 </section>

@@ -47,10 +47,18 @@
   top: 0;
   height: 100vh;
   overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
   flex-shrink: 0;
   background: var(--sidebar-bg);
   color: #f8fafc;
   box-shadow: 18px 0 40px rgba(2, 6, 23, 0.55);
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 .brand-block {
@@ -281,6 +289,23 @@
   flex-direction: column;
 }
 
+.task-content-scroll {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 6px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.task-content-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
 .card-glow {
   position: absolute;
   inset: auto -30px -30px auto;
@@ -300,8 +325,6 @@
 }
 
 .task-head {
-  position: relative;
-  z-index: 1;
   display: flex;
   justify-content: space-between;
   align-items: start;
@@ -322,6 +345,7 @@
   font-family: Georgia, "Times New Roman", serif;
   font-size: 2rem;
   color: var(--text-strong);
+  overflow-wrap: anywhere;
 }
 
 .status-chip {
@@ -336,31 +360,19 @@
   letter-spacing: 0.14em;
   color: var(--accent);
   background: var(--accent-soft);
+  flex-shrink: 0;
 }
 
 .task-copy {
-  position: relative;
-  z-index: 1;
   margin: 18px 0 12px;
   color: var(--text-muted);
   line-height: 1.7;
-  flex: 1;
-  overflow-y: auto;
-  max-height: 160px;
-  padding-right: 4px;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.task-copy::-webkit-scrollbar {
-  width: 0;
-  height: 0;
 }
 
 .task-meta {
   display: grid;
   gap: 12px;
-  margin: 0 0 auto 0; /* Push actions to bottom */
+  margin: 0;
 }
 
 .task-meta div {
@@ -383,18 +395,25 @@
 
 .task-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
-  margin-top: auto; /* Always stick to bottom */
+  margin-top: 12px; /* Always stick to bottom */
   padding-top: 12px;
+  border-top: 1px solid rgba(148, 163, 184, 0.22);
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0), rgba(15, 23, 42, 0.45) 40%, rgba(15, 23, 42, 0.72) 100%);
 }
 
 .action-btn {
-  flex: 1;
+  flex: 1 1 110px;
   min-height: 44px;
   border: none;
   border-radius: 14px;
   font-weight: 700;
   letter-spacing: 0.02em;
+  font-size: 0.98rem;
+  white-space: nowrap;
   cursor: pointer;
   color: #ffffff;
 }
@@ -413,6 +432,92 @@
 
 .action-btn.reopen {
   background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+:host ::ng-deep .task-edit-popup {
+  width: min(860px, 94vw) !important;
+  border-radius: 20px !important;
+  background: linear-gradient(180deg, #0a1223, #0d1a31) !important;
+  border: 1px solid rgba(148, 163, 184, 0.26) !important;
+  color: #e2e8f0 !important;
+  padding: 18px 18px 12px !important;
+}
+
+:host ::ng-deep .task-edit-title {
+  color: #f8fafc !important;
+  font-size: 1.8rem !important;
+  margin-bottom: 8px !important;
+}
+
+:host ::ng-deep .task-edit-html {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+:host ::ng-deep .task-edit-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  text-align: left;
+}
+
+:host ::ng-deep .task-edit-field {
+  display: grid;
+  gap: 6px;
+}
+
+:host ::ng-deep .task-edit-field.full {
+  grid-column: 1 / -1;
+}
+
+:host ::ng-deep .task-edit-field span {
+  color: #93c5fd;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+}
+
+:host ::ng-deep .task-edit-field input,
+:host ::ng-deep .task-edit-field select,
+:host ::ng-deep .task-edit-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #f8fafc;
+  padding: 10px 12px;
+  font: inherit;
+}
+
+:host ::ng-deep .task-edit-field textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+:host ::ng-deep .task-edit-field input:focus,
+:host ::ng-deep .task-edit-field select:focus,
+:host ::ng-deep .task-edit-field textarea:focus {
+  outline: none;
+  border-color: rgba(56, 189, 248, 0.8);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+}
+
+:host ::ng-deep .task-edit-confirm,
+:host ::ng-deep .task-edit-cancel {
+  border-radius: 10px !important;
+  padding: 10px 16px !important;
+  font-weight: 700 !important;
+}
+
+:host ::ng-deep .task-edit-confirm {
+  background: linear-gradient(135deg, #0ea5e9, #2563eb) !important;
+}
+
+:host ::ng-deep .task-edit-cancel {
+  background: rgba(148, 163, 184, 0.16) !important;
+  color: #e2e8f0 !important;
 }
 
 @media (max-width: 980px) {
@@ -441,6 +546,10 @@
   .toolbar {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  :host ::ng-deep .task-edit-form {
+    grid-template-columns: 1fr;
   }
 
   .header-copy h2 {

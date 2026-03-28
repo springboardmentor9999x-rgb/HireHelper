@@ -272,7 +272,8 @@ exports.getMyRequests = async (req, res) => {
 
     const requesterId = req.user.id;
     const requests = await pool.query(
-      `SELECT r.*, t.title, t.location
+      `SELECT r.*, t.title, t.location, t.category, t.urgency, t.tools_required, t.vehicle_required, t.contact_method,
+              t.budget, t.helpers_needed, t.duration_hours, t.special_instructions
        FROM requests r
        JOIN tasks t ON r.task_id = t.id
        WHERE r.requester_id = $1
@@ -293,7 +294,8 @@ exports.getReceivedRequests = async (req, res) => {
 
     const ownerId = req.user.id;
     const requests = await pool.query(
-      `SELECT r.*, t.title, u.first_name
+      `SELECT r.*, t.title, t.category, t.urgency, t.tools_required, t.vehicle_required, t.contact_method,
+              t.budget, t.helpers_needed, t.duration_hours, t.special_instructions, u.first_name
        FROM requests r
        JOIN tasks t ON r.task_id = t.id
        JOIN users u ON r.requester_id = u.id

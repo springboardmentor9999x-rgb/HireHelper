@@ -14,13 +14,9 @@
 
     <div class="topbar-right">
       <div class="notification-wrap">
-        <button type="button" class="notification-button" (click)="toggleNotifications()">
+        <button type="button" class="notification-button" (click)="onNotificationButtonClick()">
           <span class="notification-icon"></span>
-          <span class="notification-text">
-            <small>Alerts</small>
-            <strong>Notifications</strong>
-          </span>
-          <span class="notification-count" *ngIf="notifications.length">{{ notifications.length }}</span>
+          <span class="notification-dot" *ngIf="hasNotificationDot"></span>
         </button>
 
         <div class="notification-panel" *ngIf="showNotifications">
@@ -36,20 +32,17 @@
         </div>
       </div>
 
-      <a
-        class="profile-card"
-        [class.profile-card-compact]="compactProfile"
-        routerLink="/profile"
-        aria-label="Open profile">
-        <div class="profile-copy" *ngIf="!compactProfile">
-          <span class="profile-label">Signed in as</span>
-          <strong>{{ userName }}</strong>
-          <small>{{ user?.email_id || 'Open profile details' }}</small>
-        </div>
-        <img *ngIf="user?.profile_picture" class="avatar" [src]="user!.profile_picture" [alt]="userName" />
-        <span *ngIf="!user?.profile_picture" class="avatar">{{ userInitial }}</span>
+      <div class="profile-wrap">
+        <button type="button" class="profile-card profile-card-compact" (click)="onProfileButtonClick()" aria-label="Open profile menu">
+          <img *ngIf="user?.profile_picture" class="avatar" [src]="user!.profile_picture" [alt]="userName" />
+          <span *ngIf="!user?.profile_picture" class="avatar">{{ userInitial }}</span>
+        </button>
 
-      </a>
+        <div class="profile-menu" *ngIf="showProfileMenu">
+          <button type="button" class="profile-menu-item" (click)="goToProfile()">Go to profile</button>
+          <button type="button" class="profile-menu-item profile-menu-danger" (click)="logout()">Logout</button>
+        </div>
+      </div>
     </div>
   </div>
 

@@ -1,0 +1,61 @@
+<app-workspace-header
+  sectionLabel="Offers"
+  title="Offer Management"
+  subtitle="Create promotional offers and track active entries from one place."
+  panelLabel="Active offers"
+  [panelValue]="offers.length">
+</app-workspace-header>
+
+<section class="content">
+  <article class="panel form-panel">
+    <p class="panel-kicker">Create Offer</p>
+    <h3>Add New Offer</h3>
+
+    <form class="offer-form" [formGroup]="offerForm" (ngSubmit)="createOffer()">
+      <label class="full">
+        <span>Offer Title *</span>
+        <input type="text" formControlName="title" placeholder="Weekend Cleaning Discount" />
+      </label>
+
+      <label class="full">
+        <span>Offer Details *</span>
+        <textarea rows="4" formControlName="details" placeholder="Describe who can use this offer and any conditions."></textarea>
+      </label>
+
+      <label>
+        <span>Discount (%) *</span>
+        <input type="number" min="1" max="100" formControlName="discount" placeholder="20" />
+      </label>
+
+      <label>
+        <span>Expires On *</span>
+        <input type="date" formControlName="expiresOn" />
+      </label>
+
+      <div class="actions full">
+        <button type="submit" [disabled]="submitting">{{ submitting ? 'Saving...' : 'Create Offer' }}</button>
+      </div>
+    </form>
+  </article>
+
+  <article class="panel list-panel">
+    <p class="panel-kicker">Offers</p>
+    <h3>Current Offers</h3>
+
+    <p class="empty" *ngIf="offers.length === 0">No offers created yet.</p>
+
+    <div class="offer-list" *ngIf="offers.length > 0">
+      <article class="offer-card" *ngFor="let offer of offers">
+        <div class="offer-head">
+          <h4>{{ offer.title }}</h4>
+          <span class="discount">{{ offer.discount }}% OFF</span>
+        </div>
+        <p>{{ offer.details }}</p>
+        <div class="offer-meta">
+          <small>Expires: {{ offer.expiresOn | date:'mediumDate' }}</small>
+          <button type="button" (click)="removeOffer(offer.id)">Remove</button>
+        </div>
+      </article>
+    </div>
+  </article>
+</section>

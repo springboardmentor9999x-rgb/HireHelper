@@ -13,10 +13,8 @@
       <input type="text" placeholder="Last Name" [(ngModel)]="last_name" name="last_name" required />
       <input type="email" placeholder="Work Email" [(ngModel)]="email_id" name="email_id" required />
       <input type="password" placeholder="Password" [(ngModel)]="password" name="password" required />
-      <label for="profile_picture" class="file-label">
-        <input type="file" id="profile_picture" accept="image/*" [(ngModel)]="profile_picture" name="profile_picture" />
-        <span>📷 Upload your picture</span>
-      </label>
+      <label for="profile_picture" class="upload-label">Upload your picture</label>
+      <input type="file" id="profile_picture" accept="image/*" [(ngModel)]="profile_picture" name="profile_picture" />
       <small class="photo-hint">Please upload your photo properly - face recognizable for better experience</small>
 
       <div class="phone-row">

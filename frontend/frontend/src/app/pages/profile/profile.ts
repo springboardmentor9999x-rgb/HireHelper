@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, NgIf } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { finalize, timeout } from 'rxjs';
 import { AuthService, AppUser } from '../../services/auth.service';
 import { WorkspaceHeaderComponent } from '../../components/workspace-header/workspace-header';
 import Swal from 'sweetalert2';
@@ -14,6 +15,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./profile.css']
 })
 export class ProfileComponent implements OnInit {
+  private readonly apiOrigin = 'http://localhost:5000';
   user: AppUser | null = null;
   error = '';
   pwdError = '';
@@ -35,12 +37,22 @@ export class ProfileComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.user = this.auth.getStoredUser();
+    const storedUser = this.auth.getStoredUser();
+    this.user = storedUser
+      ? {
+          ...storedUser,
+          profile_picture: this.normalizeProfilePictureUrl(storedUser.profile_picture)
+        }
+      : null;
 
     this.auth.getCurrentUser().subscribe({
       next: (user) => {
-        this.user = user;
-        this.auth.saveUser(user);
+        const normalizedUser = {
+          ...user,
+          profile_picture: this.normalizeProfilePictureUrl(user.profile_picture)
+        };
+        this.user = normalizedUser;
+        this.auth.saveUser(normalizedUser);
       },
       error: (err) => {
         this.error = err.error?.message || 'Failed to load profile';
@@ -71,20 +83,37 @@ export class ProfileComponent implements OnInit {
     this.photoLoading = true;
     this.error = '';
 
-    this.auth.updateProfilePicture(this.selectedPhoto).subscribe({
-      next: (response) => {
-        if (this.user) {
-          this.user.profile_picture = response.profile_picture;
-          this.auth.saveUser(this.user);
-        }
+    this.auth.updateProfilePicture(this.selectedPhoto).pipe(
+      timeout(30000),
+      finalize(() => {
         this.photoLoading = false;
         this.selectedPhoto = null;
+      })
+    ).subscribe({
+      next: (response) => {
+        if (this.user) {
+          this.user.profile_picture = this.normalizeProfilePictureUrl(response.profile_picture);
+          this.auth.saveUser(this.user);
+        }
       },
       error: (err) => {
+        if (err?.name === 'TimeoutError') {
+          this.error = 'Photo upload timed out. Please try again.';
+          return;
+        }
         this.error = err.error?.message || 'Photo upload failed';
-        this.photoLoading = false;
       }
     });
+  }
+
+  private normalizeProfilePictureUrl(url?: string): string | undefined {
+    if (!url) {
+      return undefined;
+    }
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    return `${this.apiOrigin}${url.startsWith('/') ? '' : '/'}${url}`;
   }
 
   togglePasswordForm(): void {

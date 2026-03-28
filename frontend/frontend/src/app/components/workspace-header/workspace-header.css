@@ -11,10 +11,10 @@
 .topbar-panel,
 .profile-card,
 .notification-panel {
-  background: rgba(8, 13, 25, 0.92);
-  border: 1px solid rgba(148, 163, 184, 0.1);
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.2);
   backdrop-filter: blur(16px);
-  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.34);
+  box-shadow: 0 16px 36px rgba(2, 6, 23, 0.3);
 }
 
 .topbar {
@@ -76,23 +76,26 @@
 }
 
 .notification-button {
-  min-height: 58px;
+  min-height: 50px;
+  min-width: 50px;
+  width: 50px;
+  height: 50px;
   border-radius: 16px;
-  padding: 10px 14px;
+  padding: 0;
   color: #f3f4f6;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
   cursor: pointer;
-  min-width: 186px;
+  position: relative;
 }
 
 .notification-icon {
   width: 34px;
   height: 34px;
   border-radius: 10px;
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.92));
-  border: 1px solid rgba(125, 211, 252, 0.1);
+  background: linear-gradient(135deg, rgba(51, 65, 85, 0.72), rgba(30, 41, 59, 0.76));
+  border: 1px solid rgba(148, 163, 184, 0.2);
   position: relative;
   flex: 0 0 auto;
 }
@@ -121,13 +124,6 @@
   background: #7dd3fc;
 }
 
-.notification-text {
-  display: grid;
-  text-align: left;
-  gap: 3px;
-}
-
-.notification-text small,
 .panel-label,
 .profile-label {
   color: #7f8aa3;
@@ -136,23 +132,15 @@
   letter-spacing: 0.16em;
 }
 
-.notification-text strong {
-  color: #f3f4f6;
-  font-size: 0.94rem;
-  font-weight: 700;
-}
-
-.notification-count {
-  align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  height: 24px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #2563eb, #3b82f6);
-  color: #ffffff;
-  display: inline-flex;
-  margin-left: auto;
-  font-weight: 800;
+.notification-dot {
+  position: absolute;
+  right: 10px;
+  top: 9px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 0 2px rgba(8, 13, 25, 0.95);
 }
 
 .notification-panel {
@@ -225,18 +213,19 @@
 }
 
 .profile-card {
-  min-width: 240px;
-  padding: 12px 14px;
+  min-width: 0;
+  padding: 0;
   border-radius: 16px;
   text-decoration: none;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  gap: 12px;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
 }
 
 .profile-card-compact {
-  min-width: 0;
   width: 50px;
   height: 50px;
   padding: 0;
@@ -244,31 +233,9 @@
   border-radius: 16px;
 }
 
-.profile-copy {
-  display: grid;
-  gap: 4px;
-  min-width: 0;
-}
-
-.profile-copy strong {
-  color: #f3f4f6;
-  font-size: 1rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.profile-copy small {
-  color: #b5c0d4;
-  font-size: 0.82rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .avatar {
-  width: 38px;
-  height: 38px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
@@ -277,6 +244,45 @@
   color: #ffffff;
   font-weight: 800;
   flex: 0 0 auto;
+}
+
+.profile-wrap {
+  position: relative;
+  z-index: 80;
+}
+
+.profile-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 170px;
+  padding: 8px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.94);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 16px 36px rgba(2, 6, 23, 0.34);
+  display: grid;
+  gap: 6px;
+}
+
+.profile-menu-item {
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  color: #f3f4f6;
+  border-radius: 10px;
+  padding: 9px 10px;
+  text-align: left;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.profile-menu-item:hover {
+  background: rgba(96, 165, 250, 0.12);
+}
+
+.profile-menu-danger:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.35);
 }
 
 @media (max-width: 980px) {
@@ -295,6 +301,12 @@
   .topbar-panel,
   .profile-card {
     width: auto;
+  }
+
+  .notification-button,
+  .profile-card {
+    width: 50px;
+    min-width: 50px;
   }
 
   .notification-panel {
@@ -322,7 +334,8 @@
   .notification-button,
   .topbar-panel,
   .profile-card {
-    width: 100%;
-    min-width: 0;
+    width: 50px;
+    min-width: 50px;
   }
 }
+

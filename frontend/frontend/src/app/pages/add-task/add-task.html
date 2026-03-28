@@ -26,6 +26,64 @@
       </label>
 
       <label>
+        <span>Category *</span>
+        <input type="text" formControlName="category" placeholder="Cleaning" />
+        <small class="field-error" *ngIf="f.category.touched && f.category.invalid">Category is required.</small>
+      </label>
+
+      <label>
+        <span>Urgency *</span>
+        <select formControlName="urgency">
+          <option value="LOW">Low</option>
+          <option value="MEDIUM">Medium</option>
+          <option value="HIGH">High</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Budget (INR) *</span>
+        <input type="number" min="1" formControlName="budget" placeholder="1200" />
+        <small class="field-error" *ngIf="f.budget.touched && f.budget.invalid">Enter a valid budget.</small>
+      </label>
+
+      <label>
+        <span>Helpers Needed *</span>
+        <input type="number" min="1" formControlName="helpers_needed" placeholder="1" />
+        <small class="field-error" *ngIf="f.helpers_needed.touched && f.helpers_needed.invalid">Enter helper count.</small>
+      </label>
+
+      <label>
+        <span>Duration (hours) *</span>
+        <input type="number" min="0.5" step="0.5" formControlName="duration_hours" placeholder="3" />
+        <small class="field-error" *ngIf="f.duration_hours.touched && f.duration_hours.invalid">Enter task duration.</small>
+      </label>
+
+      <label>
+        <span>Tools Required</span>
+        <select formControlName="tools_required">
+          <option [ngValue]="false">No</option>
+          <option [ngValue]="true">Yes</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Vehicle Required</span>
+        <select formControlName="vehicle_required">
+          <option [ngValue]="false">No</option>
+          <option [ngValue]="true">Yes</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Contact Method *</span>
+        <select formControlName="contact_method">
+          <option value="WhatsApp">WhatsApp</option>
+          <option value="Call">Call</option>
+          <option value="Phone">Phone</option>
+        </select>
+      </label>
+
+      <label>
         <span>Start Time *</span>
         <input type="datetime-local" formControlName="start_time" />
         <small class="field-error" *ngIf="f.start_time.touched && f.start_time.invalid">Start time is required.</small>
@@ -41,6 +99,11 @@
         <input type="url" formControlName="picture" placeholder="https://example.com/image.jpg" />
         <small class="field-error" *ngIf="f.picture.touched && f.picture.invalid">Picture URL is required.</small>
       </label>
+
+      <label class="full">
+        <span>Special Instructions</span>
+        <textarea formControlName="special_instructions" rows="3" placeholder="Bring cleaning supplies"></textarea>
+      </label>
     </div>
 
     <div class="actions" (click)="$event.stopPropagation()">
@@ -54,11 +117,30 @@
   <div class="info-card">
     <p class="info-kicker">Posting notes</p>
     <h3>Before you post</h3>
-    <ul>
-      <li>Use a specific title so the task is easy to scan.</li>
-      <li>Describe the work clearly and include any constraints.</li>
-      <li>Set an accurate start time. End time can stay optional.</li>
+    <ul class="info-list">
+      <li>
+        <strong>Write a precise title</strong>
+        Mention the task and location in a few words so helpers can scan quickly.
+      </li>
+      <li>
+        <strong>Describe scope and constraints</strong>
+        Include exact work, floor/area details, required tools, and anything helpers must bring.
+      </li>
+      <li>
+        <strong>Set realistic timing and budget</strong>
+        Keep start time accurate, add duration, and match budget to expected effort.
+      </li>
+      <li>
+        <strong>Use clear contact preferences</strong>
+        Choose your contact method and mention urgency to speed up the right responses.
+      </li>
     </ul>
+    <div class="info-strip">
+      <span class="status-chip">Clear title</span>
+      <span class="status-chip">Accurate budget</span>
+      <span class="status-chip">Realistic duration</span>
+      <span class="status-chip">Safety first</span>
+    </div>
   </div>
 
   <p class="error-banner" *ngIf="error">{{ error }}</p>

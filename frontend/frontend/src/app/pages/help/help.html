@@ -1,0 +1,72 @@
+<app-workspace-header
+  sectionLabel="Support"
+  title="Help Center"
+  subtitle="Find quick answers and send a support request when you need direct assistance."
+  panelLabel="FAQs"
+  [panelValue]="faqs.length">
+</app-workspace-header>
+
+<section class="content">
+  <article class="panel faq-panel">
+    <p class="panel-kicker">Common Questions</p>
+    <h3>Frequently Asked Questions</h3>
+
+    <div class="faq-list">
+      <article class="faq-item" *ngFor="let faq of faqs; let i = index">
+        <p class="faq-question">Q{{ i + 1 }}. {{ faq.question }}</p>
+        <p class="faq-answer">{{ faq.answer }}</p>
+      </article>
+    </div>
+  </article>
+
+  <article class="panel support-panel">
+    <p class="panel-kicker">Contact Support</p>
+    <h3>Send Support Request</h3>
+
+    <form class="support-form" [formGroup]="supportForm" (ngSubmit)="sendSupportRequest()">
+      <label>
+        <span>Name *</span>
+        <input type="text" formControlName="name" placeholder="Your full name" />
+        <small class="field-error" *ngIf="f.name.touched && f.name.invalid">Name is required.</small>
+      </label>
+
+      <label>
+        <span>Support Type *</span>
+        <select formControlName="supportType">
+          <option value="General">General</option>
+          <option value="Technical">Technical</option>
+          <option value="Account">Account</option>
+          <option value="Billing">Billing</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Email *</span>
+        <input type="email" formControlName="email" placeholder="you@example.com" />
+        <small class="field-error" *ngIf="f.email.touched && f.email.invalid">Enter a valid email.</small>
+      </label>
+
+      <label>
+        <span>Phone Number *</span>
+        <input type="tel" formControlName="phone" placeholder="+91 98765 43210" />
+        <small class="field-error" *ngIf="f.phone.touched && f.phone.invalid">Enter a valid phone number.</small>
+      </label>
+
+      <label class="full">
+        <span>Subject *</span>
+        <input type="text" formControlName="subject" placeholder="Short summary of your issue" />
+        <small class="field-error" *ngIf="f.subject.touched && f.subject.invalid">Subject is required.</small>
+      </label>
+
+      <label class="full">
+        <span>Message *</span>
+        <textarea rows="5" formControlName="message" placeholder="Describe the issue in detail."></textarea>
+        <small class="field-error" *ngIf="f.message.touched && f.message.invalid">Message should be at least 20 characters.</small>
+      </label>
+
+      <div class="actions full">
+        <button type="submit" [disabled]="sending">{{ sending ? 'Sending...' : 'Send Support' }}</button>
+      </div>
+    </form>
+  </article>
+</section>

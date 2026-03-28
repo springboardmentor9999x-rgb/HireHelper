@@ -28,32 +28,70 @@
     <article class="task-card" *ngFor="let task of tasks">
       <div class="card-glow"></div>
       <img *ngIf="task.picture" class="task-image" [src]="task.picture" [alt]="task.title" />
-      <div class="task-head">
-        <div>
-          <p class="task-overline">Published task</p>
-          <h3>{{ task.title }}</h3>
+      <div class="task-content-scroll">
+        <div class="task-head">
+          <div>
+            <p class="task-overline">Published task</p>
+            <h3>{{ task.title }}</h3>
+          </div>
+          <span class="status-chip">{{ task.status || 'OPEN' }}</span>
         </div>
-        <span class="status-chip">{{ task.status || 'OPEN' }}</span>
+        <p class="task-copy">{{ task.description }}</p>
+        <dl class="task-meta">
+          <div *ngIf="task.category">
+            <dt>Category</dt>
+            <dd>{{ task.category }}</dd>
+          </div>
+          <div *ngIf="task.urgency">
+            <dt>Urgency</dt>
+            <dd>{{ task.urgency }}</dd>
+          </div>
+          <div *ngIf="task.tools_required !== undefined && task.tools_required !== null">
+            <dt>Tools Required</dt>
+            <dd>{{ task.tools_required ? 'Yes' : 'No' }}</dd>
+          </div>
+          <div *ngIf="task.vehicle_required !== undefined && task.vehicle_required !== null">
+            <dt>Vehicle Required</dt>
+            <dd>{{ task.vehicle_required ? 'Yes' : 'No' }}</dd>
+          </div>
+          <div *ngIf="task.contact_method">
+            <dt>Contact Method</dt>
+            <dd>{{ task.contact_method }}</dd>
+          </div>
+          <div *ngIf="task.budget !== undefined && task.budget !== null">
+            <dt>Budget</dt>
+            <dd>₹{{ task.budget }}</dd>
+          </div>
+          <div *ngIf="task.helpers_needed !== undefined && task.helpers_needed !== null">
+            <dt>Helpers Needed</dt>
+            <dd>{{ task.helpers_needed }}</dd>
+          </div>
+          <div *ngIf="task.duration_hours !== undefined && task.duration_hours !== null">
+            <dt>Duration</dt>
+            <dd>{{ task.duration_hours }} hour(s)</dd>
+          </div>
+          <div>
+            <dt>Location</dt>
+            <dd>{{ task.location }}</dd>
+          </div>
+          <div>
+            <dt>Start</dt>
+            <dd>{{ task.start_time | date:'medium' }}</dd>
+          </div>
+          <div *ngIf="task.end_time">
+            <dt>End</dt>
+            <dd>{{ task.end_time | date:'medium' }}</dd>
+          </div>
+          <div>
+            <dt>Created</dt>
+            <dd>{{ task.created_at | date:'mediumDate' }}</dd>
+          </div>
+          <div *ngIf="task.special_instructions">
+            <dt>Special Instructions</dt>
+            <dd>{{ task.special_instructions }}</dd>
+          </div>
+        </dl>
       </div>
-      <p class="task-copy">{{ task.description }}</p>
-      <dl class="task-meta">
-        <div>
-          <dt>Location</dt>
-          <dd>{{ task.location }}</dd>
-        </div>
-        <div>
-          <dt>Start</dt>
-          <dd>{{ task.start_time | date:'medium' }}</dd>
-        </div>
-        <div *ngIf="task.end_time">
-          <dt>End</dt>
-          <dd>{{ task.end_time | date:'medium' }}</dd>
-        </div>
-        <div>
-          <dt>Created</dt>
-          <dd>{{ task.created_at | date:'mediumDate' }}</dd>
-        </div>
-      </dl>
       <div class="task-actions">
         <button class="action-btn edit" (click)="editTask(task)">Edit</button>
         <button

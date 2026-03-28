@@ -23,32 +23,98 @@ async function getStatusColumnType() {
 exports.addTask = async (req, res) => {
   try {
     const user_id = req.user.id;
-    const { title, description, location, start_time, end_time, picture } = req.body;
+    const {
+      title,
+      description,
+      location,
+      category,
+      urgency,
+      tools_required,
+      vehicle_required,
+      contact_method,
+      budget,
+      helpers_needed,
+      duration_hours,
+      special_instructions,
+      start_time,
+      end_time,
+      picture
+    } = req.body;
 
-    if (!title || !description || !location || !start_time || !picture) {
-      return res.status(400).json({ message: "Title, description, location, start_time and picture are required" });
+    if (!title || !description || !location || !category || !urgency || !contact_method || !start_time || !picture) {
+      return res.status(400).json({
+        message: "Title, description, location, category, urgency, contact_method, start_time and picture are required"
+      });
     }
 
     const normalizedTitle = title.trim();
     const normalizedDescription = description.trim();
     const normalizedLocation = location.trim();
+    const normalizedCategory = category.trim();
+    const normalizedUrgency = urgency.trim().toUpperCase();
+    const normalizedContactMethod = contact_method.trim();
     const normalizedPicture = picture.trim();
+    const normalizedSpecialInstructions = (special_instructions || "").trim();
+    const toolsRequiredBool = tools_required === true || tools_required === "true" || tools_required === 1 || tools_required === "1";
+    const vehicleRequiredBool = vehicle_required === true || vehicle_required === "true" || vehicle_required === 1 || vehicle_required === "1";
+    const budgetNumber = Number(budget);
+    const helpersNeededNumber = Number(helpers_needed);
+    const durationHoursNumber = Number(duration_hours);
 
-    if (!normalizedTitle || !normalizedDescription || !normalizedLocation || !normalizedPicture) {
+    if (
+      !normalizedTitle ||
+      !normalizedDescription ||
+      !normalizedLocation ||
+      !normalizedCategory ||
+      !normalizedUrgency ||
+      !normalizedContactMethod ||
+      !normalizedPicture
+    ) {
       return res.status(400).json({ message: "Required fields cannot be empty" });
+    }
+
+    if (!["LOW", "MEDIUM", "HIGH"].includes(normalizedUrgency)) {
+      return res.status(400).json({ message: "Urgency must be LOW, MEDIUM, or HIGH" });
+    }
+
+    if (!Number.isFinite(budgetNumber) || budgetNumber <= 0) {
+      return res.status(400).json({ message: "Budget must be a positive number" });
+    }
+
+    if (!Number.isInteger(helpersNeededNumber) || helpersNeededNumber <= 0) {
+      return res.status(400).json({ message: "Helpers needed must be a positive whole number" });
+    }
+
+    if (!Number.isFinite(durationHoursNumber) || durationHoursNumber <= 0) {
+      return res.status(400).json({ message: "Duration must be a positive number of hours" });
     }
 
     const statusType = await getStatusColumnType();
     const defaultStatusValue = mapStatusValueForColumnType(statusType, "OPEN");
     const newTask = await pool.query(
-      `INSERT INTO tasks(user_id, title, description, location, start_time, end_time, picture, status)
-       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING id, user_id, title, description, location, start_time, end_time, picture, status, created_at`,
+      `INSERT INTO tasks(
+         user_id, title, description, location, category, urgency, tools_required, vehicle_required, contact_method,
+         budget, helpers_needed, duration_hours, special_instructions,
+         start_time, end_time, picture, status
+       )
+       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+       RETURNING id, user_id, title, description, location, category, urgency, tools_required, vehicle_required, contact_method,
+                 budget, helpers_needed, duration_hours, special_instructions,
+                 start_time, end_time, picture, status, created_at`,
       [
         user_id,
         normalizedTitle,
         normalizedDescription,
         normalizedLocation,
+        normalizedCategory,
+        normalizedUrgency,
+        toolsRequiredBool,
+        vehicleRequiredBool,
+        normalizedContactMethod,
+        budgetNumber,
+        helpersNeededNumber,
+        durationHoursNumber,
+        normalizedSpecialInstructions || null,
         start_time,
         end_time || null,
         normalizedPicture,
@@ -71,19 +137,70 @@ exports.updateTask = async (req, res) => {
   try {
     const user_id = req.user.id;
     const { id } = req.params;
-    const { title, description, location, start_time, end_time, picture } = req.body;
+    const {
+      title,
+      description,
+      location,
+      category,
+      urgency,
+      tools_required,
+      vehicle_required,
+      contact_method,
+      budget,
+      helpers_needed,
+      duration_hours,
+      special_instructions,
+      start_time,
+      end_time,
+      picture
+    } = req.body;
 
-    if (!title || !description || !location || !start_time || !picture) {
-      return res.status(400).json({ message: "Title, description, location, start_time and picture are required" });
+    if (!title || !description || !location || !category || !urgency || !contact_method || !start_time || !picture) {
+      return res.status(400).json({
+        message: "Title, description, location, category, urgency, contact_method, start_time and picture are required"
+      });
     }
 
     const normalizedTitle = title.trim();
     const normalizedDescription = description.trim();
     const normalizedLocation = location.trim();
+    const normalizedCategory = category.trim();
+    const normalizedUrgency = urgency.trim().toUpperCase();
+    const normalizedContactMethod = contact_method.trim();
     const normalizedPicture = picture.trim();
+    const normalizedSpecialInstructions = (special_instructions || "").trim();
+    const toolsRequiredBool = tools_required === true || tools_required === "true" || tools_required === 1 || tools_required === "1";
+    const vehicleRequiredBool = vehicle_required === true || vehicle_required === "true" || vehicle_required === 1 || vehicle_required === "1";
+    const budgetNumber = Number(budget);
+    const helpersNeededNumber = Number(helpers_needed);
+    const durationHoursNumber = Number(duration_hours);
 
-    if (!normalizedTitle || !normalizedDescription || !normalizedLocation || !normalizedPicture) {
+    if (
+      !normalizedTitle ||
+      !normalizedDescription ||
+      !normalizedLocation ||
+      !normalizedCategory ||
+      !normalizedUrgency ||
+      !normalizedContactMethod ||
+      !normalizedPicture
+    ) {
       return res.status(400).json({ message: "Required fields cannot be empty" });
+    }
+
+    if (!["LOW", "MEDIUM", "HIGH"].includes(normalizedUrgency)) {
+      return res.status(400).json({ message: "Urgency must be LOW, MEDIUM, or HIGH" });
+    }
+
+    if (!Number.isFinite(budgetNumber) || budgetNumber <= 0) {
+      return res.status(400).json({ message: "Budget must be a positive number" });
+    }
+
+    if (!Number.isInteger(helpersNeededNumber) || helpersNeededNumber <= 0) {
+      return res.status(400).json({ message: "Helpers needed must be a positive whole number" });
+    }
+
+    if (!Number.isFinite(durationHoursNumber) || durationHoursNumber <= 0) {
+      return res.status(400).json({ message: "Duration must be a positive number of hours" });
     }
 
     const taskCheck = await pool.query(
@@ -107,15 +224,35 @@ exports.updateTask = async (req, res) => {
        SET title = $1,
            description = $2,
            location = $3,
-           start_time = $4,
-           end_time = $5,
-           picture = $6
-       WHERE id = $7
-       RETURNING id, user_id, title, description, location, start_time, end_time, picture, status, created_at`,
+           category = $4,
+           urgency = $5,
+           tools_required = $6,
+           vehicle_required = $7,
+           contact_method = $8,
+           budget = $9,
+           helpers_needed = $10,
+           duration_hours = $11,
+           special_instructions = $12,
+           start_time = $13,
+           end_time = $14,
+           picture = $15
+       WHERE id = $16
+       RETURNING id, user_id, title, description, location, category, urgency, tools_required, vehicle_required, contact_method,
+                 budget, helpers_needed, duration_hours, special_instructions,
+                 start_time, end_time, picture, status, created_at`,
       [
         normalizedTitle,
         normalizedDescription,
         normalizedLocation,
+        normalizedCategory,
+        normalizedUrgency,
+        toolsRequiredBool,
+        vehicleRequiredBool,
+        normalizedContactMethod,
+        budgetNumber,
+        helpersNeededNumber,
+        durationHoursNumber,
+        normalizedSpecialInstructions || null,
         start_time,
         end_time || null,
         normalizedPicture,
@@ -197,7 +334,9 @@ exports.closeTask = async (req, res) => {
       `UPDATE tasks
        SET status = $1
        WHERE id = $2
-       RETURNING id, user_id, title, description, location, start_time, end_time, picture, status, created_at`,
+       RETURNING id, user_id, title, description, location, category, urgency, tools_required, vehicle_required, contact_method,
+                 budget, helpers_needed, duration_hours, special_instructions,
+                 start_time, end_time, picture, status, created_at`,
       [closedStatusValue, id]
     );
 
@@ -240,7 +379,9 @@ exports.reopenTask = async (req, res) => {
       `UPDATE tasks
        SET status = $1
        WHERE id = $2
-       RETURNING id, user_id, title, description, location, start_time, end_time, picture, status, created_at`,
+       RETURNING id, user_id, title, description, location, category, urgency, tools_required, vehicle_required, contact_method,
+                 budget, helpers_needed, duration_hours, special_instructions,
+                 start_time, end_time, picture, status, created_at`,
       [openStatusValue, id]
     );
 
@@ -260,7 +401,9 @@ exports.getMyTasks = async (req, res) => {
     const user_id = req.user.id;
 
     const tasks = await pool.query(
-      `SELECT id, user_id, title, description, location, start_time, end_time, picture, status, created_at
+      `SELECT id, user_id, title, description, location, category, urgency, tools_required, vehicle_required, contact_method,
+              budget, helpers_needed, duration_hours, special_instructions,
+              start_time, end_time, picture, status, created_at
        FROM tasks
        WHERE user_id = $1
        ORDER BY created_at DESC`,
@@ -280,7 +423,9 @@ exports.getFeedTasks = async (req, res) => {
     const user_id = req.user.id;
 
     const tasks = await pool.query(
-      `SELECT id, user_id, title, description, location, start_time, end_time, picture, status, created_at
+      `SELECT id, user_id, title, description, location, category, urgency, tools_required, vehicle_required, contact_method,
+              budget, helpers_needed, duration_hours, special_instructions,
+              start_time, end_time, picture, status, created_at
        FROM tasks
        WHERE user_id != $1
        ORDER BY created_at DESC`,

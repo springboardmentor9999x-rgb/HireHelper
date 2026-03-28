@@ -47,10 +47,18 @@
   top: 0;
   height: 100vh;
   overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
   flex-shrink: 0;
   background: var(--sidebar-bg);
   color: #f8fafc;
   box-shadow: 18px 0 40px rgba(2, 6, 23, 0.55);
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 .brand-block {
@@ -291,6 +299,23 @@
   overflow: hidden;
 }
 
+.task-content-scroll {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 6px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.task-content-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
 .card-glow {
   position: absolute;
   inset: auto -30px -30px auto;
@@ -332,6 +357,7 @@
   font-family: Georgia, "Times New Roman", serif;
   font-size: 2rem;
   color: var(--text-strong);
+  overflow-wrap: anywhere;
 }
 
 .status-chip {
@@ -346,31 +372,19 @@
   letter-spacing: 0.14em;
   color: var(--accent);
   background: var(--accent-soft);
+  flex-shrink: 0;
 }
 
 .task-copy {
-  flex: 1;
-  overflow-y: auto;
-  max-height: 140px;
-  padding-right: 4px;
   margin: 0 0 12px;
   line-height: 1.7;
   color: var(--text-muted);
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  z-index: 1;
-  position: relative;
-}
-
-.task-copy::-webkit-scrollbar {
-  width: 0;
-  height: 0;
 }
 
 .task-meta {
   display: grid;
   gap: 12px;
-  margin-bottom: auto;
+  margin: 0;
 }
 
 .task-meta div {
@@ -395,6 +409,7 @@
   position: relative;
   z-index: 1;
   width: 100%;
+  margin-top: 12px;
   min-height: 48px;
   border: none;
   border-radius: 16px;

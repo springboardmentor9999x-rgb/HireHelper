@@ -88,6 +88,19 @@ async function initDbSchema() {
   await pool.query(`
     ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_picture TEXT;
   `);
+
+  await pool.query(`
+    ALTER TABLE tasks
+      ADD COLUMN IF NOT EXISTS category VARCHAR(100),
+      ADD COLUMN IF NOT EXISTS urgency VARCHAR(20),
+      ADD COLUMN IF NOT EXISTS tools_required BOOLEAN,
+      ADD COLUMN IF NOT EXISTS vehicle_required BOOLEAN,
+      ADD COLUMN IF NOT EXISTS contact_method VARCHAR(50),
+      ADD COLUMN IF NOT EXISTS budget NUMERIC(10, 2),
+      ADD COLUMN IF NOT EXISTS helpers_needed INTEGER,
+      ADD COLUMN IF NOT EXISTS duration_hours NUMERIC(5, 2),
+      ADD COLUMN IF NOT EXISTS special_instructions TEXT;
+  `);
 }
 
 module.exports = {

@@ -64,3 +64,24 @@ exports.deleteAllNotifications = async (req, res) => {
     return res.status(500).json({ message: err.message || "Server error" });
   }
 };
+
+exports.markAllNotificationsAsRead = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const result = await pool.query(
+      `UPDATE notifications
+       SET is_read = true
+       WHERE user_id = $1 AND COALESCE(is_read, false) = false`,
+      [userId]
+    );
+
+    return res.json({
+      message: "Notifications marked as read",
+      updatedCount: result.rowCount
+    });
+  } catch (err) {
+    console.error("[markAllNotificationsAsRead] error:", err);
+    return res.status(500).json({ message: err.message || "Server error" });
+  }
+};

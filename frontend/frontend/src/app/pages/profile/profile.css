@@ -36,6 +36,34 @@
   word-break: break-word;
 }
 
+.photo-preview {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+}
+
+.photo-preview img,
+.photo-placeholder {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+}
+
+.photo-preview img {
+  object-fit: cover;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.photo-placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: #ffffff;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
 .error-banner {
   padding: 18px 20px;
   border-radius: 20px;
@@ -173,9 +201,9 @@
 }
 
 .detail-card .change-pwd-btn {
-  background: none;
-  border: none;
-  color: #edeff3;
+  background: transparent;
+  border: 0;
+  color: #f8fafc;
   font-size: 1.1rem;
   font-weight: normal;
   cursor: pointer;
@@ -190,8 +218,26 @@
   line-height: 1.6;
 }
 
+.detail-card .change-btn {
+  background: transparent;
+  border: 0;
+  color: #f8fafc;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 8px;
+}
+
+.detail-card .change-btn:hover:not(:disabled),
 .detail-card .change-pwd-btn:hover {
   color: #f8fafc;
+  opacity: 0.92;
+}
+
+.detail-card .change-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .change-pwd-preview:hover {

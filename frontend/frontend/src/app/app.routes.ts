@@ -13,6 +13,8 @@ import { WorkspaceShellComponent } from './components/workspace-shell/workspace-
 import { MyRequestsComponent } from './pages/my-requests/my-requests';
 import { RequestsComponent } from './pages/requests/requests';
 import { NotificationsComponent } from './pages/notifications/notifications';
+import { HelpComponent } from './pages/help/help';
+import { OffersComponent } from './pages/offers/offers';
 
 export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
@@ -32,6 +34,8 @@ export const routes: Routes = [
       { path: 'my-requests', component: MyRequestsComponent },
       { path: 'requests', component: RequestsComponent },
       { path: 'notifications', component: NotificationsComponent },
+      { path: 'offers', component: OffersComponent },
+      { path: 'help', component: HelpComponent },
       { path: 'profile', component: ProfileComponent }
     ]
   },

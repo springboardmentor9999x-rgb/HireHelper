@@ -7,6 +7,15 @@ export interface TaskPayload {
   title: string;
   description: string;
   location: string;
+  category: string;
+  urgency: 'LOW' | 'MEDIUM' | 'HIGH';
+  tools_required: boolean;
+  vehicle_required: boolean;
+  contact_method: string;
+  budget: number;
+  helpers_needed: number;
+  duration_hours: number;
+  special_instructions?: string | null;
   start_time: string;
   end_time?: string | null;
   picture: string;
@@ -31,11 +40,29 @@ export interface TaskRequest {
 export interface MyRequestItem extends TaskRequest {
   title: string;
   location: string;
+  category?: string;
+  urgency?: string;
+  tools_required?: boolean;
+  vehicle_required?: boolean;
+  contact_method?: string;
+  budget?: number;
+  helpers_needed?: number;
+  duration_hours?: number;
+  special_instructions?: string;
 }
 
 export interface ReceivedRequestItem extends TaskRequest {
   title: string;
   first_name: string;
+  category?: string;
+  urgency?: string;
+  tools_required?: boolean;
+  vehicle_required?: boolean;
+  contact_method?: string;
+  budget?: number;
+  helpers_needed?: number;
+  duration_hours?: number;
+  special_instructions?: string;
 }
 
 export interface NotificationItem {
@@ -45,6 +72,7 @@ export interface NotificationItem {
   created_at: string;
   audience: string;
   message: string;
+  is_read?: boolean;
 }
 
 @Injectable({
@@ -98,8 +126,9 @@ export class TaskService {
   }
 
   getNotifications(): Observable<NotificationItem[]> {
-    return this.http.get<NotificationItem[]>('http://localhost:5000/api/notifications').pipe(
-      tap(notifications => this.notificationSubject.next(notifications.length))
+    return this.http.get<unknown>('http://localhost:5000/api/notifications').pipe(
+      map((response) => this.normalizeNotificationList(response)),
+      tap((notifications) => this.notificationSubject.next(notifications.length))
     );
   }
 
@@ -113,6 +142,10 @@ export class TaskService {
     return this.http.delete<{ message: string; deletedCount: number }>('http://localhost:5000/api/notifications').pipe(
       tap(() => this.notificationSubject.next(0))
     );
+  }
+
+  markAllNotificationsAsRead(): Observable<{ message: string; updatedCount: number }> {
+    return this.http.put<{ message: string; updatedCount: number }>('http://localhost:5000/api/notifications/read-all', {});
   }
 
   private refreshNotificationCount(): void {
@@ -181,6 +214,30 @@ export class TaskService {
 
       if (Array.isArray(candidate.rows)) {
         return candidate.rows as TaskItem[];
+      }
+    }
+
+    return [];
+  }
+
+  private normalizeNotificationList(response: unknown): NotificationItem[] {
+    if (Array.isArray(response)) {
+      return response as NotificationItem[];
+    }
+
+    if (response && typeof response === 'object') {
+      const candidate = response as { notifications?: unknown; rows?: unknown; data?: unknown };
+
+      if (Array.isArray(candidate.notifications)) {
+        return candidate.notifications as NotificationItem[];
+      }
+
+      if (Array.isArray(candidate.rows)) {
+        return candidate.rows as NotificationItem[];
+      }
+
+      if (Array.isArray(candidate.data)) {
+        return candidate.data as NotificationItem[];
       }
     }
 

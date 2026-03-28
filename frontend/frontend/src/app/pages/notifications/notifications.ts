@@ -1,7 +1,7 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { finalize, timeout } from 'rxjs';
+import { timeout } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { NotificationItem, TaskService } from '../../services/task.service';
 import { WorkspaceHeaderComponent } from '../../components/workspace-header/workspace-header';
@@ -19,13 +19,13 @@ export class NotificationsComponent implements OnInit {
   }
   notifications: NotificationItem[] = [];
   loading = true;
+  markingAllRead = false;
   error = '';
 
   constructor(
     private taskService: TaskService,
     private auth: AuthService,
-    private router: Router,
-    private cdr: ChangeDetectorRef
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -43,21 +43,20 @@ export class NotificationsComponent implements OnInit {
 
     this.taskService.getNotifications()
       .pipe(
-        timeout(10000),
-        finalize(() => {
-          this.loading = false;
-        })
+        timeout(10000)
       )
       .subscribe({
         next: (notifications) => {
-          this.notifications = notifications;
-          this.cdr.detectChanges();
+          this.notifications = [...notifications].sort(
+            (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+          this.loading = false;
         },
         error: (err) => {
           this.error = err.name === 'TimeoutError'
             ? 'Notification request timed out. Check that the backend is running and then refresh.'
             : err.error?.message || 'Failed to load notifications';
-          this.cdr.detectChanges();
+          this.loading = false;
         }
       });
   }
@@ -66,7 +65,6 @@ export class NotificationsComponent implements OnInit {
     this.taskService.deleteNotification(id).subscribe({
       next: () => {
         this.notifications = this.notifications.filter(n => n.id !== id);
-        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Delete failed:', err);
@@ -76,13 +74,37 @@ export class NotificationsComponent implements OnInit {
 
   deleteAllNotifications(): void {
     this.taskService.deleteAllNotifications().subscribe({
-      next: (response) => {
+      next: () => {
         this.notifications = [];
-        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Delete all failed:', err);
       }
     });
+  }
+
+  markAllAsRead(): void {
+    if (this.markingAllRead || this.notifications.length === 0 || this.allRead) {
+      return;
+    }
+
+    this.markingAllRead = true;
+    this.taskService.markAllNotificationsAsRead().subscribe({
+      next: () => {
+        this.notifications = this.notifications.map((notification) => ({
+          ...notification,
+          is_read: true
+        }));
+        this.markingAllRead = false;
+      },
+      error: (err) => {
+        console.error('Mark all as read failed:', err);
+        this.markingAllRead = false;
+      }
+    });
+  }
+
+  get allRead(): boolean {
+    return this.notifications.length > 0 && this.notifications.every((notification) => !!notification.is_read);
   }
 }

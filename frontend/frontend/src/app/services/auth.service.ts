@@ -53,7 +53,7 @@ export class AuthService {
   updateProfilePicture(file: File): Observable<{ message: string; profile_picture: string }> {
     const formData = new FormData();
     formData.append('profile_picture', file);
-    return this.http.put<{ message: string; profile_picture: string }>(`${this.userBaseUrl}/profile-picture`, formData);
+    return this.http.put<{ message: string; profile_picture: string }>('http://localhost:5000/api/profile/profile-picture', formData);
   }
 
   getCurrentUser(): Observable<AppUser> {
