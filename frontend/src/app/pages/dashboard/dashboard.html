@@ -1,0 +1,80 @@
+﻿<div class="p-8 space-y-8">
+  <header class="flex items-center justify-between gap-4">
+    <div>
+      <h2 class="text-2xl font-bold text-slate-900">Dashboard Overview</h2>
+      <p class="text-slate-500 text-sm mt-1">Welcome back, {{ userName || 'User' }}.</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="px-4 py-2 rounded-xl bg-white border border-slate-200 shadow-sm text-center min-w-32">
+        <p class="text-xl font-black text-blue-600">{{ notifications }}</p>
+        <p class="text-xs text-slate-500">Unread Alerts</p>
+      </div>
+      <button type="button" routerLink="/feed"
+        class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 transition">
+        View Task Feed
+      </button>
+    </div>
+  </header>
+
+  <section class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-7 text-white">
+    <h1 class="text-2xl font-bold mb-1">Welcome to HireHelper, {{ userName || 'User' }}!</h1>
+    <p *ngIf="isEmployer" class="text-blue-100 mb-5">Manage your tasks and review applications.</p>
+    <p *ngIf="isHelper" class="text-blue-100 mb-5">Browse tasks and track your applications.</p>
+    <div class="flex flex-wrap gap-3">
+      <button *ngIf="isEmployer" type="button" routerLink="/add-task"
+        class="px-5 py-2.5 bg-white text-blue-600 font-bold text-sm rounded-xl hover:shadow-lg transition">
+        Post New Task
+      </button>
+      <button *ngIf="isHelper" type="button" routerLink="/feed"
+        class="px-5 py-2.5 bg-white text-blue-600 font-bold text-sm rounded-xl hover:shadow-lg transition">
+        Browse Tasks
+      </button>
+      <button type="button" routerLink="/feed"
+        class="px-5 py-2.5 bg-blue-500 text-white font-semibold text-sm rounded-xl hover:bg-blue-400 transition">
+        View Task Feed
+      </button>
+    </div>
+  </section>
+
+  <section>
+    <h3 class="text-lg font-bold text-slate-800 mb-4">Quick Stats</h3>
+
+    <div *ngIf="isEmployer" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <p class="text-3xl font-black text-blue-600">{{ activeTasks }}</p>
+        <p class="text-sm text-slate-500 mt-1">Active Tasks</p>
+      </div>
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <p class="text-3xl font-black text-indigo-600">{{ totalHelpers }}</p>
+        <p class="text-sm text-slate-500 mt-1">Total Helpers</p>
+      </div>
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <p class="text-3xl font-black text-amber-500">{{ pendingRequests }}</p>
+        <p class="text-sm text-slate-500 mt-1">Pending Applications</p>
+      </div>
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <p class="text-3xl font-black text-green-600">{{ completedTasks }}</p>
+        <p class="text-sm text-slate-500 mt-1">Completed Tasks</p>
+      </div>
+    </div>
+
+    <div *ngIf="isHelper" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <p class="text-3xl font-black text-blue-600">{{ appliedTasks }}</p>
+        <p class="text-sm text-slate-500 mt-1">Applications Sent</p>
+      </div>
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <p class="text-3xl font-black text-green-600">{{ acceptedApplications }}</p>
+        <p class="text-sm text-slate-500 mt-1">Accepted</p>
+      </div>
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <p class="text-3xl font-black text-amber-500">{{ pendingApplications }}</p>
+        <p class="text-sm text-slate-500 mt-1">Pending Responses</p>
+      </div>
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <p class="text-3xl font-black text-indigo-600">{{ completedJobs }}</p>
+        <p class="text-sm text-slate-500 mt-1">Completed Jobs</p>
+      </div>
+    </div>
+  </section>
+</div>

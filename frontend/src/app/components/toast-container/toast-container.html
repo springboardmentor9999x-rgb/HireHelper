@@ -1,0 +1,15 @@
+<div class="toast-stack">
+  <div
+    *ngFor="let toast of (toasts$ | async)"
+    class="toast-card"
+    [ngClass]="getTypeClass(toast.type)"
+  >
+    <span class="toast-text">{{ toast.text }}</span>
+    <ng-container *ngIf="toast.actions && toast.actions.length">
+      <button *ngFor="let action of toast.actions" type="button" class="toast-action" (click)="action.callback(); dismiss(toast.id)">
+        {{ action.label }}
+      </button>
+    </ng-container>
+    <button type="button" class="toast-close" (click)="dismiss(toast.id)">x</button>
+  </div>
+</div>

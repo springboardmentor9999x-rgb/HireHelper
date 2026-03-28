@@ -1,0 +1,72 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import "tailwindcss";
+
+@layer base {
+  /* Globals for buttons */
+  button:not(:disabled), .action-btn {
+    @apply transition-all duration-300 ease-out cursor-pointer;
+  }
+  button:not(:disabled):active {
+    @apply scale-[0.96];
+  }
+  button:not(:disabled):hover {
+    @apply scale-[1.03] shadow-md;
+  }
+
+  /* Exclude sidebar toggles from aggressive UI scaling */
+  .sidebar-shell button:hover {
+    @apply scale-100 shadow-sm brightness-105;
+  }
+
+  /* Globals for links */
+  a {
+    @apply transition-colors duration-200;
+  }
+  
+  input, select, textarea {
+    @apply transition-all duration-300 outline-none;
+  }
+}
+
+@layer components {
+  /* Generic dynamic styling for statistic cards, tasks, and list items */
+  /* Targets rounded white blocks that have a shadow (cards) */
+  [class*='bg-white'][class*='rounded'][class*='shadow-']:not(button) {
+    @apply transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl relative z-10;
+  }
+  
+  /* Specific exception for inputs in case they match */
+  input[class*='bg-white'], textarea[class*='bg-white'], select[class*='bg-white'] {
+    @apply hover:translate-y-0 hover:shadow-sm z-0;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ensure routed Angular pages fade in on load to prevent jumping */
+router-outlet + * {
+  display: block;
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Base custom native view transition speeds */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+}

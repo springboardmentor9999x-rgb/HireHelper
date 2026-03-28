@@ -1,0 +1,191 @@
+<div class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-slate-100">
+  <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl p-8">
+
+    <div class="text-center mb-4 pb-4 relative">
+      <h1 class="text-4xl font-black text-slate-900 tracking-tight">HireHelper</h1>
+      <p class="text-slate-500 text-sm mt-2">Your trusted hiring platform</p>
+      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-0.5 rounded-full bg-gradient-to-r from-blue-500 to-emerald-400"></div>
+    </div>
+
+    <div class="text-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900">Create Your Account</h2>
+      <p class="text-gray-500 text-sm mt-1">Join HireHelper and start your journey today</p>
+    </div>
+
+    <form #registerForm="ngForm" (ngSubmit)="register()" class="space-y-4">
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">Full Name <span class="text-red-500">*</span></label>
+          <div class="relative">
+            <input type="text" id="name" name="name" [(ngModel)]="registerData.name" #nameField="ngModel"
+              required minlength="3" placeholder="Enter your full name"
+              class="w-full h-12 border border-slate-300 rounded-xl px-4 pr-11 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition" />
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </span>
+          </div>
+          <div class="text-red-500 text-xs mt-1" *ngIf="nameField.invalid && nameField.touched">
+            <span *ngIf="nameField.errors?.['required']">Full name is required</span>
+            <span *ngIf="nameField.errors?.['minlength']">At least 3 characters</span>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">Last Name <span class="text-slate-400 font-normal">(Optional)</span></label>
+          <div class="relative">
+            <input type="text" id="lastname" name="lastname" [(ngModel)]="registerData.last_name"
+              placeholder="Enter your last name"
+              class="w-full h-12 border border-slate-300 rounded-xl px-4 pr-11 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition" />
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Email Address <span class="text-red-500">*</span></label>
+        <div class="relative">
+          <input type="email" id="email" name="email" [(ngModel)]="registerData.email" #emailField="ngModel"
+            required email placeholder="Enter your email address"
+            class="w-full h-12 border border-slate-300 rounded-xl px-4 pr-11 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition" />
+          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </span>
+        </div>
+        <div class="text-red-500 text-xs mt-1" *ngIf="emailField.invalid && emailField.touched">
+          <span *ngIf="emailField.errors?.['required']">Email is required</span>
+          <span *ngIf="emailField.errors?.['email']">Please enter a valid email address</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">Password <span class="text-red-500">*</span></label>
+          <div class="relative">
+            <input [type]="showPassword ? 'text' : 'password'" id="password" name="password" [(ngModel)]="registerData.password" #passwordField="ngModel"
+              required minlength="8" placeholder="Create a strong password"
+              class="w-full h-12 border border-slate-300 rounded-xl px-4 pr-11 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition" />
+            <button type="button"
+              (click)="togglePasswordVisibility()"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-blue-700 hover:text-blue-800">
+              {{ showPassword ? 'Hide' : 'Show' }}
+            </button>
+          </div>
+          <div class="text-red-500 text-xs mt-1" *ngIf="passwordField.invalid && passwordField.touched">
+            <span *ngIf="passwordField.errors?.['required']">Password is required</span>
+            <span *ngIf="passwordField.errors?.['minlength']">At least 8 characters</span>
+          </div>
+          <div class="flex items-center gap-2 mt-2" *ngIf="registerData.password">
+            <div class="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+              <div class="h-full rounded-full transition-all"
+                [ngClass]="{
+                  'w-1/3 bg-red-500': registerData.password.length < 8,
+                  'w-2/3 bg-amber-400': registerData.password.length >= 8 && registerData.password.length < 12,
+                  'w-full bg-green-500': registerData.password.length >= 12
+                }"></div>
+            </div>
+            <span class="text-xs font-semibold text-slate-500 w-14">
+              {{ registerData.password.length < 8 ? 'Weak' : registerData.password.length < 12 ? 'Medium' : 'Strong' }}
+            </span>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1.5">Confirm Password <span class="text-red-500">*</span></label>
+          <div class="relative">
+            <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirmPassword" name="confirmPassword" [(ngModel)]="registerData.confirmPassword" #confirmPasswordField="ngModel"
+              required placeholder="Re-enter your password"
+              class="w-full h-12 border border-slate-300 rounded-xl px-4 pr-11 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition" />
+            <button type="button"
+              (click)="toggleConfirmPasswordVisibility()"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-blue-700 hover:text-blue-800">
+              {{ showConfirmPassword ? 'Hide' : 'Show' }}
+            </button>
+          </div>
+          <div class="text-red-500 text-xs mt-1" *ngIf="confirmPasswordField.invalid && confirmPasswordField.touched">
+            <span *ngIf="confirmPasswordField.errors?.['required']">Please confirm your password</span>
+          </div>
+          <div class="text-red-500 text-xs mt-1" *ngIf="confirmPasswordField.touched && registerData.password !== registerData.confirmPassword && registerData.confirmPassword">
+            Passwords do not match
+          </div>
+          <div class="text-green-600 text-xs mt-1" *ngIf="registerData.password && registerData.confirmPassword && registerData.password === registerData.confirmPassword">
+            ✓ Passwords match
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">I am a <span class="text-red-500">*</span></label>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="border rounded-xl p-4 cursor-pointer transition-all"
+            [class.border-blue-500]="registerData.role === 'helper'"
+            [class.bg-blue-50]="registerData.role === 'helper'"
+            [class.border-slate-200]="registerData.role !== 'helper'"
+            [class.bg-slate-50]="registerData.role !== 'helper'"
+            (click)="registerData.role = 'helper'">
+            <input type="radio" id="helper" name="role" value="helper" [(ngModel)]="registerData.role" required class="sr-only" />
+            <label for="helper" class="flex gap-3 cursor-pointer items-start justify-between">
+              <div class="text-slate-600 mt-0.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+              </div>
+              <div class="flex-1">
+                <h3 class="font-bold text-gray-900 text-sm">Helper</h3>
+                <p class="text-slate-500 text-xs">Looking for job opportunities</p>
+              </div>
+              <span class="mt-0.5 h-5 w-5 rounded-full border-2 flex items-center justify-center transition"
+                [class.border-blue-600]="registerData.role === 'helper'"
+                [class.border-slate-300]="registerData.role !== 'helper'">
+                <span class="h-2.5 w-2.5 rounded-full bg-blue-600" *ngIf="registerData.role === 'helper'"></span>
+              </span>
+            </label>
+          </div>
+          <div class="border rounded-xl p-4 cursor-pointer transition-all"
+            [class.border-blue-500]="registerData.role === 'hirer'"
+            [class.bg-blue-50]="registerData.role === 'hirer'"
+            [class.border-slate-200]="registerData.role !== 'hirer'"
+            [class.bg-slate-50]="registerData.role !== 'hirer'"
+            (click)="registerData.role = 'hirer'">
+            <input type="radio" id="hirer" name="role" value="hirer" [(ngModel)]="registerData.role" required class="sr-only" />
+            <label for="hirer" class="flex gap-3 cursor-pointer items-start justify-between">
+              <div class="text-slate-600 mt-0.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              </div>
+              <div class="flex-1">
+                <h3 class="font-bold text-gray-900 text-sm">Hirer</h3>
+                <p class="text-slate-500 text-xs">Looking to hire helpers</p>
+              </div>
+              <span class="mt-0.5 h-5 w-5 rounded-full border-2 flex items-center justify-center transition"
+                [class.border-blue-600]="registerData.role === 'hirer'"
+                [class.border-slate-300]="registerData.role !== 'hirer'">
+                <span class="h-2.5 w-2.5 rounded-full bg-blue-600" *ngIf="registerData.role === 'hirer'"></span>
+              </span>
+            </label>
+          </div>
+        </div>
+        <div class="text-red-500 text-xs mt-1" *ngIf="registerForm.submitted && !registerData.role">
+          Please select a role
+        </div>
+      </div>
+
+      <div>
+        <label class="flex items-start gap-2 text-sm text-slate-600 cursor-pointer">
+          <input type="checkbox" name="terms" required #termsField="ngModel" ngModel class="mt-0.5 accent-blue-600 w-4 h-4 flex-shrink-0" />
+          <span>I agree to HireHelper's <a href="#" class="text-blue-600 hover:underline">Terms of Service</a> and <a href="#" class="text-blue-600 hover:underline">Privacy Policy</a></span>
+        </label>
+        <div class="text-red-500 text-xs mt-1" *ngIf="termsField.invalid && termsField.touched">
+          You must accept the terms and conditions
+        </div>
+      </div>
+
+      <button type="submit" [disabled]="registerForm.invalid || registerData.password !== registerData.confirmPassword"
+        class="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-200 hover:-translate-y-0.5 transition disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none">
+        <span>Create Account</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+    </form>
+
+    <p class="text-center text-sm text-gray-500 mt-5">
+      Already have an account? <a routerLink="/login" class="text-blue-700 font-bold hover:underline cursor-pointer">Sign In</a>
+    </p>
+  </div>
+</div>

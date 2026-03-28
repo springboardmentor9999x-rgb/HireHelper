@@ -1,0 +1,136 @@
+<div class="min-h-screen bg-slate-50 p-6 lg:p-8">
+  <div class="max-w-6xl mx-auto space-y-6">
+    <section class="bg-gradient-to-r from-emerald-600 to-cyan-600 rounded-3xl p-7 text-white flex flex-col md:flex-row md:items-end md:justify-between gap-5">
+      <div>
+        <p class="text-xs uppercase tracking-[0.24em] text-emerald-100 mb-2">Account Settings</p>
+        <h1 class="text-3xl font-bold">Manage your profile</h1>
+        <p class="text-sm text-emerald-50/90 mt-2">Email is read-only. Update all other details, including profile photo and password.</p>
+      </div>
+
+      <div class="bg-white/15 backdrop-blur-sm rounded-2xl px-4 py-3 flex items-center gap-3 self-start md:self-auto">
+        <img *ngIf="profilePicturePreview" [src]="profilePicturePreview" alt="Profile preview" class="w-12 h-12 rounded-full object-cover border border-white/40" />
+        <div *ngIf="!profilePicturePreview" class="w-12 h-12 rounded-full bg-white text-emerald-700 flex items-center justify-center text-lg font-black">
+          {{ profile.first_name ? profile.first_name.charAt(0).toUpperCase() : 'U' }}
+        </div>
+        <div>
+          <p class="font-bold">{{ profile.first_name || profile.username || 'User' }}</p>
+          <p class="text-sm text-emerald-50/90">{{ getRoleLabel() }}</p>
+        </div>
+      </div>
+    </section>
+
+    <div *ngIf="saveMessage" class="rounded-2xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-emerald-700 text-sm font-medium">
+      {{ saveMessage }}
+    </div>
+
+    <div *ngIf="passwordMessage" class="rounded-2xl bg-amber-50 border border-amber-200 px-4 py-3 text-amber-700 text-sm font-medium">
+      {{ passwordMessage }}
+    </div>
+
+    <div *ngIf="errorMessage" class="rounded-2xl bg-rose-50 border border-rose-200 px-4 py-3 text-rose-700 text-sm font-medium">
+      {{ errorMessage }}
+    </div>
+
+    <section class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+      <div class="mb-5">
+        <h2 class="text-xl font-bold text-slate-900">Profile Details</h2>
+        <p class="text-sm text-slate-500 mt-1">Except email, every field below is editable.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="username">Username</label>
+          <input id="username" type="text" [(ngModel)]="profile.username" class="w-full h-12 border border-slate-200 rounded-xl px-4 text-sm text-slate-900 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="email">Email (Read-only)</label>
+          <input id="email" type="email" [(ngModel)]="profile.email" readonly class="w-full h-12 border border-slate-200 rounded-xl px-4 text-sm text-slate-500 bg-slate-100 cursor-not-allowed" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="firstName">First Name</label>
+          <input id="firstName" type="text" [(ngModel)]="profile.first_name" class="w-full h-12 border border-slate-200 rounded-xl px-4 text-sm text-slate-900 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="lastName">Last Name</label>
+          <input id="lastName" type="text" [(ngModel)]="profile.last_name" class="w-full h-12 border border-slate-200 rounded-xl px-4 text-sm text-slate-900 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="phoneNumber">Phone Number</label>
+          <input id="phoneNumber" type="text" [(ngModel)]="profile.phone_number" placeholder="Enter phone number" class="w-full h-12 border border-slate-200 rounded-xl px-4 text-sm text-slate-900 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="role">Role</label>
+          <select id="role" [(ngModel)]="profile.role" class="w-full h-12 border border-slate-200 rounded-xl px-4 text-sm text-slate-900 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition bg-white">
+            <option value="helper">Helper</option>
+            <option value="hirer">Hirer</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="city">City</label>
+          <input id="city" type="text" [(ngModel)]="profile.city" class="w-full h-12 border border-slate-200 rounded-xl px-4 text-sm text-slate-900 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="address">Address</label>
+          <input id="address" type="text" [(ngModel)]="profile.address" class="w-full h-12 border border-slate-200 rounded-xl px-4 text-sm text-slate-900 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition" />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="bio">Bio</label>
+          <textarea id="bio" rows="4" [(ngModel)]="profile.bio" placeholder="Write your bio"
+            class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition resize-y"></textarea>
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="profilePicture">Profile Picture</label>
+          <input id="profilePicture" type="file" accept="image/*" (change)="onProfilePictureSelected($event)"
+            class="w-full h-12 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition bg-white" />
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+      <div class="mb-5">
+        <h2 class="text-xl font-bold text-slate-900">Password Update</h2>
+        <p class="text-sm text-slate-500 mt-1">Password only updates when you enable it below.</p>
+      </div>
+
+      <label class="flex items-start justify-between gap-4 rounded-2xl border border-slate-200 p-4 cursor-pointer mb-4">
+        <div>
+          <p class="font-semibold text-slate-900">Change Password</p>
+          <p class="text-sm text-slate-500 mt-1">Turn this on only when you want to set a new password.</p>
+        </div>
+        <input type="checkbox" [(ngModel)]="changePassword" (change)="onToggleChangePassword()" class="mt-1 h-4 w-4 accent-emerald-600" />
+      </label>
+
+      <div *ngIf="changePassword" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="password">New Password</label>
+          <input id="password" type="password" autocomplete="new-password" [(ngModel)]="passwordData.password" placeholder="Enter new password"
+            class="w-full h-12 border border-slate-200 rounded-xl px-4 text-sm text-slate-900 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5" for="confirmPassword">Confirm Password</label>
+          <input id="confirmPassword" type="password" autocomplete="new-password" [(ngModel)]="passwordData.confirmPassword" placeholder="Confirm new password"
+            class="w-full h-12 border border-slate-200 rounded-xl px-4 text-sm text-slate-900 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition" />
+        </div>
+      </div>
+
+      <div class="pt-5 flex flex-col sm:flex-row gap-3">
+        <button type="button" (click)="saveProfile()" [disabled]="loading" class="h-11 px-5 rounded-xl bg-gradient-to-r from-emerald-600 to-cyan-600 text-white text-sm font-bold hover:-translate-y-0.5 transition shadow-lg shadow-emerald-100 disabled:opacity-60 disabled:cursor-not-allowed">
+          {{ loading ? 'Saving...' : 'Save Changes' }}
+        </button>
+        <button type="button" (click)="logout()" class="h-11 px-5 rounded-xl bg-rose-600 text-white text-sm font-bold hover:bg-rose-700 transition">
+          Logout
+        </button>
+      </div>
+    </section>
+  </div>
+</div>

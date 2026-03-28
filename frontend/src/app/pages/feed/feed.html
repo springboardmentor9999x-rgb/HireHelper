@@ -1,0 +1,251 @@
+<div class="min-h-screen bg-slate-50 p-6 lg:p-8">
+  <div class="max-w-7xl mx-auto">
+    <div class="mb-6">
+      <h1 class="text-3xl font-bold text-slate-900">Available Tasks</h1>
+      <p class="text-slate-500 text-sm mt-1">Browse, filter, and apply for tasks in your area.</p>
+    </div>
+
+    <div class="bg-white border border-slate-200 rounded-2xl p-4 mb-6 shadow-sm space-y-4">
+      <div class="relative">
+        <input
+          type="text"
+          placeholder="Search tasks by title or description..."
+          [(ngModel)]="searchQuery"
+          (input)="filterTasks()"
+          class="w-full h-11 border border-slate-200 rounded-xl pl-10 pr-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition" />
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </div>
+
+      <div class="flex flex-wrap gap-3 items-end">
+        <div class="min-w-40 flex-1">
+          <label for="cityFilter" class="block text-xs font-semibold text-slate-500 mb-1.5">City</label>
+          <select id="cityFilter" [(ngModel)]="selectedCity" (change)="filterTasks()"
+            class="w-full h-10 border border-slate-200 rounded-xl px-3 text-sm text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-white transition">
+            <option value="">All Cities</option>
+            <option *ngFor="let city of availableCities" [value]="city">{{ city }}</option>
+          </select>
+        </div>
+
+        <div class="min-w-40 flex-1">
+          <label for="statusFilter" class="block text-xs font-semibold text-slate-500 mb-1.5">Status</label>
+          <select id="statusFilter" [(ngModel)]="selectedStatus" (change)="filterTasks()"
+            class="w-full h-10 border border-slate-200 rounded-xl px-3 text-sm text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-white transition">
+            <option value="">All Status</option>
+            <option value="open">Open</option>
+            <option value="in_progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+
+        <div class="min-w-40 flex-1">
+          <label for="sortBy" class="block text-xs font-semibold text-slate-500 mb-1.5">Sort By</label>
+          <select id="sortBy" [(ngModel)]="sortBy" (change)="sortTasks()"
+            class="w-full h-10 border border-slate-200 rounded-xl px-3 text-sm text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-white transition">
+            <option value="latest">Latest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="title">Title A-Z</option>
+          </select>
+        </div>
+
+        <button *ngIf="selectedCity || selectedStatus || searchQuery" type="button" (click)="clearFilters()"
+          class="h-10 px-4 rounded-xl bg-slate-100 text-slate-600 text-sm font-medium hover:bg-slate-200 transition">
+          Clear Filters
+        </button>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between text-sm text-slate-500 mb-5">
+      <p>
+        <span class="font-bold text-slate-800">{{ filteredTasks.length }}</span>
+        {{ filteredTasks.length === 1 ? 'task' : 'tasks' }} found
+        <span *ngIf="selectedCity">in {{ selectedCity }}</span>
+      </p>
+    </div>
+
+    <div *ngIf="loading" class="flex flex-col items-center justify-center py-16 gap-3 text-slate-500">
+      <svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+      <p class="text-sm">Loading tasks...</p>
+    </div>
+
+    <div *ngIf="!loading && filteredTasks.length === 0" class="flex flex-col items-center justify-center py-16 gap-3 text-slate-500 bg-white border border-slate-200 rounded-2xl">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <h3 class="text-lg font-semibold text-slate-700">No tasks found</h3>
+      <p *ngIf="selectedCity" class="text-sm">No tasks available in {{ selectedCity }}</p>
+      <p *ngIf="!selectedCity" class="text-sm">Try adjusting your filters or check back later.</p>
+      <button type="button" (click)="clearFilters()" class="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition">Clear All Filters</button>
+    </div>
+
+    <div *ngIf="!loading && filteredTasks.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <article *ngFor="let task of filteredTasks" class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition">
+        <div class="h-44 bg-gradient-to-br from-slate-100 to-slate-200 bg-cover bg-center relative" [style.background-image]="task.image ? 'url(' + task.image + ')' : 'none'">
+          <div *ngIf="!task.image" class="absolute inset-0 flex items-center justify-center text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+
+          <div class="absolute top-3 left-3 flex gap-2">
+            <span class="text-xs font-bold px-2.5 py-1 rounded-full backdrop-blur-sm"
+              [ngClass]="{
+                'bg-emerald-100/95 text-emerald-700': task.status === 'open',
+                'bg-amber-100/95 text-amber-700': task.status === 'in_progress',
+                'bg-blue-100/95 text-blue-700': task.status === 'completed'
+              }">
+              {{ getStatusLabel(task.status) }}
+            </span>
+            <span *ngIf="isNewTask(task.created_at)" class="text-xs font-bold px-2.5 py-1 rounded-full bg-white/90 text-slate-700">New</span>
+          </div>
+        </div>
+
+        <div class="p-5">
+          <div class="flex items-start justify-between gap-3 mb-3">
+            <h3 class="font-bold text-slate-900 text-lg leading-tight">{{ task.title }}</h3>
+            <span class="text-xs text-slate-400 shrink-0">{{ getTimeAgo(task.created_at) }}</span>
+          </div>
+
+          <p class="text-slate-500 text-sm leading-relaxed mb-4">
+            {{ (task.description || 'No description provided.') | slice:0:100 }}
+          </p>
+
+          <div class="space-y-2 text-sm text-slate-600 mb-4">
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>{{ task.city || 'City not specified' }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>{{ formatDate(task.start_time) }}</span>
+            </div>
+            <div *ngIf="task.location" class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              <span>{{ task.location }}</span>
+            </div>
+          </div>
+
+          <div *ngIf="task.created_by" 
+               (click)="openProfileModal(task.created_by_id || task.created_by.id, task.created_by.name || task.created_by.email || task.created_by, task.created_by_rating)" 
+               class="flex items-center gap-2 mb-5 text-sm text-slate-500 cursor-pointer hover:bg-slate-50 p-1.5 -ml-1.5 rounded-lg transition inline-flex w-auto group">
+            <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600 transition">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <span class="group-hover:text-blue-600 transition font-medium">
+              {{ task.created_by.name || task.created_by.email || task.created_by }}
+              <span *ngIf="task.created_by_rating" class="ml-1 text-yellow-500 text-xs text-nowrap">⭐ {{ task.created_by_rating }}</span>
+            </span>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-slate-500 mb-1.5">Message to Hirer (optional)</label>
+            <textarea
+              rows="2"
+              [(ngModel)]="requestMessages[task.id]"
+              [disabled]="hasRequested(task.id)"
+              placeholder="Write a short message about why you're a good fit..."
+              class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <button type="button" (click)="viewDetails(task)" class="h-10 rounded-xl border border-slate-200 text-slate-600 text-sm font-semibold hover:bg-slate-50 transition">
+              Details
+            </button>
+            <button
+              type="button"
+              (click)="requestTask(task)"
+              [disabled]="task.status !== 'open' || hasRequested(task.id)"
+              class="h-10 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-bold hover:-translate-y-0.5 transition disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none shadow-lg shadow-blue-100">
+              {{ hasRequested(task.id) ? 'Requested' : (task.status === 'open' ? 'Request' : 'Unavailable') }}
+            </button>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="selectedTask" class="fixed inset-0 z-50 bg-slate-950/55 backdrop-blur-sm flex items-center justify-center p-4" (click)="closeModal()">
+  <div class="w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden" (click)="$event.stopPropagation()">
+    <div class="flex items-start justify-between gap-4 p-6 border-b border-slate-200">
+      <div>
+        <h2 class="text-2xl font-bold text-slate-900">{{ selectedTask.title }}</h2>
+        <p class="text-sm text-slate-500 mt-1">Posted {{ getTimeAgo(selectedTask.created_at) }}</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-bold px-3 py-1 rounded-full"
+          [ngClass]="{
+            'bg-emerald-100 text-emerald-700': selectedTask.status === 'open',
+            'bg-amber-100 text-amber-700': selectedTask.status === 'in_progress',
+            'bg-blue-100 text-blue-700': selectedTask.status === 'completed'
+          }">
+          {{ getStatusLabel(selectedTask.status) }}
+        </span>
+        <button type="button" (click)="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="selectedTask.image" class="h-56 bg-slate-100">
+      <img [src]="selectedTask.image" [alt]="selectedTask.title" class="w-full h-full object-cover" />
+    </div>
+
+    <div class="p-6 space-y-6">
+      <section>
+        <h3 class="text-sm font-bold uppercase tracking-wide text-slate-500 mb-2">Description</h3>
+        <p class="text-slate-700 leading-relaxed">{{ selectedTask.description }}</p>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <section class="rounded-2xl bg-slate-50 p-4">
+          <h3 class="text-sm font-bold uppercase tracking-wide text-slate-500 mb-2">Location</h3>
+          <p class="text-slate-800 font-semibold">{{ selectedTask.city }}</p>
+          <p class="text-sm text-slate-600 mt-1">{{ selectedTask.location || 'Location not specified' }}</p>
+        </section>
+
+        <section class="rounded-2xl bg-slate-50 p-4">
+          <h3 class="text-sm font-bold uppercase tracking-wide text-slate-500 mb-2">Schedule</h3>
+          <p class="text-sm text-slate-700"><span class="font-semibold">Start:</span> {{ formatDateTime(selectedTask.start_time) }}</p>
+          <p *ngIf="selectedTask.end_time" class="text-sm text-slate-700 mt-1"><span class="font-semibold">End:</span> {{ formatDateTime(selectedTask.end_time) }}</p>
+        </section>
+
+        <section *ngIf="selectedTask.created_by" class="rounded-2xl bg-slate-50 p-4 md:col-span-2">
+          <h3 class="text-sm font-bold uppercase tracking-wide text-slate-500 mb-2">Posted By</h3>
+          <p (click)="openProfileModal(selectedTask.created_by_id || selectedTask.created_by.id, selectedTask.created_by.name || selectedTask.created_by.email || selectedTask.created_by, selectedTask.created_by_rating)"
+             class="text-slate-700 font-medium cursor-pointer flex items-center gap-2 hover:text-blue-600 transition w-fit p-1 -ml-1 rounded-md hover:bg-slate-100">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            {{ selectedTask.created_by.name || selectedTask.created_by.email || selectedTask.created_by }}
+            <span *ngIf="selectedTask.created_by_rating" class="text-yellow-500 text-xs text-nowrap">⭐ {{ selectedTask.created_by_rating }}</span>
+          </p>
+        </section>
+      </div>
+
+      <section>
+        <h3 class="text-sm font-bold uppercase tracking-wide text-slate-500 mb-2">Message to Hirer (optional)</h3>
+        <textarea
+          rows="3"
+          [(ngModel)]="requestMessages[selectedTask.id]"
+          [disabled]="hasRequested(selectedTask.id)"
+          placeholder="Write a short message about your experience or availability..."
+          class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"></textarea>
+      </section>
+    </div>
+
+    <div class="p-6 border-t border-slate-200 flex flex-col sm:flex-row gap-3 justify-end">
+      <button type="button" (click)="closeModal()" class="h-11 px-5 rounded-xl border border-slate-200 text-slate-600 text-sm font-semibold hover:bg-slate-50 transition">
+        Close
+      </button>
+      <button
+        type="button"
+        (click)="requestTask(selectedTask); closeModal()"
+        [disabled]="selectedTask.status !== 'open' || hasRequested(selectedTask.id)"
+        class="h-11 px-5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-bold hover:-translate-y-0.5 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-100">
+        {{ hasRequested(selectedTask.id) ? 'Already Requested' : (selectedTask.status === 'open' ? 'Request This Task' : 'Task Not Available') }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<app-profile-modal
+  [isOpen]="isProfileModalOpen"
+  [userId]="profileUserId"
+  [userName]="profileUserName"
+  [userRating]="profileUserRating"
+  (closeEvent)="isProfileModalOpen = false">
+</app-profile-modal>

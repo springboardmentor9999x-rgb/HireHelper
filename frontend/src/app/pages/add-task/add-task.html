@@ -1,0 +1,219 @@
+<div class="min-h-screen bg-slate-50 p-6 lg:p-8">
+  <div class="max-w-7xl mx-auto">
+    <div class="mb-6">
+      <h1 class="text-3xl font-bold text-slate-900">Post a New Task</h1>
+      <p class="text-slate-500 text-sm mt-1">Fill in the details below to create a new task for helpers.</p>
+    </div>
+
+    <form #taskForm="ngForm" (ngSubmit)="createTask()" class="grid grid-cols-1 xl:grid-cols-[1.4fr,0.9fr] gap-6">
+      <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-6">
+        <div>
+          <label for="title" class="block text-sm font-semibold text-slate-700 mb-1.5">Task Title <span class="text-red-500">*</span></label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            [(ngModel)]="taskData.title"
+            placeholder="e.g., House Cleaning, Garden Maintenance"
+            required
+            minlength="5"
+            maxlength="200"
+            #titleField="ngModel"
+            class="w-full h-12 border border-slate-200 rounded-xl px-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition" />
+          <div class="flex items-center justify-between mt-2 text-xs">
+            <p class="text-red-500" *ngIf="titleField.invalid && titleField.touched">
+              <span *ngIf="titleField.errors?.['required']">Task title is required.</span>
+              <span *ngIf="titleField.errors?.['minlength']">Title must be at least 5 characters.</span>
+            </p>
+            <span class="text-slate-400 ml-auto">{{ taskData.title.length }}/200</span>
+          </div>
+        </div>
+
+        <div>
+          <label for="description" class="block text-sm font-semibold text-slate-700 mb-1.5">Task Description <span class="text-red-500">*</span></label>
+          <textarea
+            id="description"
+            name="description"
+            [(ngModel)]="taskData.description"
+            placeholder="Describe the task, requirements, tools, and expectations..."
+            required
+            minlength="20"
+            rows="6"
+            #descriptionField="ngModel"
+            class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition resize-none"></textarea>
+          <div class="flex items-center justify-between mt-2 text-xs">
+            <p class="text-red-500" *ngIf="descriptionField.invalid && descriptionField.touched">
+              <span *ngIf="descriptionField.errors?.['required']">Description is required.</span>
+              <span *ngIf="descriptionField.errors?.['minlength']">Description must be at least 20 characters.</span>
+            </p>
+            <span class="text-slate-400 ml-auto">{{ taskData.description.length }} characters</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="city" class="block text-sm font-semibold text-slate-700 mb-1.5">City <span class="text-red-500">*</span></label>
+            <input
+              type="text"
+              id="city"
+              name="city"
+              [(ngModel)]="taskData.city"
+              placeholder="e.g., New York"
+              required
+              #cityField="ngModel"
+              class="w-full h-12 border border-slate-200 rounded-xl px-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition" />
+            <p class="text-red-500 text-xs mt-2" *ngIf="cityField.invalid && cityField.touched">City is required.</p>
+          </div>
+
+          <div>
+            <label for="location" class="block text-sm font-semibold text-slate-700 mb-1.5">Address / Location <span class="text-red-500">*</span></label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              [(ngModel)]="taskData.location"
+              placeholder="e.g., 123 Main Street"
+              required
+              #locationField="ngModel"
+              class="w-full h-12 border border-slate-200 rounded-xl px-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition" />
+            <p class="text-red-500 text-xs mt-2" *ngIf="locationField.invalid && locationField.touched">Location is required.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="start_time" class="block text-sm font-semibold text-slate-700 mb-1.5">Start Date & Time <span class="text-red-500">*</span></label>
+            <input
+              type="datetime-local"
+              id="start_time"
+              name="start_time"
+              [(ngModel)]="taskData.start_time"
+              required
+              #startTimeField="ngModel"
+              class="w-full h-12 border border-slate-200 rounded-xl px-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition" />
+            <p class="text-red-500 text-xs mt-2" *ngIf="startTimeField.invalid && startTimeField.touched">Start date & time is required.</p>
+          </div>
+
+          <div>
+            <label for="end_time" class="block text-sm font-semibold text-slate-700 mb-1.5">End Date & Time <span class="text-slate-400">(Optional)</span></label>
+            <input
+              type="datetime-local"
+              id="end_time"
+              name="end_time"
+              [(ngModel)]="taskData.end_time"
+              class="w-full h-12 border border-slate-200 rounded-xl px-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-3">Task Status <span class="text-red-500">*</span></label>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <label class="border rounded-2xl p-4 cursor-pointer transition"
+              [class.border-blue-500]="taskData.status === 'open'"
+              [class.bg-blue-50]="taskData.status === 'open'"
+              [class.border-slate-200]="taskData.status !== 'open'"
+              [class.bg-white]="taskData.status !== 'open'">
+              <input type="radio" id="status-open" name="status" value="open" [(ngModel)]="taskData.status" required class="hidden" />
+              <p class="font-bold text-slate-900">Open</p>
+              <p class="text-sm text-slate-500 mt-1">Accepting applications from helpers.</p>
+            </label>
+
+            <label class="border rounded-2xl p-4 cursor-pointer transition"
+              [class.border-blue-500]="taskData.status === 'in_progress'"
+              [class.bg-blue-50]="taskData.status === 'in_progress'"
+              [class.border-slate-200]="taskData.status !== 'in_progress'"
+              [class.bg-white]="taskData.status !== 'in_progress'">
+              <input type="radio" id="status-progress" name="status" value="in_progress" [(ngModel)]="taskData.status" class="hidden" />
+              <p class="font-bold text-slate-900">In Progress</p>
+              <p class="text-sm text-slate-500 mt-1">Task is currently being worked on.</p>
+            </label>
+
+            <label class="border rounded-2xl p-4 cursor-pointer transition"
+              [class.border-blue-500]="taskData.status === 'completed'"
+              [class.bg-blue-50]="taskData.status === 'completed'"
+              [class.border-slate-200]="taskData.status !== 'completed'"
+              [class.bg-white]="taskData.status !== 'completed'">
+              <input type="radio" id="status-completed" name="status" value="completed" [(ngModel)]="taskData.status" class="hidden" />
+              <p class="font-bold text-slate-900">Completed</p>
+              <p class="text-sm text-slate-500 mt-1">Task has already been finished.</p>
+            </label>
+          </div>
+          <p class="text-xs text-slate-500 mt-3">Helpers can only apply to tasks marked as Open.</p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3 pt-2">
+          <button type="button" routerLink="/dashboard" class="h-11 px-5 rounded-xl border border-slate-200 text-slate-600 text-sm font-semibold hover:bg-slate-50 transition">
+            Cancel
+          </button>
+          <button type="submit" [disabled]="taskForm.invalid || isSubmitting" class="h-11 px-5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-bold hover:-translate-y-0.5 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-100 flex items-center justify-center gap-2">
+            <svg *ngIf="!isSubmitting" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg *ngIf="isSubmitting" class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+            {{ isSubmitting ? 'Creating Task...' : 'Post Task' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h2 class="text-lg font-bold text-slate-900">Task Image</h2>
+              <p class="text-sm text-slate-500">Upload an image to make your task more attractive.</p>
+            </div>
+            <span class="text-xs text-slate-400">Optional</span>
+          </div>
+
+          <div *ngIf="imagePreview" class="relative rounded-2xl overflow-hidden border border-slate-200 mb-3">
+            <img [src]="imagePreview" alt="Task preview" class="w-full h-56 object-cover" />
+            <button type="button" (click)="removeImage()" class="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 text-slate-700 hover:bg-white transition shadow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+
+          <button *ngIf="!imagePreview" type="button" (click)="fileInput.click()" class="w-full h-44 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 text-slate-500 hover:border-blue-400 hover:text-blue-600 transition flex flex-col items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span class="font-semibold">Click to upload image</span>
+            <span class="text-sm">PNG, JPG, JPEG up to 5MB</span>
+          </button>
+
+          <input type="file" #fileInput accept="image/*" (change)="onImageSelected($event)" class="hidden" />
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+          <h2 class="text-lg font-bold text-slate-900 mb-4">Task Preview</h2>
+          <div class="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50">
+            <div class="h-40 bg-gradient-to-br from-slate-100 to-slate-200 bg-cover bg-center relative" [style.background-image]="imagePreview ? 'url(' + imagePreview + ')' : 'none'">
+              <span class="absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-full"
+                [ngClass]="{
+                  'bg-emerald-100 text-emerald-700': taskData.status === 'open',
+                  'bg-amber-100 text-amber-700': taskData.status === 'in_progress',
+                  'bg-blue-100 text-blue-700': taskData.status === 'completed'
+                }">
+                {{ getStatusLabel(taskData.status) }}
+              </span>
+            </div>
+            <div class="p-4">
+              <h3 class="font-bold text-slate-900 mb-2">{{ taskData.title || 'Task Title' }}</h3>
+              <p class="text-sm text-slate-500 leading-relaxed mb-4">{{ taskData.description || 'Task description will appear here...' }}</p>
+              <div class="space-y-2 text-sm text-slate-500">
+                <p *ngIf="taskData.city">{{ taskData.city }}</p>
+                <p *ngIf="taskData.start_time">{{ formatPreviewDate(taskData.start_time) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+          <h2 class="text-lg font-bold text-slate-900 mb-3">Tips for Better Tasks</h2>
+          <ul class="space-y-2 text-sm text-slate-500 list-disc pl-5">
+            <li>Be specific about what needs to be done.</li>
+            <li>Include any tools, materials, or skills required.</li>
+            <li>Use realistic dates and clear locations.</li>
+            <li>Add an image when it helps explain the work.</li>
+            <li>Keep the task Open if you want helpers to apply.</li>
+          </ul>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,87 @@
+:host {
+  display: block;
+}
+
+.app-shell {
+  background-color: #f8fafc;
+}
+
+.sidebar-shell {
+  background-color: #ffffff;
+  border-right: 1px solid #e2e8f0;
+}
+
+.content-shell {
+  background-color: #f8fafc;
+}
+
+.section-divider {
+  border-color: #e2e8f0;
+}
+
+.title-text {
+  color: #0f172a;
+}
+
+.subtitle-text {
+  color: #64748b;
+}
+
+.nav-link {
+  color: #475569;
+}
+
+.nav-link:hover {
+  background-color: #f1f5f9;
+}
+
+.action-btn {
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.action-btn:hover {
+  background-color: #f1f5f9;
+}
+
+.theme-dark {
+  background-color: #0f172a;
+}
+
+.theme-dark .sidebar-shell {
+  background-color: #111827;
+  border-right-color: #1f2937;
+}
+
+.theme-dark .content-shell {
+  background-color: #0f172a;
+}
+
+.theme-dark .section-divider {
+  border-color: #1f2937;
+}
+
+.theme-dark .title-text {
+  color: #f8fafc;
+}
+
+.theme-dark .subtitle-text {
+  color: #94a3b8;
+}
+
+.theme-dark .nav-link {
+  color: #cbd5e1;
+}
+
+.theme-dark .nav-link:hover {
+  background-color: #1e293b;
+}
+
+.theme-dark .action-btn {
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+.theme-dark .action-btn:hover {
+  background-color: #1e293b;
+}
