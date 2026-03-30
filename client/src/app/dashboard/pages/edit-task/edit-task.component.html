@@ -1,0 +1,126 @@
+<div class="page">
+    <div class="page-header">
+        <h1>Edit Task</h1>
+        <p>Update your task details</p>
+    </div>
+
+    @if (fetching()) {
+    <div class="loading-state card">
+        <div class="spinner-large"></div>
+        <p>Fetching task details...</p>
+    </div>
+    } @else if (error) {
+    <div class="error-state card">
+        <p>{{ error }}</p>
+        <button class="btn btn-primary" (click)="onCancel()">Back to My Tasks</button>
+    </div>
+    } @else {
+    <div class="form-container card">
+        <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+            <div class="form-row">
+                <div class="form-group full">
+                    <label for="title">Title</label>
+                    <input id="title" type="text" formControlName="title"
+                        [class.error]="isFieldInvalid('title')">
+                    @if (isFieldInvalid('title')) {
+                    <span class="error-text">Title is required</span>
+                    }
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group full">
+                    <label for="description">Description</label>
+                    <textarea id="description" formControlName="description" rows="4"
+                        [class.error]="isFieldInvalid('description')"></textarea>
+                    @if (isFieldInvalid('description')) {
+                    <span class="error-text">Description is required</span>
+                    }
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <div class="input-with-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="input-icon">
+                            <path d="M12 21S3 14 3 9.5a9 9 0 1 1 18 0c0 4.5-9 11-9 11z" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <circle cx="12" cy="9.5" r="3" stroke="currentColor" stroke-width="2" />
+                        </svg>
+                        <input id="location" type="text" formControlName="location"
+                            [class.error]="isFieldInvalid('location')">
+                    </div>
+                    @if (isFieldInvalid('location')) {
+                    <span class="error-text">Location is required</span>
+                    }
+                </div>
+                <div class="form-group">
+                    <label for="start_time">Start Time</label>
+                    <input id="start_time" type="datetime-local" formControlName="start_time"
+                        [class.error]="isFieldInvalid('start_time')">
+                    @if (isFieldInvalid('start_time')) {
+                    <span class="error-text">Start time is required</span>
+                    }
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pay">Pay Amount (₹)</label>
+                    <input id="pay" type="number" formControlName="pay"
+                        [class.error]="isFieldInvalid('pay')">
+                    @if (isFieldInvalid('pay')) {
+                    <span class="error-text">Pay amount is required</span>
+                    }
+                </div>
+                <div class="form-group">
+                    <label for="end_time">End Time (Optional)</label>
+                    <input id="end_time" type="datetime-local" formControlName="end_time">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="status">Task Status</label>
+                    <select id="status" formControlName="status">
+                        <option value="OPEN">Open</option>
+                        <option value="CLOSED">Closed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="picture_url">Picture URL</label>
+                    <input id="picture_url" type="text" formControlName="picture_url"
+                        [class.error]="isFieldInvalid('picture_url')">
+                    @if (isFieldInvalid('picture_url')) {
+                    <span class="error-text">Picture URL is required</span>
+                    }
+                </div>
+            </div>
+
+            @if (taskForm.get('picture_url')?.value) {
+            <div class="image-preview card">
+                <h4>Image Preview</h4>
+                <img [src]="taskForm.get('picture_url')?.value" alt="Task Preview"
+                    (error)="taskForm.get('picture_url')?.setErrors({'invalidUrl': true})">
+                @if (taskForm.get('picture_url')?.hasError('invalidUrl')) {
+                <span class="error-text">Invalid image URL</span>
+                }
+            </div>
+            }
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-ghost" (click)="onCancel()">Cancel</button>
+                <button type="submit" class="btn btn-primary" [disabled]="taskForm.invalid || loading()">
+                    @if (loading()) {
+                    <span class="spinner"></span>
+                    Updating...
+                    } @else {
+                    Update Task
+                    }
+                </button>
+            </div>
+        </form>
+    </div>
+    }
+</div>

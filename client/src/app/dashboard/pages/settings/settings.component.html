@@ -1,0 +1,287 @@
+<div class="settings-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-accent"></div>
+    <div class="header-content">
+      <h1>Settings</h1>
+      <p>Manage your account, security, and preferences</p>
+    </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tab-nav">
+    <button class="tab-btn" [class.active]="activeTab === 'profile'" (click)="setTab('profile')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      Profile
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'security'" (click)="setTab('security')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      Security
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'notifications'" (click)="setTab('notifications')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      Notifications
+    </button>
+  </div>
+
+  <!-- ═══ PROFILE TAB ═══ -->
+  @if (activeTab === 'profile') {
+    <div class="tab-content" @fadeIn>
+      <div class="settings-card">
+
+        <!-- Avatar preview -->
+        <div class="avatar-section">
+          <div class="avatar-circle">{{ userInitial }}</div>
+          <div class="avatar-info">
+            <p class="avatar-name">{{ userName }}</p>
+            <p class="avatar-hint">Your display name across HireHelper</p>
+          </div>
+        </div>
+
+        <div class="card-divider"></div>
+
+        <form [formGroup]="profileForm" (ngSubmit)="onUpdateProfile()">
+          <div class="form-group">
+            <label for="name">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              Full Name
+            </label>
+            <input type="text" id="name" formControlName="name" placeholder="Enter your full name" autocomplete="name">
+          </div>
+
+          @if (profileMessage) {
+            <div class="status-pill" [class.success]="profileSuccess" [class.error]="!profileSuccess">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                @if (profileSuccess) {
+                  <polyline points="20 6 9 17 4 12"/>
+                } @else {
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                }
+              </svg>
+              {{ profileMessage }}
+            </div>
+          }
+
+          <button type="submit" class="btn-primary" [disabled]="profileForm.invalid || isSubmittingProfile">
+            @if (isSubmittingProfile) {
+              <span class="spinner"></span> Updating...
+            } @else {
+              Save Changes
+            }
+          </button>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- ═══ SECURITY TAB ═══ -->
+  @if (activeTab === 'security') {
+    <div class="tab-content">
+      <div class="settings-card">
+        <div class="card-label">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          Change Password
+        </div>
+        <p class="card-desc">Keep your account secure with a strong, unique password.</p>
+
+        <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()">
+          <div class="form-group">
+            <label for="currentPassword">Current Password</label>
+            <div class="input-with-action">
+              <input [type]="showCurrentPassword ? 'text' : 'password'" id="currentPassword"
+                formControlName="currentPassword" placeholder="Your current password">
+              <button type="button" class="eye-btn" (click)="showCurrentPassword = !showCurrentPassword" tabindex="-1">
+                @if (showCurrentPassword) {
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                } @else {
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                }
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword">New Password</label>
+            <div class="input-with-action">
+              <input [type]="showNewPassword ? 'text' : 'password'" id="newPassword"
+                formControlName="newPassword" placeholder="Min 6 characters">
+              <button type="button" class="eye-btn" (click)="showNewPassword = !showNewPassword" tabindex="-1">
+                @if (showNewPassword) {
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                } @else {
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                }
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm New Password</label>
+            <div class="input-with-action">
+              <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirmPassword"
+                formControlName="confirmPassword" placeholder="Repeat new password">
+              <button type="button" class="eye-btn" (click)="showConfirmPassword = !showConfirmPassword" tabindex="-1">
+                @if (showConfirmPassword) {
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                } @else {
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                }
+              </button>
+            </div>
+            @if (passwordForm.errors?.['mismatch'] && passwordForm.get('confirmPassword')?.touched) {
+              <span class="field-error">Passwords do not match</span>
+            }
+          </div>
+
+          @if (passwordMessage) {
+            <div class="status-pill" [class.success]="passwordSuccess" [class.error]="!passwordSuccess">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                @if (passwordSuccess) {
+                  <polyline points="20 6 9 17 4 12"/>
+                } @else {
+                  <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                }
+              </svg>
+              {{ passwordMessage }}
+            </div>
+          }
+
+          <button type="submit" class="btn-primary" [disabled]="passwordForm.invalid || isSubmittingPassword">
+            @if (isSubmittingPassword) {
+              <span class="spinner"></span> Updating...
+            } @else {
+              Update Password
+            }
+          </button>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- ═══ NOTIFICATIONS TAB ═══ -->
+  @if (activeTab === 'notifications') {
+    <div class="tab-content">
+      <div class="settings-card">
+        <div class="card-label">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          Push Notifications
+        </div>
+        <p class="card-desc">Get instant OS-level alerts when new tasks appear near you — even when HireHelper is in the background.</p>
+
+        <!-- Permission Status -->
+        <div class="permission-status">
+          <div class="permission-row">
+            <span class="permission-label">Browser Permission</span>
+            @if (notificationPermission === 'granted') {
+              <span class="badge badge-green">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Granted
+              </span>
+            } @else if (notificationPermission === 'denied') {
+              <span class="badge badge-red">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Blocked
+              </span>
+            } @else {
+              <span class="badge badge-yellow">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Not Set
+              </span>
+            }
+          </div>
+          <div class="permission-row">
+            <span class="permission-label">Polling Status</span>
+            @if (notificationsEnabled && notificationPermission === 'granted') {
+              <span class="badge badge-green">
+                <span class="pulse-dot"></span>
+                Active
+              </span>
+            } @else {
+              <span class="badge badge-muted">Inactive</span>
+            }
+          </div>
+        </div>
+
+        @if (notificationPermission === 'denied') {
+          <div class="permission-warning">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            Notifications are <strong>blocked</strong> in your browser. To enable them, click the lock icon in your address bar and allow notifications for this site.
+          </div>
+        }
+
+        <!-- Toggle row -->
+        <div class="notif-toggle-row">
+          <div class="toggle-info">
+            <p class="toggle-title">Enable Notifications</p>
+            <p class="toggle-hint">
+              @if (notificationsEnabled && notificationPermission === 'granted') {
+                Polling every 30 seconds for new tasks
+              } @else {
+                Click to enable browser push alerts
+              }
+            </p>
+          </div>
+          <button
+            class="toggle-pill"
+            [class.on]="notificationsEnabled && notificationPermission === 'granted'"
+            [disabled]="notificationToggling || notificationPermission === 'denied'"
+            (click)="toggleNotifications()">
+            <span class="toggle-knob"></span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Info card -->
+      <div class="info-card">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+        <p>Notifications use your browser's native alert system — they work even when you switch to a different tab.</p>
+      </div>
+    </div>
+  }
+
+</div>

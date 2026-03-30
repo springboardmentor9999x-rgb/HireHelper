@@ -1,0 +1,61 @@
+<div class="landing-page">
+    <!-- Animated background -->
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <div class="bg-blob blob-3"></div>
+    <div class="bg-blob blob-4"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- ═══════════ NAVBAR ═══════════ -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-inner">
+            <a routerLink="/" class="nav-brand">
+                <div class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M20 7H4C2.9 7 2 7.9 2 9V19C2 20.1 2.9 21 4 21H20C21.1 21 22 20.1 22 19V9C22 7.9 21.1 7 20 7Z"
+                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M16 21V5C16 3.9 15.1 3 14 3H10C8.9 3 8 3.9 8 5V21" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <span class="brand-name">HireHelper</span>
+            </a>
+            <div class="nav-links">
+                <a routerLink="/login" class="nav-link" id="nav-login">Log in</a>
+                <a routerLink="/signup" class="nav-btn" id="nav-signup">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ═══════════ HERO ═══════════ -->
+    <section class="hero" id="hero">
+        <div class="hero-badge reveal-on-scroll">
+            <span class="badge-dot"></span>
+            <span>Built for modern teams</span>
+        </div>
+        <h1 class="hero-title reveal-on-scroll">
+            Streamline your<br>
+            <span class="gradient-text">hiring workflow</span>
+        </h1>
+        <p class="hero-subtitle reveal-on-scroll">
+            Post tasks, find talent, and manage requests — all in one
+            beautifully simple platform designed for teams that move fast.
+        </p>
+        <div class="hero-actions reveal-on-scroll">
+            <a routerLink="/signup" class="btn-primary shimmer" id="hero-get-started">
+                <span>Start for free</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" />
+                    <polyline points="12 5 19 12 12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </a>
+            <a routerLink="/login" class="btn-secondary" id="hero-login">
+                <span>Sign in</span>
+            </a>
+        </div>
+
+    </section>
+</div>

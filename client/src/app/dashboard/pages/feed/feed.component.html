@@ -1,0 +1,165 @@
+<div class="page">
+    <div class="page-header">
+        <h1>Task Feed</h1>
+        <p>Discover opportunities to help others in your community</p>
+    </div>
+
+    @if (loading) {
+    <div class="loading-state">
+        <div class="spinner-large"></div>
+        <p>Fetching new tasks...</p>
+    </div>
+    } @else if (tasks.length === 0) {
+    <div class="empty-state">
+        <div class="empty-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
+                <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </div>
+        <h3>No tasks available</h3>
+        <p>Check back later for new tasks from other users.</p>
+    </div>
+    } @else {
+    <div class="tasks-grid">
+        @for (task of tasks; track task.id) {
+        <div class="task-card">
+            @if (task.picture_url) {
+            <div class="task-image">
+                <img [src]="task.picture_url" alt="task cover">
+            </div>
+            }
+
+            <div class="task-header">
+                <span class="status-badge">{{ task.status }}</span>
+                <span class="task-date">{{ task.created_at | date:'mediumDate' }}</span>
+            </div>
+
+            <h3 class="task-title">{{ task.title }}</h3>
+            <p class="task-description">{{ task.description }}</p>
+
+            <div class="task-details">
+                <span class="detail-chip">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 21S3 14 3 9.5a9 9 0 1 1 18 0c0 4.5-9 11-9 11z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="12" cy="9.5" r="3" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                    {{ task.location }}
+                </span>
+                <span class="detail-chip">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2" />
+                        <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                    {{ task.start_time | date:'short' }}
+                </span>
+                <span class="detail-chip pay-chip">₹{{ task.pay || 0 }}</span>
+            </div>
+
+            <div class="task-footer">
+                @if (task.has_requested) {
+                    <button class="btn-requested" disabled>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Requested
+                    </button>
+                } @else {
+                    <button class="btn-request" (click)="openRequestModal(task)">
+                        Request to Help
+                    </button>
+                }
+            </div>
+        </div>
+        }
+    </div>
+    }
+</div>
+
+<!-- ═══ REQUEST MODAL ═══ -->
+@if (modalOpen) {
+<div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+
+        @if (modalState === 'form') {
+        <div class="modal-header">
+            <div class="modal-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15C21 15.53 20.79 16.04 20.41 16.41C20.04 16.79 19.53 17 19 17H7L3 21V5C3 4.47 3.21 3.96 3.59 3.59C3.96 3.21 4.47 3 5 3H19C19.53 3 20.04 3.21 20.41 3.59C20.79 3.96 21 4.47 21 5V15Z"/>
+                </svg>
+            </div>
+            <div>
+                <h2 class="modal-title">Request Task</h2>
+                <p class="modal-subtitle">{{ selectedTask?.title }}</p>
+            </div>
+            <button class="modal-close" (click)="closeModal()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="modal-meta">
+            <span class="meta-chip">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 21S3 14 3 9.5a9 9 0 1 1 18 0c0 4.5-9 11-9 11z"/><circle cx="12" cy="9.5" r="3"/>
+                </svg>
+                {{ selectedTask?.location }}
+            </span>
+            <span class="meta-chip">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+                {{ selectedTask?.start_time | date:'short' }}
+            </span>
+            <span class="meta-chip pay">₹{{ selectedTask?.pay || 0 }}</span>
+        </div>
+
+        <div class="modal-body">
+            <label for="requestMessage">Message <span class="optional-tag">optional</span></label>
+            <textarea id="requestMessage" [(ngModel)]="requestMessage"
+                placeholder="Introduce yourself or explain why you're a great fit for this task..."
+                rows="4"></textarea>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+            <button class="btn-submit" [disabled]="submitting" (click)="submitRequest()">
+                @if (submitting) { <span class="btn-spinner"></span> Sending... }
+                @else { Send Request }
+            </button>
+        </div>
+        }
+
+        @if (modalState === 'success') {
+        <div class="modal-result success-result">
+            <div class="result-icon success-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+            </div>
+            <h2>Request Sent!</h2>
+            <p>Your request has been submitted. The task owner will review it and get back to you.</p>
+            <button class="btn-submit" (click)="closeModal()">Done</button>
+        </div>
+        }
+
+        @if (modalState === 'error') {
+        <div class="modal-result error-result">
+            <div class="result-icon error-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+            </div>
+            <h2>Request Failed</h2>
+            <p>{{ errorMessage }}</p>
+            <div class="result-actions">
+                <button class="btn-cancel" (click)="closeModal()">Close</button>
+                <button class="btn-submit" (click)="modalState = 'form'">Try Again</button>
+            </div>
+        </div>
+        }
+
+    </div>
+</div>
+}

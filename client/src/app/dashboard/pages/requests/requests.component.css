@@ -1,0 +1,109 @@
+:host { display: block; }
+
+.page { max-width: 900px; margin: 0 auto; animation: fadeUp 0.4s ease; }
+.page-header { margin-bottom: 2.5rem; }
+.page-header h1 {
+    font-size: 2.1rem; font-weight: 800; letter-spacing: -0.04em;
+    background: linear-gradient(135deg, #fff 0%, rgba(167,139,250,0.85) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 0.3rem;
+}
+.page-header p { color: rgba(255,255,255,0.38); font-size: 0.9rem; }
+
+/* ─── List ─────────────────── */
+.requests-list { display: flex; flex-direction: column; gap: 1rem; }
+
+/* ─── Request Card ─────────── */
+.req-card {
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px; padding: 1.4rem 1.5rem;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.06);
+    transition: all 0.3s ease; animation: fadeUp 0.4s ease both;
+}
+.req-card:hover { border-color: rgba(108,71,255,0.2); transform: translateY(-2px); box-shadow: 0 12px 36px rgba(0,0,0,0.35); }
+.req-card.has-pending { border-left: 3px solid rgba(251,191,36,0.5); }
+
+.req-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 1rem; margin-bottom: 0.85rem;
+}
+
+.user-row { display: flex; align-items: center; gap: 0.85rem; }
+
+.user-avatar {
+    width: 40px; height: 40px; border-radius: 12px;
+    background: linear-gradient(135deg, #6c47ff, #a78bfa);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.95rem; color: #fff;
+    flex-shrink: 0; box-shadow: 0 3px 10px rgba(108,71,255,0.3);
+}
+
+.user-name { font-size: 0.95rem; font-weight: 700; color: #f0f0ff; margin: 0 0 0.15rem; }
+.user-email { font-size: 0.78rem; color: rgba(255,255,255,0.35); margin: 0; }
+
+.status-badge {
+    display: inline-flex; align-items: center; padding: 0.25rem 0.75rem;
+    border-radius: 20px; font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0;
+}
+.status-badge.pending  { background: rgba(251,191,36,0.12); color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
+.status-badge.accepted { background: rgba(52,211,153,0.12); color: #34d399; border: 1px solid rgba(52,211,153,0.25); }
+.status-badge.rejected { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
+
+/* ─── Task Ref ─────────────── */
+.task-ref {
+    display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;
+    font-size: 0.82rem;
+}
+.task-ref-label { color: rgba(255,255,255,0.35); }
+.task-ref-value { color: #a78bfa; font-weight: 600; }
+
+.req-message {
+    font-size: 0.875rem; color: rgba(255,255,255,0.45); font-style: italic;
+    padding: 0.75rem 1rem;
+    background: rgba(255,255,255,0.03); border-left: 3px solid rgba(108,71,255,0.3);
+    border-radius: 0 8px 8px 0; line-height: 1.55; margin-bottom: 1rem;
+}
+
+/* ─── Actions ──────────────── */
+.action-row { display: flex; gap: 0.6rem; }
+
+.btn-accept {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.55rem 1.1rem; border-radius: 9px;
+    background: linear-gradient(135deg, rgba(52,211,153,0.2), rgba(16,185,129,0.15));
+    border: 1px solid rgba(52,211,153,0.3); color: #34d399;
+    font-size: 0.82rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: all 0.2s;
+}
+.btn-accept:hover { background: rgba(52,211,153,0.28); transform: translateY(-1px); }
+
+.btn-reject {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.55rem 1.1rem; border-radius: 9px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+    color: rgba(255,255,255,0.5); font-size: 0.82rem; font-weight: 700;
+    font-family: inherit; cursor: pointer; transition: all 0.2s;
+}
+.btn-reject:hover { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.25); color: #f87171; }
+
+.btn-chat {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.55rem 1.1rem; border-radius: 9px;
+    background: rgba(108,71,255,0.06); border: 1px solid rgba(108,71,255,0.15);
+    color: #a78bfa; font-size: 0.82rem; font-weight: 700;
+    font-family: inherit; cursor: pointer; transition: all 0.2s;
+}
+.btn-chat:hover { background: rgba(108,71,255,0.15); border-color: rgba(108,71,255,0.3); transform: translateY(-1px); }
+
+/* ─── Loading/Empty ─────────── */
+.loading-state { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:6rem 2rem; gap:1rem; color:rgba(255,255,255,0.35); font-size:0.9rem; }
+.spinner-large  { width:38px; height:38px; border:3px solid rgba(108,71,255,0.12); border-top-color:#7c5cbf; border-radius:50%; animation:spin 0.8s linear infinite; }
+.empty-state    { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:5rem 2rem; text-align:center; gap:0.75rem; background:rgba(255,255,255,0.03); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.07); border-radius:18px; }
+.empty-icon     { width:72px; height:72px; border-radius:20px; background:rgba(108,71,255,0.08); border:1px solid rgba(108,71,255,0.15); display:flex; align-items:center; justify-content:center; color:rgba(167,139,250,0.6); margin-bottom:0.5rem; }
+.empty-state h3 { font-size:1.1rem; font-weight:600; color:rgba(255,255,255,0.7); }
+.empty-state p  { font-size:0.85rem; color:rgba(255,255,255,0.35); max-width:320px; line-height:1.6; }
+
+@keyframes fadeUp { from { opacity:0; transform: translateY(14px); } to { opacity:1; transform: translateY(0); } }
+@keyframes spin   { to { transform: rotate(360deg); } }

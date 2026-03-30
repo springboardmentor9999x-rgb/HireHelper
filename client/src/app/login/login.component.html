@@ -1,0 +1,121 @@
+<div class="page-wrapper">
+  <!-- Animated background blobs -->
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+  <div class="bg-blob blob-3"></div>
+
+  <div class="login-card">
+    <!-- Logo / Branding -->
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 7H4C2.9 7 2 7.9 2 9V19C2 20.1 2.9 21 4 21H20C21.1 21 22 20.1 22 19V9C22 7.9 21.1 7 20 7Z"
+            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M16 21V5C16 3.9 15.1 3 14 3H10C8.9 3 8 3.9 8 5V21" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <span class="brand-name">HireHelper</span>
+    </div>
+
+    <div class="card-header">
+      <h1>Welcome back</h1>
+      <p>Sign in to your account to continue</p>
+    </div>
+
+    <!-- Error alert -->
+    @if (errorMessage()) {
+    <div class="error-alert" id="error-alert">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+        <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        <circle cx="12" cy="16" r="1" fill="currentColor" />
+      </svg>
+      {{ errorMessage() }}
+    </div>
+    }
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate id="login-form">
+      <!-- Email -->
+      <div class="form-group" [class.has-error]="email.invalid && email.touched">
+        <label for="email">Email address</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z"
+              stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            <polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+          <input id="email" type="email" formControlName="email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+        @if (email.invalid && email.touched) {
+        <span class="field-error">
+          {{ email.errors?.['required'] ? 'Email is required.' : 'Please enter a valid email.' }}
+        </span>
+        }
+      </div>
+
+      <!-- Password -->
+      <div class="form-group" [class.has-error]="password.invalid && password.touched">
+        <label for="password">Password</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" stroke-width="1.8" />
+            <path d="M7 11V7C7 4.24 9.24 2 12 2C14.76 2 17 4.24 17 7V11" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" />
+          </svg>
+          <input id="password" [type]="showPassword() ? 'text' : 'password'" formControlName="password"
+            placeholder="••••••••" autocomplete="current-password" />
+          <button type="button" class="toggle-password" (click)="togglePassword()" id="toggle-password"
+            aria-label="Toggle password visibility">
+            @if (showPassword()) {
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M17.94 17.94A10.07 10.07 0 0 1 12 20C7 20 2.73 16.39 1 12C1.92 9.68 3.5 7.67 5.53 6.23M9.9 4.24A9.12 9.12 0 0 1 12 4C17 4 21.27 7.61 23 12C22.32 13.76 21.22 15.31 19.82 16.54"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            } @else {
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" />
+            </svg>
+            }
+          </button>
+        </div>
+        @if (password.invalid && password.touched) {
+        <span class="field-error">
+          {{ password.errors?.['required'] ? 'Password is required.' : 'Password must be at least 6 characters.' }}
+        </span>
+        }
+      </div>
+
+      <!-- Forgot password -->
+      <div class="form-footer">
+        <a routerLink="/forgot-password" class="forgot-link" id="forgot-password-link">Forgot password?</a>
+      </div>
+
+      <!-- Submit button -->
+      <button type="submit" class="btn-submit" [disabled]="isLoading()" id="submit-btn">
+        @if (isLoading()) {
+        <span class="spinner"></span>
+        <span>Signing in…</span>
+        } @else {
+        <span>Sign in</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <polyline points="12 5 19 12 12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        }
+      </button>
+    </form>
+
+    <p class="signup-prompt">
+      Don't have an account? <a routerLink="/signup" id="signup-link">Sign up</a>
+    </p>
+  </div>
+</div>

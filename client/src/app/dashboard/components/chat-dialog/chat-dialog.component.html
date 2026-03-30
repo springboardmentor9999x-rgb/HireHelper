@@ -1,0 +1,52 @@
+<div class="chat-overlay" (click)="onClose()">
+    <div class="chat-container glass" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="header-info">
+                <div class="user-avatar">{{ otherUserName?.charAt(0)?.toUpperCase() }}</div>
+                <div>
+                    <h3>{{ otherUserName }}</h3>
+                    <p>{{ taskTitle }}</p>
+                </div>
+            </div>
+            <button class="btn-close" (click)="onClose()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+        </div>
+
+        <!-- Messages Area -->
+        <div class="messages-area" #scrollContainer>
+            @if (loading && messages.length === 0) {
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                </div>
+            } @else if (messages.length === 0) {
+                <div class="empty-state">
+                    <p>No messages yet. Say hi!</p>
+                </div>
+            } @else {
+                <div class="message-list">
+                    @for (msg of messages; track msg.id) {
+                        <div class="message-wrapper" [class.sent]="msg.sender_id === currentUserId">
+                            <div class="message-bubble">
+                                <p class="message-content">{{ msg.content }}</p>
+                                <span class="message-time">{{ msg.created_at | date:'shortTime' }}</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Input Area -->
+        <div class="chat-input-area">
+            <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" 
+                placeholder="Type a message..." class="chat-input">
+            <button class="btn-send" (click)="sendMessage()" [disabled]="!newMessage.trim()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9L22 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>

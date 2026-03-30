@@ -1,0 +1,98 @@
+<div class="page">
+    <div class="page-header">
+        <h1>Add Task</h1>
+        <p>Create a new task and find someone to help you</p>
+    </div>
+
+    @if (successMessage) {
+    <div class="success-banner">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        {{ successMessage }}
+    </div>
+    }
+
+    <div class="form-glass">
+        <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+            <div class="form-row full-width">
+                <div class="form-group">
+                    <label for="title">Task Title <span class="required-star">*</span></label>
+                    <input id="title" type="text" formControlName="title"
+                        placeholder="e.g. Help with grocery shopping"
+                        [class.error]="isFieldInvalid('title')">
+                    @if (isFieldInvalid('title')) { <span class="error-text">Title is required</span> }
+                </div>
+            </div>
+
+            <div class="form-row full-width">
+                <div class="form-group">
+                    <label for="description">Description <span class="required-star">*</span></label>
+                    <textarea id="description" formControlName="description" rows="4"
+                        placeholder="Describe the task in detail..."
+                        [class.error]="isFieldInvalid('description')"></textarea>
+                    @if (isFieldInvalid('description')) { <span class="error-text">Description is required</span> }
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="location">Location <span class="required-star">*</span></label>
+                    <div class="input-icon-wrap">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 21S3 14 3 9.5a9 9 0 1 1 18 0c0 4.5-9 11-9 11z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="12" cy="9.5" r="3" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <input id="location" type="text" formControlName="location"
+                            placeholder="City or address" [class.error]="isFieldInvalid('location')">
+                    </div>
+                    @if (isFieldInvalid('location')) { <span class="error-text">Location is required</span> }
+                </div>
+                <div class="form-group">
+                    <label for="start_time">Start Time <span class="required-star">*</span></label>
+                    <input id="start_time" type="datetime-local" formControlName="start_time"
+                        [class.error]="isFieldInvalid('start_time')">
+                    @if (isFieldInvalid('start_time')) { <span class="error-text">Start time is required</span> }
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pay">Pay Amount (₹) <span class="required-star">*</span></label>
+                    <input id="pay" type="number" formControlName="pay"
+                        placeholder="e.g. 500" [class.error]="isFieldInvalid('pay')">
+                    @if (isFieldInvalid('pay')) { <span class="error-text">Pay amount is required</span> }
+                </div>
+                <div class="form-group">
+                    <label for="end_time">End Time <span style="opacity:0.4;font-weight:400">(optional)</span></label>
+                    <input id="end_time" type="datetime-local" formControlName="end_time">
+                </div>
+            </div>
+
+            <div class="form-row full-width">
+                <div class="form-group">
+                    <label for="picture_url">Picture URL <span class="required-star">*</span></label>
+                    <input id="picture_url" type="text" formControlName="picture_url"
+                        placeholder="https://example.com/image.jpg">
+                </div>
+            </div>
+
+            @if (taskForm.get('picture_url')?.value) {
+            <div class="image-preview">
+                <h4>Preview</h4>
+                <img [src]="taskForm.get('picture_url')?.value" alt="Task Preview"
+                    (error)="taskForm.get('picture_url')?.setErrors({'invalidUrl': true})">
+                @if (taskForm.get('picture_url')?.hasError('invalidUrl')) {
+                <span class="error-text">Invalid image URL</span>
+                }
+            </div>
+            }
+
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" (click)="resetForm()">Cancel</button>
+                <button type="submit" class="btn-submit" [disabled]="taskForm.invalid || loading">
+                    @if (loading) { <span class="spinner"></span> Creating... }
+                    @else { Create Task }
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

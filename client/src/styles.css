@@ -1,0 +1,212 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: #07071a;
+    background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(108, 71, 255, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 60% 80%, rgba(167, 139, 250, 0.06) 0%, transparent 50%);
+    background-attachment: fixed;
+}
+
+/* ─── Global Scrollbar ─────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(108, 71, 255, 0.35); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(108, 71, 255, 0.55); }
+
+/* ─── Shared Glass Card ────────────────────────────── */
+.glass-card {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+    border-color: rgba(108, 71, 255, 0.25);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(108, 71, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* ─── Page Header ──────────────────────────────────── */
+.page-hdr {
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.4s ease;
+}
+
+.page-hdr h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    background: linear-gradient(135deg, #fff 0%, rgba(167,139,250,0.85) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.4rem;
+}
+
+.page-hdr p {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.38);
+}
+
+/* ─── Status Badges ────────────────────────────────── */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.badge-open    { background: rgba(52, 211, 153, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.25); }
+.badge-pending { background: rgba(251, 191, 36, 0.12); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.25); }
+.badge-accepted{ background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); }
+.badge-rejected{ background: rgba(248, 113, 113, 0.12); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.25); }
+
+/* ─── Shared Loading / Empty ───────────────────────── */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem 2rem;
+    gap: 1rem;
+    color: rgba(255,255,255,0.35);
+    font-size: 0.9rem;
+    animation: fadeUp 0.4s ease;
+}
+
+.spinner-lg {
+    width: 38px;
+    height: 38px;
+    border: 3px solid rgba(108, 71, 255, 0.12);
+    border-top-color: #7c5cbf;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 2rem;
+    text-align: center;
+    gap: 0.75rem;
+    animation: fadeUp 0.4s ease;
+}
+
+.empty-icon-wrap {
+    width: 72px;
+    height: 72px;
+    border-radius: 20px;
+    background: rgba(108, 71, 255, 0.08);
+    border: 1px solid rgba(108, 71, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(167, 139, 250, 0.6);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+}
+
+.empty-state p {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.35);
+    max-width: 340px;
+    line-height: 1.6;
+}
+
+/* ─── Global Buttons ───────────────────────────────── */
+.btn-gls {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.4rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.22s ease;
+    border: none;
+}
+
+.btn-gls-primary {
+    background: linear-gradient(135deg, #6c47ff, #8b5cf6);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(108, 71, 255, 0.3);
+}
+
+.btn-gls-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(108, 71, 255, 0.45);
+}
+
+.btn-gls-ghost {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.6);
+    border: 1px solid rgba(255,255,255,0.09);
+}
+
+.btn-gls-ghost:hover {
+    background: rgba(255,255,255,0.09);
+    color: #fff;
+}
+
+.btn-gls-danger {
+    background: rgba(248, 113, 113, 0.1);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.2);
+}
+
+.btn-gls-danger:hover {
+    background: rgba(248, 113, 113, 0.18);
+}
+
+.btn-gls:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* ─── Shared Animations ─────────────────────────────── */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+}

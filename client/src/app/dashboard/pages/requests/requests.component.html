@@ -1,0 +1,83 @@
+<div class="page">
+    <div class="page-header">
+        <h1>Incoming Requests</h1>
+        <p>Manage requests from users interested in your tasks</p>
+    </div>
+
+    @if (loading) {
+    <div class="loading-state">
+        <div class="spinner-large"></div>
+        <p>Loading requests...</p>
+    </div>
+    } @else if (requests.length === 0) {
+    <div class="empty-state">
+        <div class="empty-icon">
+            <svg width="38" height="38" viewBox="0 0 24 24" fill="none">
+                <path d="M21 15C21 15.53 20.79 16.04 20.41 16.41C20.04 16.79 19.53 17 19 17H7L3 21V5C3 4.47 3.21 3.96 3.59 3.59C3.96 3.21 4.47 3 5 3H19C19.53 3 20.04 3.21 20.41 3.59C20.79 3.96 21 4.47 21 5V15Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <h3>No incoming requests</h3>
+        <p>When users request to help with your tasks, they will appear here.</p>
+    </div>
+    } @else {
+    <div class="requests-list">
+        @for (req of requests; track req.id) {
+        <div class="req-card" [class.has-pending]="req.status === 'PENDING'">
+            <div class="req-header">
+                <div class="user-row">
+                    <div class="user-avatar">{{ req.user_name?.charAt(0)?.toUpperCase() }}</div>
+                    <div>
+                        <p class="user-name">{{ req.user_name }}</p>
+                        <p class="user-email">{{ req.user_email }}</p>
+                    </div>
+                </div>
+                <span class="status-badge {{ req.status?.toLowerCase() }}">{{ req.status }}</span>
+            </div>
+
+            <div class="task-ref">
+                <span class="task-ref-label">Task:</span>
+                <span class="task-ref-value">{{ req.task_title }}</span>
+            </div>
+
+            @if (req.message) {
+            <div class="req-message">"{{ req.message }}"</div>
+            }
+
+            @if (req.status === 'PENDING') {
+            <div class="action-row">
+                <button class="btn-accept" (click)="onUpdateStatus(req.id, 'ACCEPTED')">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Accept
+                </button>
+                <button class="btn-reject" (click)="onUpdateStatus(req.id, 'REJECTED')">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                    Reject
+                </button>
+                <button class="btn-chat" (click)="openChat(req)">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 15C21 15.53 20.79 16.04 20.41 16.41C20.04 16.79 19.53 17 19 17H7L3 21V5C3 4.47 3.21 3.96 3.59 3.59C3.96 3.21 4.47 3 5 3H19C19.53 3 20.04 3.21 20.41 3.59C20.79 3.96 21 4.47 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Chat
+                </button>
+            </div>
+            } @else {
+            <div class="action-row">
+                <button class="btn-chat" (click)="openChat(req)">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 15C21 15.53 20.79 16.04 20.41 16.41C20.04 16.79 19.53 17 19 17H7L3 21V5C3 4.47 3.21 3.96 3.59 3.59C3.96 3.21 4.47 3 5 3H19C19.53 3 20.04 3.21 20.41 3.59C20.79 3.96 21 4.47 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Chat
+                </button>
+            </div>
+            }
+        </div>
+        }
+    </div>
+    }
+</div>
+
+@if (chatOpen) {
+    <app-chat-dialog 
+        [requestId]="selectedRequestId"
+        [taskTitle]="selectedTaskTitle"
+        [otherUserName]="selectedUserName"
+        [currentUserId]="currentUserId"
+        (close)="closeChat()">
+    </app-chat-dialog>
+}

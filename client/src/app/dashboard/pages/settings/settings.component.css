@@ -1,0 +1,519 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:host {
+    display: block;
+    font-family: 'Inter', sans-serif;
+}
+
+/* ─── Page Layout ────────────────────────────────────── */
+.settings-page {
+    padding-bottom: 4rem;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+/* ─── Header ─────────────────────────────────────────── */
+.page-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.header-accent {
+    width: 4px;
+    height: 48px;
+    background: linear-gradient(180deg, #6c47ff, #a78bfa);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.header-content h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #f0f0ff;
+    margin: 0 0 0.25rem;
+    letter-spacing: -0.03em;
+}
+
+.header-content p {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin: 0;
+}
+
+/* ─── Tab Navigation ─────────────────────────────────── */
+.tab-nav {
+    display: flex;
+    gap: 0.25rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    padding: 0.4rem;
+    margin-bottom: 1.75rem;
+}
+
+.tab-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1rem;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.tab-btn:hover {
+    color: rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.tab-btn.active {
+    background: rgba(108, 71, 255, 0.2);
+    color: #a78bfa;
+    border: 1px solid rgba(108, 71, 255, 0.35);
+}
+
+/* ─── Tab Content ────────────────────────────────────── */
+.tab-content {
+    animation: fadeUp 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Settings Card ──────────────────────────────────── */
+.settings-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 16px;
+    padding: 1.75rem;
+    transition: border-color 0.2s;
+}
+
+.settings-card:hover {
+    border-color: rgba(108, 71, 255, 0.2);
+}
+
+.card-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #f0f0ff;
+    margin-bottom: 0.4rem;
+}
+
+.card-label svg {
+    color: #6c47ff;
+}
+
+.card-desc {
+    font-size: 0.84rem;
+    color: rgba(255, 255, 255, 0.38);
+    margin: 0 0 1.5rem;
+    line-height: 1.55;
+}
+
+.card-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.06);
+    margin: 1.25rem 0;
+}
+
+/* ─── Avatar Section ─────────────────────────────────── */
+.avatar-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.avatar-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6c47ff, #a78bfa);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(108, 71, 255, 0.3);
+}
+
+.avatar-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #f0f0ff;
+    margin: 0 0 0.2rem;
+}
+
+.avatar-hint {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.35);
+    margin: 0;
+}
+
+/* ─── Form Elements ──────────────────────────────────── */
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.55);
+    margin-bottom: 0.5rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #6c47ff;
+    background: rgba(108, 71, 255, 0.06);
+    box-shadow: 0 0 0 3px rgba(108, 71, 255, 0.12);
+}
+
+.form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.22);
+}
+
+.input-with-action {
+    position: relative;
+}
+
+.input-with-action input {
+    padding-right: 2.75rem;
+}
+
+.eye-btn {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    padding: 0.25rem;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.eye-btn:hover {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.field-error {
+    display: block;
+    color: #f87171;
+    font-size: 0.75rem;
+    margin-top: 0.4rem;
+}
+
+/* ─── Status Pill ────────────────────────────────────── */
+.status-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.84rem;
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+}
+
+.status-pill.success {
+    background: rgba(52, 211, 153, 0.1);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.2);
+}
+
+.status-pill.error {
+    background: rgba(248, 113, 113, 0.1);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.2);
+}
+
+/* ─── Primary Button ─────────────────────────────────── */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #6c47ff, #8b5cf6);
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0);
+    transition: background 0.2s;
+}
+
+.btn-primary:hover:not(:disabled)::before {
+    background: rgba(255,255,255,0.08);
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(108, 71, 255, 0.35);
+}
+
+.btn-primary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ─── Spinner ─────────────────────────────────────────── */
+.spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ─── Permission Status ────────────────────────────────── */
+.permission-status {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.permission-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.permission-label {
+    font-size: 0.84rem;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+/* ─── Badges ─────────────────────────────────────────── */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-green {
+    background: rgba(52, 211, 153, 0.12);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.25);
+}
+
+.badge-red {
+    background: rgba(248, 113, 113, 0.12);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.25);
+}
+
+.badge-yellow {
+    background: rgba(251, 191, 36, 0.12);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.25);
+}
+
+.badge-muted {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ─── Pulse Dot ──────────────────────────────────────── */
+.pulse-dot {
+    width: 7px;
+    height: 7px;
+    background: #34d399;
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+    display: inline-block;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(0.8); }
+}
+
+/* ─── Permission Warning ─────────────────────────────── */
+.permission-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    font-size: 0.82rem;
+    color: rgba(251, 191, 36, 0.85);
+    line-height: 1.5;
+    margin-bottom: 1.25rem;
+}
+
+.permission-warning svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: #fbbf24;
+}
+
+.permission-warning strong {
+    font-weight: 600;
+}
+
+/* ─── Notification Toggle Row ────────────────────────── */
+.notif-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+}
+
+.toggle-info {
+    flex: 1;
+}
+
+.toggle-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #f0f0ff;
+    margin: 0 0 0.2rem;
+}
+
+.toggle-hint {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.35);
+    margin: 0;
+}
+
+/* ─── Toggle Pill Switch ─────────────────────────────── */
+.toggle-pill {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 26px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+}
+
+.toggle-pill.on {
+    background: linear-gradient(135deg, #6c47ff, #8b5cf6);
+    border-color: transparent;
+    box-shadow: 0 2px 10px rgba(108, 71, 255, 0.4);
+}
+
+.toggle-pill:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.toggle-knob {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.25s ease;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+.toggle-pill.on .toggle-knob {
+    transform: translateX(22px);
+}
+
+/* ─── Info Card ──────────────────────────────────────── */
+.info-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    background: rgba(108, 71, 255, 0.06);
+    border: 1px solid rgba(108, 71, 255, 0.15);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    font-size: 0.82rem;
+    color: rgba(167, 139, 250, 0.8);
+    line-height: 1.55;
+}
+
+.info-card svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: #a78bfa;
+}
+
+.info-card p {
+    margin: 0;
+}

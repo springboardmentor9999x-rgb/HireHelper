@@ -1,0 +1,58 @@
+<div class="page">
+    <div class="page-header">
+        <h1>My Requests</h1>
+        <p>Track the requests you've sent to other users</p>
+    </div>
+
+    @if (loading) {
+    <div class="loading-state">
+        <div class="spinner-large"></div>
+        <p>Loading your requests...</p>
+    </div>
+    } @else if (requests.length === 0) {
+    <div class="empty-state">
+        <div class="empty-icon">
+            <svg width="38" height="38" viewBox="0 0 24 24" fill="none">
+                <path d="M17 21V19C17 17.94 16.58 16.92 15.83 16.17C15.08 15.42 14.06 15 13 15H5C3.94 15 2.92 15.42 2.17 16.17C1.42 16.92 1 17.94 1 19V21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+        </div>
+        <h3>No sent requests</h3>
+        <p>You haven't requested to help with any tasks yet. Explore the feed to find opportunities!</p>
+        <a routerLink="/dashboard/feed" class="btn-feed">Go to Feed</a>
+    </div>
+    } @else {
+    <div class="requests-list">
+        @for (req of requests; track req.id) {
+        <div class="req-card">
+            <div class="req-header">
+                <div>
+                    <p class="req-title">{{ req.task_title }}</p>
+                    <p class="req-date">Requested on {{ req.created_at | date:'mediumDate' }}</p>
+                </div>
+                <span class="status-badge {{ req.status?.toLowerCase() }}">{{ req.status }}</span>
+            </div>
+            @if (req.message) {
+            <div class="req-message">"{{ req.message }}"</div>
+            }
+            <div class="req-footer">
+                <button class="btn-chat" (click)="openChat(req)">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 15C21 15.53 20.79 16.04 20.41 16.41C20.04 16.79 19.53 17 19 17H7L3 21V5C3 4.47 3.21 3.96 3.59 3.59C3.96 3.21 4.47 3 5 3H19C19.53 3 20.04 3.21 20.41 3.59C20.79 3.96 21 4.47 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Chat with Owner
+                </button>
+            </div>
+
+@if (chatOpen) {
+    <app-chat-dialog 
+        [requestId]="selectedRequestId"
+        [taskTitle]="selectedTaskTitle"
+        [otherUserName]="selectedUserName"
+        [currentUserId]="currentUserId"
+        (close)="closeChat()">
+    </app-chat-dialog>
+}
+        </div>
+        }
+    </div>
+    }
+</div>

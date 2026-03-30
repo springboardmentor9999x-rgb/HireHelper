@@ -1,0 +1,37 @@
+# Node.js
+**/node_modules
+**/npm-debug.log*
+**/yarn-error.log*
+**/yarn-debug.log*
+**/.pnpm-debug.log*
+
+# Environment Variables
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+**/server/.env
+
+# IDE / Operating System
+**/.vscode/
+**/.idea/
+**/.DS_Store
+**/Thumbs.db
+
+# Angular / Frontend
+**/dist/
+**/.angular/
+**/tmp/
+**/out/
+
+# Database
+**/pg_dump.sql
+**/db_backup.sql
+
+# System-generated
+**/.DS_Store
+**/npm-debug.log*
+**/yarn-error.log*
+**/yarn-debug.log*
+**/*.log

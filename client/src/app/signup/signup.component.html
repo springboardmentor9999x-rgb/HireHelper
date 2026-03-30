@@ -1,0 +1,372 @@
+<div class="page-wrapper">
+    <!-- Animated background blobs -->
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <div class="bg-blob blob-3"></div>
+
+    <div class="signup-card">
+        <!-- Logo / Branding -->
+        <div class="brand">
+            <div class="brand-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M20 7H4C2.9 7 2 7.9 2 9V19C2 20.1 2.9 21 4 21H20C21.1 21 22 20.1 22 19V9C22 7.9 21.1 7 20 7Z"
+                        stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M16 21V5C16 3.9 15.1 3 14 3H10C8.9 3 8 3.9 8 5V21" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </div>
+            <span class="brand-name">HireHelper</span>
+        </div>
+
+        <!-- Step indicator -->
+        <div class="step-indicator">
+            <div class="step" [class.active]="currentStep() === 'form'" [class.done]="currentStep() !== 'form'">
+                <div class="step-dot">
+                    @if (currentStep() !== 'form') {
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                        <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    } @else { 1 }
+                </div>
+                <span>Details</span>
+            </div>
+            <div class="step-line" [class.done]="currentStep() === 'phone-otp' || currentStep() === 'email-otp'"></div>
+            <div class="step" [class.active]="currentStep() === 'email-otp'"
+                [class.done]="currentStep() === 'phone-otp'">
+                <div class="step-dot">
+                    @if (currentStep() === 'phone-otp') {
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                        <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    } @else { 2 }
+                </div>
+                <span>Email</span>
+            </div>
+            <div class="step-line" [class.done]="currentStep() === 'phone-otp'"></div>
+            <div class="step" [class.active]="currentStep() === 'phone-otp'">
+                <div class="step-dot">3</div>
+                <span>Phone</span>
+            </div>
+        </div>
+
+        <!-- Error / success alerts -->
+        @if (errorMessage()) {
+        <div class="error-alert" id="error-alert">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                <circle cx="12" cy="16" r="1" fill="currentColor" />
+            </svg>
+            {{ errorMessage() }}
+        </div>
+        }
+        @if (successMsg()) {
+        <div class="success-alert">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+            {{ successMsg() }}
+        </div>
+        }
+
+        <!-- ═══════════════════ STEP 1: Signup Form ═══════════════════ -->
+        @if (currentStep() === 'form') {
+        <div class="card-header">
+            <h1>Create your account</h1>
+            <p>Join HireHelper and start hiring smarter</p>
+        </div>
+
+        <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" novalidate id="signup-form">
+
+            <!-- Full Name -->
+            <div class="form-group" [class.has-error]="name.invalid && name.touched">
+                <label for="name">Full Name</label>
+                <div class="input-wrapper">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M20 21V19C20 17.9 19.6 16.8 18.8 16C18.1 15.2 17 14.8 16 14.8H8C7 14.8 5.9 15.2 5.2 16C4.4 16.8 4 17.9 4 19V21"
+                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    <input id="name" type="text" formControlName="name" placeholder="Your full name"
+                        autocomplete="name" />
+                </div>
+                @if (name.invalid && name.touched) {
+                <span class="field-error">
+                    {{ name.errors?.['required'] ? 'Full name is required.' : 'Name must be at least 2 characters.' }}
+                </span>
+                }
+            </div>
+
+            <!-- Email -->
+            <div class="form-group" [class.has-error]="email.invalid && email.touched">
+                <label for="email">Email Address</label>
+                <div class="input-wrapper">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z"
+                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        <polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <input id="email" type="email" formControlName="email" placeholder="you@example.com"
+                        autocomplete="email" />
+                </div>
+                @if (email.invalid && email.touched) {
+                <span class="field-error">
+                    {{ email.errors?.['required'] ? 'Email is required.' : 'Please enter a valid email.' }}
+                </span>
+                }
+            </div>
+
+            <!-- Phone (now required) -->
+            <div class="form-group" [class.has-error]="phone.invalid && phone.touched">
+                <label for="phone">Contact Number</label>
+                <div class="input-wrapper">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.59 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 5.52 5.52l.97-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"
+                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <input id="phone" type="tel" formControlName="phone" placeholder="+91 98765 43210"
+                        autocomplete="tel" />
+                </div>
+                @if (phone.invalid && phone.touched) {
+                <span class="field-error">
+                    {{ phone.errors?.['required'] ? 'Phone number is required.' : 'Please enter a valid phone number.'
+                    }}
+                </span>
+                }
+            </div>
+
+            <!-- Password -->
+            <div class="form-group" [class.has-error]="password.invalid && password.touched">
+                <label for="password">Password</label>
+                <div class="input-wrapper">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor"
+                            stroke-width="1.8" />
+                        <path d="M7 11V7C7 4.24 9.24 2 12 2C14.76 2 17 4.24 17 7V11" stroke="currentColor"
+                            stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                    <input id="password" [type]="showPassword() ? 'text' : 'password'" formControlName="password"
+                        placeholder="Min. 8 characters" autocomplete="new-password" />
+                    <button type="button" class="toggle-password" (click)="togglePassword()"
+                        aria-label="Toggle password visibility">
+                        @if (showPassword()) {
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M17.94 17.94A10.07 10.07 0 0 1 12 20C7 20 2.73 16.39 1 12C1.92 9.68 3.5 7.67 5.53 6.23M9.9 4.24A9.12 9.12 0 0 1 12 4C17 4 21.27 7.61 23 12C22.32 13.76 21.22 15.31 19.82 16.54"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                        } @else {
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" />
+                        </svg>
+                        }
+                    </button>
+                </div>
+                @if (password.invalid && password.touched) {
+                <span class="field-error">
+                    {{ password.errors?.['required'] ? 'Password is required.' : 'Password must be at least 8
+                    characters.' }}
+                </span>
+                }
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="form-group"
+                [class.has-error]="(confirmPassword.invalid && confirmPassword.touched) || passwordMismatch">
+                <label for="confirmPassword">Confirm Password</label>
+                <div class="input-wrapper">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <input id="confirmPassword" [type]="showConfirmPassword() ? 'text' : 'password'"
+                        formControlName="confirmPassword" placeholder="••••••••" autocomplete="new-password" />
+                    <button type="button" class="toggle-password" (click)="toggleConfirmPassword()"
+                        aria-label="Toggle confirm password visibility">
+                        @if (showConfirmPassword()) {
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M17.94 17.94A10.07 10.07 0 0 1 12 20C7 20 2.73 16.39 1 12C1.92 9.68 3.5 7.67 5.53 6.23M9.9 4.24A9.12 9.12 0 0 1 12 4C17 4 21.27 7.61 23 12C22.32 13.76 21.22 15.31 19.82 16.54"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                        } @else {
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" />
+                        </svg>
+                        }
+                    </button>
+                </div>
+                @if (confirmPassword.errors?.['required'] && confirmPassword.touched) {
+                <span class="field-error">Please confirm your password.</span>
+                }
+                @if (passwordMismatch) {
+                <span class="field-error">Passwords do not match.</span>
+                }
+            </div>
+
+            <button type="submit" class="btn-submit" [disabled]="isLoading()" id="submit-btn">
+                @if (isLoading()) {
+                <span class="spinner"></span>
+                <span>Sending OTP…</span>
+                } @else {
+                <span>Continue</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" />
+                    <polyline points="12 5 19 12 12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+                }
+            </button>
+        </form>
+
+        <p class="login-prompt">Already have an account? <a routerLink="/login" id="login-link">Sign in</a></p>
+        }
+
+        <!-- ═══════════════════ STEP 2: Email OTP ═══════════════════ -->
+        @if (currentStep() === 'email-otp') {
+        <div class="otp-panel">
+            <div class="otp-icon email-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z"
+                        stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    <polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </div>
+            <h2 class="otp-title">Verify your email</h2>
+            <p class="otp-subtitle">
+                We've sent a 6-digit code to<br>
+                <strong class="otp-target">{{ pendingEmail }}</strong>
+            </p>
+
+            <form [formGroup]="emailOtpForm" (ngSubmit)="verifyEmailOtp()" novalidate id="email-otp-form">
+                <div class="form-group"
+                    [class.has-error]="emailOtpForm.get('otp')!.invalid && emailOtpForm.get('otp')!.touched">
+                    <label for="email-otp">Enter OTP</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.8" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="1.8"
+                                stroke-linecap="round" />
+                        </svg>
+                        <input id="email-otp" type="text" formControlName="otp" placeholder="000000" maxlength="6"
+                            autocomplete="one-time-code" class="otp-input" />
+                    </div>
+                    @if (emailOtpForm.get('otp')!.invalid && emailOtpForm.get('otp')!.touched) {
+                    <span class="field-error">Please enter the 6-digit code.</span>
+                    }
+                </div>
+
+                <button type="submit" class="btn-submit" [disabled]="isLoading()" id="verify-email-btn">
+                    @if (isLoading()) {
+                    <span class="spinner"></span><span>Verifying…</span>
+                    } @else {
+                    <span>Verify Email</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    }
+                </button>
+            </form>
+
+            <div class="otp-footer">
+                @if (resendCountdown() > 0) {
+                <span class="resend-timer">Resend in {{ resendCountdown() }}s</span>
+                } @else {
+                <button class="resend-btn" (click)="resendEmailOtp()" type="button">Resend OTP</button>
+                }
+                <span class="separator">·</span>
+                <button class="back-btn" (click)="goBack()" type="button">← Change email</button>
+            </div>
+        </div>
+        }
+
+        <!-- ═══════════════════ STEP 3: Phone OTP ═══════════════════ -->
+        @if (currentStep() === 'phone-otp') {
+        <div class="otp-panel">
+            <div class="otp-icon phone-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.59 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 5.52 5.52l.97-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"
+                        stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </div>
+            <h2 class="otp-title">Verify your phone</h2>
+            <p class="otp-subtitle">
+                We've sent a 6-digit code to<br>
+                <strong class="otp-target">{{ pendingPhone }}</strong>
+                <br><span class="dev-note">📋 Check the Node.js console for the OTP</span>
+            </p>
+
+            <form [formGroup]="phoneOtpForm" (ngSubmit)="verifyPhoneOtp()" novalidate id="phone-otp-form">
+                <div class="form-group"
+                    [class.has-error]="phoneOtpForm.get('otp')!.invalid && phoneOtpForm.get('otp')!.touched">
+                    <label for="phone-otp">Enter OTP</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.8" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="1.8"
+                                stroke-linecap="round" />
+                        </svg>
+                        <input id="phone-otp" type="text" formControlName="otp" placeholder="000000" maxlength="6"
+                            autocomplete="one-time-code" class="otp-input" />
+                    </div>
+                    @if (phoneOtpForm.get('otp')!.invalid && phoneOtpForm.get('otp')!.touched) {
+                    <span class="field-error">Please enter the 6-digit code.</span>
+                    }
+                </div>
+
+                <button type="submit" class="btn-submit" [disabled]="isLoading()" id="verify-phone-btn">
+                    @if (isLoading()) {
+                    <span class="spinner"></span><span>Creating account…</span>
+                    } @else {
+                    <span>Verify & Create Account</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    }
+                </button>
+            </form>
+
+            <div class="otp-footer">
+                @if (resendCountdown() > 0) {
+                <span class="resend-timer">Resend in {{ resendCountdown() }}s</span>
+                } @else {
+                <button class="resend-btn" (click)="resendPhoneOtp()" type="button">Resend OTP</button>
+                }
+                <span class="separator">·</span>
+                <button class="back-btn" (click)="goBack()" type="button">← Change phone</button>
+            </div>
+        </div>
+        }
+
+    </div>
+</div>
