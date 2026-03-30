@@ -1,7 +1,7 @@
 :root {
   --bg: #f5f7ff;
   --bg2: #eef2ff;
-  --card: rgba(255, 255, 255, 0.95);
+  --card: rgba(255, 255, 255, 0.9);
   --text: #0f172a;
   --muted: #64748b;
   --primary: #4f46e5;
@@ -14,46 +14,31 @@
   --radius: 20px;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-html, body {
+body {
   margin: 0;
-  padding: 0;
   font-family: Arial, sans-serif;
   background: linear-gradient(135deg, var(--bg), var(--bg2));
   color: var(--text);
-  min-height: 100%;
-}
-
-body {
-  min-height: 100vh;
-}
-
-button {
-  font-family: inherit;
 }
 
 .page-shell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  min-height: 100vh;
+  padding: 24px;
 }
 
 .page-topbar {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  text-align: center;
-  gap: 10px;
-  margin-bottom: 30px;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
 }
 
 .page-title-wrap h1,
 .page-title-wrap h2 {
   margin: 0;
-  font-size: 36px;
+  font-size: 30px;
   font-weight: 700;
   color: var(--text);
 }
@@ -61,7 +46,7 @@ button {
 .page-title-wrap p {
   margin: 8px 0 0 0;
   color: var(--muted);
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .back-btn,
@@ -73,7 +58,7 @@ button {
   outline: none;
   cursor: pointer;
   border-radius: 14px;
-  padding: 12px 18px;
+  padding: 11px 18px;
   font-size: 14px;
   font-weight: 700;
   transition: all 0.2s ease;
@@ -83,7 +68,6 @@ button {
   background: white;
   color: var(--text);
   box-shadow: var(--shadow);
-    align-self: flex-start;
 }
 
 .back-btn:hover {
@@ -93,16 +77,6 @@ button {
 .primary-btn {
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   color: white;
-  box-shadow: 0 10px 25px rgba(79, 70, 229, 0.25);
-}
-
-.primary-btn:hover {
-  transform: translateY(-2px);
-}
-
-.primary-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .secondary-btn {
@@ -120,20 +94,26 @@ button {
   color: #991b1b;
 }
 
+.primary-btn:hover,
+.secondary-btn:hover,
+.success-btn:hover,
+.danger-btn:hover {
+  transform: translateY(-2px);
+}
+
 .glass-card {
   background: var(--card);
+  backdrop-filter: blur(10px);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
   border-radius: var(--radius);
-  padding: 22px;
-   width: 380px;
+  padding: 20px;
 }
 
 .grid-cards {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 22px;
 }
 
 .badge {
@@ -167,49 +147,22 @@ button {
 }
 
 .info-row {
-  margin: 10px 0;
+  margin: 8px 0;
   color: #334155;
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: 14px;
 }
 
 .empty-state {
   text-align: center;
   padding: 40px 20px;
   color: var(--muted);
-  font-size: 16px;
 }
 
 .card-actions {
   display: flex;
   gap: 12px;
-  margin-top: 20px;
+  margin-top: 18px;
   flex-wrap: wrap;
-}
-
-.premium-card-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.premium-card-title h3 {
-  margin: 0;
-  font-size: 24px;
-  color: #111827;
-}
-
-.top-chip {
-  display: inline-block;
-  background: #eef2ff;
-  color: #3730a3;
-  padding: 8px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-  margin-bottom: 12px;
 }
 
 .page-list {
@@ -220,8 +173,8 @@ button {
 
 .notification-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
 }
@@ -235,10 +188,33 @@ button {
   margin: 0;
   font-size: 15px;
   font-weight: 600;
+  color: var(--text);
 }
 
 .notification-time {
   margin-top: 8px;
   color: var(--muted);
   font-size: 13px;
+}
+
+.premium-card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.premium-card-title h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.top-chip {
+  background: #eef2ff;
+  color: var(--primary-dark);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
 }

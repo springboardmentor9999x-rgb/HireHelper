@@ -1,0 +1,56 @@
+<div class="page-shell">
+  <div class="page-topbar">
+    <button class="back-btn" (click)="goBack()">← Back</button>
+
+    <div class="page-title-wrap">
+      <h2>Incoming Requests</h2>
+      <p>Accept or reject people who want to help with your tasks.</p>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="glass-card empty-state">
+    Loading requests...
+  </div>
+
+  <div *ngIf="!loading && errorMessage" class="glass-card empty-state">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!loading && requests.length === 0" class="glass-card empty-state">
+    No incoming requests found.
+  </div>
+
+  <div class="grid-cards" *ngIf="!loading && requests.length > 0">
+    <div class="glass-card" *ngFor="let req of requests">
+      <div class="premium-card-title">
+        <h3>{{ req.first_name }} {{ req.last_name }}</h3>
+        <span
+          class="badge"
+          [ngClass]="{
+            'pending': req.status === 'PENDING',
+            'accepted': req.status === 'ACCEPTED',
+            'rejected': req.status === 'REJECTED'
+          }"
+        >
+          {{ req.status }}
+        </span>
+      </div>
+
+      <div class="top-chip">{{ req.task_title }}</div>
+
+      <p class="info-row"><strong>Email:</strong> {{ req.email }}</p>
+      <p class="info-row"><strong>Phone:</strong> {{ req.number }}</p>
+      <p class="info-row"><strong>Location:</strong> {{ req.loc || 'Not specified' }}</p>
+      <p class="info-row"><strong>Task Status:</strong> {{ req.task_status }}</p>
+
+      <div class="card-actions" *ngIf="req.status === 'PENDING' && req.task_status !== 'ASSIGNED'">
+        <button class="success-btn" (click)="updateStatus(req.id, 'ACCEPTED')">Accept</button>
+        <button class="danger-btn" (click)="updateStatus(req.id, 'REJECTED')">Reject</button>
+      </div>
+
+      <div class="card-actions" *ngIf="req.task_status === 'ASSIGNED'">
+        <span class="badge assigned">Assigned</span>
+      </div>
+    </div>
+  </div>
+</div>

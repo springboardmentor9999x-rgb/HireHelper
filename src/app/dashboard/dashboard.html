@@ -1,78 +1,75 @@
 <div class="dashboard-container">
 
-  <!-- Sidebar -->
   <aside class="sidebar">
-    <h2 class="logo">HireHelper</h2>
+    <div class="logo">HireHelper</div>
 
-    <ul>
-      <li>
-        <a routerLink="/dashboard" routerLinkActive="active">
-          <i class="icon">🏠</i> Dashboard
-        </a>
-      </li>
-
-      <li>
-        <a routerLink="/feed" routerLinkActive="active">
-          <i class="icon">📰</i> Feed
-        </a>
-      </li>
-
-      <li>
-        <a routerLink="/my-tasks" routerLinkActive="active">
-          <i class="icon">📋</i> My Tasks
-        </a>
-      </li>
-
-      <li>
-        <a routerLink="/add-task" routerLinkActive="active">
-          <i class="icon">➕</i> Add Task
-        </a>
-      </li>
-
-      <li>
-        <a (click)="logout()">
-          <i class="icon">🚪</i> Logout
-        </a>
-      </li>
-    </ul>
+    <nav class="nav-links">
+      <a routerLink="/dashboard" routerLinkActive="active-link">🏠 <span>Dashboard</span></a>
+      <a routerLink="/feed" routerLinkActive="active-link">📰 <span>Feed</span></a>
+      <a routerLink="/my-tasks" routerLinkActive="active-link">📋 <span>My Tasks</span></a>
+      <a routerLink="/add-task" routerLinkActive="active-link">➕ <span>Add Task</span></a>
+      <a (click)="logout()">🚪 <span>Logout</span></a>
+    </nav>
   </aside>
 
-  <!-- Main Content -->
-  <main class="content">
+  <main class="main-content">
+    <div class="top-bar">
+      <div>
+        <h1>Welcome Back 👋</h1>
+        <p class="subtitle">Manage your tasks and requests in one place.</p>
+      </div>
 
-    <!-- Top Navbar -->
-    <div class="top-navbar">
-      <h2>Welcome Back 👋</h2>
-      <div class="user-info">
-    <span>{{ userName }}</span>
-        <img src="https://i.pravatar.cc/40" alt="profile">
+      <div class="profile-card">
+        <div class="avatar">{{ userInitials }}</div>
+        <div class="profile-info">
+          <h3>{{ userName }}</h3>
+          <p>Active User</p>
+        </div>
       </div>
     </div>
 
-    <!-- Dashboard Cards -->
-    <div class="cards">
-      <div class="card">
-        <h3>Total Tasks</h3>
-        <p>12</p>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <p class="card-label">Total Tasks</p>
+        <h2>12</h2>
       </div>
 
-      <div class="card">
-        <h3>Completed</h3>
-        <p>8</p>
+      <div class="stat-card">
+        <p class="card-label">Completed</p>
+        <h2>8</h2>
       </div>
 
-      <div class="card">
-        <h3>Pending</h3>
-        <p>4</p>
+      <div class="stat-card">
+        <p class="card-label">Pending</p>
+        <h2>4</h2>
       </div>
 
-      <div class="card">
-        <h3>Earnings</h3>
-        <p>₹4,500</p>
+      <div class="stat-card highlight-card">
+        <p class="card-label">Earnings</p>
+        <h2>₹4,500</h2>
       </div>
     </div>
 
-    <router-outlet></router-outlet>
+    <div class="bottom-section">
+      <div class="welcome-card">
+        <h2>Hello, {{ userName }} 👋</h2>
+        <p>
+          Welcome to your HireHelper dashboard. From here you can manage tasks,
+          explore the feed, add new work, and track your progress.
+        </p>
+      </div>
 
+      <div class="quick-card">
+        <h3>Quick Actions</h3>
+        <div class="quick-buttons">
+          <a routerLink="/feed">Go to Feed</a>
+          <a routerLink="/my-tasks">My Tasks</a>
+          <a routerLink="/add-task">Add Task</a>
+          <a routerLink="/my-requests">📨 <span>My Requests</span></a>
+          <a routerLink="/requests">📥 <span>Requests</span></a>
+        </div>
+      </div>
+    </div>
   </main>
+
 </div>

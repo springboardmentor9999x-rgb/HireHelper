@@ -1,40 +1,63 @@
-<div class="feed-page">
+<div class="page-shell">
+  <div class="page-topbar">
 
-<h2 class="feed-title">Task Feed</h2>
 
-<div *ngIf="loading" class="loading-box">
-Loading tasks...
-</div>
-
-<div *ngIf="!loading && message" class="message-box">
-{{ message }}
-</div>
-
-<div *ngIf="!loading && tasks.length > 0" class="feed-container">
-
-  <div *ngFor="let task of tasks" class="task-card">
-
-    <h3>{{ task.title }}</h3>
-
-    <p><b>Description:</b> {{ task.description || '-' }}</p>
-
-    <p><b>Location:</b> {{ task.loc || '-' }}</p>
-
-    <p><b>Start Time:</b> {{ task.start_time | date:'short' }}</p>
-
-    <span class="status">
-      {{ task.status || 'OPEN' }}
-    </span>
-
-    <br>
-
-    <button class="request-btn"
-    (click)="requestTask(task)">
-    Request
-    </button>
-
+    <div class="page-title-wrap">
+      <h2>Task Feed</h2>
+      <p>Explore tasks posted by other users and send your request.</p>
+    </div>
   </div>
 
-</div>
+  <div *ngIf="loading" class="glass-card empty-state">
+    Loading tasks...
+  </div>
 
+  <div *ngIf="!loading && tasks.length === 0" class="glass-card empty-state">
+    No tasks available.
+  </div>
+
+  <div class="grid-cards" *ngIf="!loading && tasks.length > 0">
+    <div class="glass-card" *ngFor="let task of tasks">
+      <div class="premium-card-title">
+        <h3>{{ task.title }}</h3>
+
+        <span class="badge assigned" *ngIf="task.status === 'ASSIGNED'">
+          ASSIGNED
+        </span>
+
+        <span class="badge pending" *ngIf="task.status !== 'ASSIGNED'">
+          {{ task.status }}
+        </span>
+      </div>
+
+      <div class="top-chip">
+        Helper Task
+      </div>
+
+      <p class="info-row">
+        <strong>Description:</strong> {{ task.description || 'No description' }}
+      </p>
+
+      <p class="info-row">
+        <strong>Location:</strong> {{ task.loc || 'Not specified' }}
+      </p>
+
+      <p class="info-row">
+        <strong>Budget:</strong> ₹{{ task.budget || 'N/A' }}
+      </p>
+
+      <p class="info-row">
+        <strong>Start:</strong> {{ task.start_time | date:'medium' }}
+      </p>
+
+      <div class="card-actions">
+        <button
+          class="primary-btn"
+          (click)="sendRequest(task.id)"
+          [disabled]="task.status === 'ASSIGNED'">
+          Request
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

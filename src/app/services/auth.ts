@@ -1,43 +1,102 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:5000/api/auth';  // Backend URL
+  private baseUrl = 'http://localhost:5000/api/auth';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  // Register API call
   register(user: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/register`, user);
   }
 
-  // Login API call
   login(credentials: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/login`, credentials);
   }
 
-  // Save JWT in localStorage
   saveToken(token: string) {
     localStorage.setItem('token', token);
   }
 
-  // Get JWT from localStorage
   getToken(): string | null {
     return localStorage.getItem('token');
   }
 
-  // Logout
   logout() {
     localStorage.removeItem('token');
   }
 
-  // ✅ Protected route: get current user
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.getToken() || '';
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+  }
+
   getProfile(): Observable<any> {
-    // Interceptor will automatically attach the JWT
-    return this.http.get('http://localhost:5000/api/users/me');
+    return this.http.get('http://localhost:5000/api/users/me', {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  requestTask(task_id: number): Observable<any> {
+    return this.http.post(
+      'http://localhost:5000/api/requests',
+      { task_id },
+      {
+        headers: this.getAuthHeaders()
+      }
+    );
+  }
+
+  getMyRequests(): Observable<any> {
+    return this.http.get(
+      'http://localhost:5000/api/requests/my',
+      {
+        headers: this.getAuthHeaders()
+      }
+    );
+  }
+
+  getReceivedRequests(): Observable<any> {
+    return this.http.get(
+      'http://localhost:5000/api/requests/incoming',
+      {
+        headers: this.getAuthHeaders()
+      }
+    );
+  }
+
+  updateRequestStatus(requestId: number, status: 'ACCEPTED' | 'REJECTED'): Observable<any> {
+    return this.http.put(
+      `http://localhost:5000/api/requests/${requestId}`,
+      { status },
+      {
+        headers: this.getAuthHeaders()
+      }
+    );
+  }
+
+  getNotifications(): Observable<any> {
+    return this.http.get(
+      'http://localhost:5000/api/notifications',
+      {
+        headers: this.getAuthHeaders()
+      }
+    );
+  }
+
+  markNotificationAsRead(notificationId: number): Observable<any> {
+    return this.http.put(
+      `http://localhost:5000/api/notifications/${notificationId}/read`,
+      {},
+      {
+        headers: this.getAuthHeaders()
+      }
+    );
   }
 }

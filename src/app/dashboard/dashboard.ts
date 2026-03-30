@@ -12,6 +12,7 @@ import { AuthService } from '../services/auth';
 })
 export class Dashboard implements OnInit {
   userName = 'User';
+  userInitials = 'U';
 
   constructor(
     private auth: AuthService,
@@ -23,29 +24,34 @@ export class Dashboard implements OnInit {
     this.getUserProfile();
   }
 
-  getUserProfile() {
-    const token = localStorage.getItem('token');
-    console.log('Dashboard token:', token);
+getUserProfile() {
+  const token = localStorage.getItem('token');
 
-    if (!token) {
-      return;
-    }
+  if (!token) return;
 
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`
+  const headers = new HttpHeaders({
+    Authorization: `Bearer ${token}`
+  });
+
+  this.http.get<any>('http://localhost:5000/api/users/me', { headers })
+    .subscribe({
+      next: (res) => {
+        console.log('User profile response:', res);
+
+        // 🔥 FIX
+        this.userName = res?.first_name || res?.name || 'User';
+
+        const first = res?.first_name || '';
+        const last = res?.last_name || '';
+
+        this.userInitials =
+          ((first.charAt(0) || '') + (last.charAt(0) || '')).toUpperCase() || 'U';
+      },
+      error: (err) => {
+        console.error('Error fetching user profile:', err);
+      }
     });
-
-    this.http.get<any>('http://localhost:5000/api/users/me', { headers })
-      .subscribe({
-        next: (res) => {
-          console.log('User profile response:', res);
-          this.userName = res?.first_name ? res.first_name : 'User';
-        },
-        error: (err) => {
-          console.error('Error fetching user profile:', err);
-        }
-      });
-  }
+}
 
   logout() {
     this.auth.logout();

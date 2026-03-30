@@ -7,6 +7,8 @@ import { AddTaskComponent } from './add-task/add-task';
 import { MyTasksComponent } from './my-tasks/my-tasks';
 import { FeedComponent } from './feed/feed';
 import { VerifyComponent } from './verify/verify';
+import { MyRequestsComponent } from './my-requests/my-requests';
+import { RequestsComponent } from './requests/requests';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -16,5 +18,8 @@ export const routes: Routes = [
   { path: 'verify', component: VerifyComponent },
   { path: 'add-task', component: AddTaskComponent, canActivate: [AuthGuard] },
   { path: 'my-tasks', component: MyTasksComponent, canActivate: [AuthGuard] },
-  { path: 'feed', component: FeedComponent, canActivate: [AuthGuard] }
+  { path: 'feed', component: FeedComponent, canActivate: [AuthGuard] },
+    { path: 'my-requests', component: MyRequestsComponent },
+  { path: 'requests', component: RequestsComponent }
+  
 ];

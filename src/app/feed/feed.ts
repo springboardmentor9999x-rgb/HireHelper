@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../services/auth';
 
 @Component({
   selector: 'app-feed',
@@ -16,14 +17,19 @@ export class FeedComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadFeed();
   }
 
-  loadFeed() {
+  goBack(): void {
+    window.history.back();
+  }
+
+  loadFeed(): void {
     const token = localStorage.getItem('token');
 
     if (!token) {
@@ -65,8 +71,15 @@ export class FeedComponent implements OnInit {
     });
   }
 
-  requestTask(task: any) {
-    alert(`Request clicked for task: ${task.title}`);
-    console.log('Requested task:', task);
+  sendRequest(taskId: number): void {
+    this.authService.requestTask(taskId).subscribe({
+      next: (res) => {
+        alert(res.message || 'Request sent successfully');
+      },
+      error: (err) => {
+        console.error('Request send error:', err);
+        alert(err.error?.message || 'Failed to send request');
+      }
+    });
   }
 }

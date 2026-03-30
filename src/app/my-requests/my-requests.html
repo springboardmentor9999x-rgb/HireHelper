@@ -1,0 +1,20 @@
+<div class="page">
+  <div class="header-card">
+    <h1>My Requests</h1>
+    <button (click)="loadMyRequests()">Refresh</button>
+  </div>
+
+  <div *ngIf="loading">Loading...</div>
+
+  <div *ngIf="!loading && message">
+    {{ message }}
+  </div>
+
+  <div *ngIf="!loading && requests.length > 0">
+    <div *ngFor="let req of requests">
+      <h3>{{ req.title }}</h3>
+      <p>{{ req.loc || req.location }}</p>
+      <p>Status: {{ req.status }}</p>
+    </div>
+  </div>
+</div>

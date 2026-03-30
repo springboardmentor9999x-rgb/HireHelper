@@ -1,17 +1,65 @@
-<h2>My Tasks</h2>
+<div class="page-shell">
+  <div class="page-topbar">
+    
 
-<p *ngIf="message">{{message}}</p>
+    <div class="page-title-wrap">
+      <h2>My Tasks</h2>
+      <p>View and manage all tasks posted by you.</p>
+    </div>
+  </div>
 
-<div *ngFor="let task of tasks" class="task-card">
+  <div *ngIf="loading" class="glass-card empty-state">
+    Loading your tasks...
+  </div>
 
-  <h3>{{task.title}}</h3>
+  <div *ngIf="!loading && message" class="glass-card empty-state">
+    {{ message }}
+  </div>
 
-  <p><b>Description:</b> {{task.description}}</p>
+  <div class="grid-cards" *ngIf="!loading && tasks.length > 0">
+    <div class="glass-card" *ngFor="let task of tasks">
+      <div class="premium-card-title">
+        <h3>{{ task.title }}</h3>
 
-  <p><b>Location:</b> {{task.loc}}</p>
+        <span
+          class="badge"
+          [ngClass]="{
+            'pending': task.status === 'OPEN' || task.status === 'PENDING',
+            'assigned': task.status === 'ASSIGNED',
+            'accepted': task.status === 'COMPLETED'
+          }"
+        >
+          {{ task.status }}
+        </span>
+      </div>
 
-  <p><b>Start Time:</b> {{task.start_time | date:'short'}}</p>
+      <div class="top-chip">
+        Your Posted Task
+      </div>
 
-  <p><b>Status:</b> {{task.status}}</p>
+      <p class="info-row">
+        <strong>Description:</strong> {{ task.description || 'No description' }}
+      </p>
 
+      <p class="info-row">
+        <strong>Location:</strong> {{ task.loc || task.location || 'Not specified' }}
+      </p>
+
+      <p class="info-row">
+        <strong>Budget:</strong> ₹{{ task.budget || 'N/A' }}
+      </p>
+
+      <p class="info-row">
+        <strong>Start:</strong> {{ task.start_time | date:'medium' }}
+      </p>
+
+      <p class="info-row" *ngIf="task.end_time">
+        <strong>End:</strong> {{ task.end_time | date:'medium' }}
+      </p>
+
+      <p class="info-row" *ngIf="task.category">
+        <strong>Category:</strong> {{ task.category }}
+      </p>
+    </div>
+  </div>
 </div>
