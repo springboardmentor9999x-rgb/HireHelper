@@ -88,6 +88,13 @@ export class LayoutComponent implements OnInit, OnDestroy {
     this.showNotificationDropdown = false;
   }
 
+  get firstNameDisplay(): string {
+    if (this.currentUser?.firstName) {
+      return this.currentUser.firstName.charAt(0).toUpperCase() + this.currentUser.firstName.slice(1);
+    }
+    return '';
+  }
+
   markAsRead(notificationId: number) {
     const apiUrl = `${environment.apiUrl}/notifications/read/${notificationId}`;
     

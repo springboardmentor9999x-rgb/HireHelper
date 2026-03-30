@@ -210,6 +210,28 @@
   color: #991b1b;
 }
 
+.closed-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background-color: #fee2e2;
+  color: #991b1b;
+  display: inline-block;
+}
+
+.rejected-message {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #991b1b;
+  display: inline-block;
+}
+
 .requester-info {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

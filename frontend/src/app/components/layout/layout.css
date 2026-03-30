@@ -310,6 +310,23 @@
   padding: var(--spacing-2xl) var(--spacing-3xl);
 }
 
+/* ============ WELCOME HEADER ============ */
+.welcome-header {
+  margin-bottom: var(--spacing-3xl);
+  padding: var(--spacing-2xl);
+  background: linear-gradient(135deg, #3aaeed 0%, #2883d9 100%);
+  border-radius: var(--radius-2xl);
+  box-shadow: 0 8px 24px rgba(58, 174, 237, 0.25);
+}
+
+.welcome-header h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.5px;
+}
+
 /* ============ SCROLLBAR STYLING ============ */
 .sidebar::-webkit-scrollbar {
   width: 6px;

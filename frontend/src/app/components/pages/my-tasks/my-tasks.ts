@@ -101,14 +101,14 @@ export class MyTasksComponent implements OnInit {
 
   getCategoryColor(category: string): string {
     const categoryColors: { [key: string]: string } = {
-      development: '#3B82F6',
-      design: '#8B5CF6',
-      writing: '#EC4899',
-      marketing: '#F59E0B',
-      consulting: '#10B981',
-      other: '#6B7280',
+      development: '#0066FF',
+      design: '#9933FF',
+      writing: '#E60B99',
+      marketing: '#FF9900',
+      consulting: '#00CC66',
+      other: '#666666',
     };
-    return categoryColors[category?.toLowerCase()] || '#6B7280';
+    return categoryColors[category?.toLowerCase()] || '#666666';
   }
 
   deleteTask(taskId: number) {

@@ -275,12 +275,6 @@ const requestController = {
       const taskId = request.rows[0].task_id;
       const requesterId = request.rows[0].requester_id;
 
-      // Update task status to ASSIGNED
-      await pool.query(
-        'UPDATE tasks SET status = $1 WHERE id = $2',
-        ['ASSIGNED', taskId]
-      );
-
       // Create notification for requester (person who sent the request)
       const notificationMessage = `Your request has been accepted! The task owner will contact you soon.`;
       await pool.query(
@@ -289,7 +283,6 @@ const requestController = {
       );
 
       console.log(`✅ Request ${id} accepted`);
-      console.log(`📍 Task ${taskId} status updated to ASSIGNED`);
       console.log(`📬 Notification sent to requester ${requesterId}`);
 
       res.status(200).json({

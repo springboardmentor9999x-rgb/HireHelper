@@ -54,6 +54,9 @@
     ></app-notification-sidebar>
 
     <section class="page-content">
+      <div *ngIf="currentUser?.firstName" class="welcome-header">
+        <h1>Welcome, {{ firstNameDisplay }} 👋</h1>
+      </div>
       <router-outlet></router-outlet>
     </section>
   </div>

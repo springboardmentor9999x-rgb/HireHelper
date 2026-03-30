@@ -93,8 +93,8 @@
           <span *ngIf="!isProcessing(request.id)">🔒 Close Task</span>
           <span *ngIf="isProcessing(request.id)">Closing...</span>
         </button>
-        <span *ngIf="request.status === 'ACCEPTED' && isTaskClosed(request.task_id)" class="closed-message">
-          ✓ Task has been closed
+        <span *ngIf="request.status === 'ACCEPTED' && isTaskClosed(request.task_id)" class="closed-badge">
+          ✓ Closed
         </span>
         <span *ngIf="request.status === 'REJECTED'" class="rejected-message">
           ✕ You rejected this request
