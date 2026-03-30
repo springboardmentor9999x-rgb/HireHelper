@@ -25,7 +25,7 @@ const requestController = {
 
       // 1. Check if task exists
       const taskCheck = await pool.query(
-        'SELECT id, user_id, status FROM tasks WHERE id = $1',
+        'SELECT id, user_id, status, title FROM tasks WHERE id = $1',
         [task_id]
       );
 
