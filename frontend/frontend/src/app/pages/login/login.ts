@@ -19,6 +19,7 @@ export class LoginComponent {
   password = '';
   error = '';
   isSubmitting = false;
+  rememberMe = false;
 
   constructor(
     private auth: AuthService,

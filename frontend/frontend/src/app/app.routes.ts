@@ -15,13 +15,14 @@ import { RequestsComponent } from './pages/requests/requests';
 import { NotificationsComponent } from './pages/notifications/notifications';
 import { HelpComponent } from './pages/help/help';
 import { OffersComponent } from './pages/offers/offers';
+import { LandingComponent } from './pages/landing/landing';
 
 export const routes: Routes = [
+  { path: '', component: LandingComponent, pathMatch: 'full' },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
-  { path: 'verify-otp', component: VerifyOtpComponent },
-  { path: '', redirectTo: 'register', pathMatch: 'full' },
+{ path: 'verify-otp', component: VerifyOtpComponent },
   {
     path: '',
     component: WorkspaceShellComponent,

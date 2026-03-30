@@ -27,6 +27,14 @@
         required
       />
 
+      <div class="remember-row">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe" id="rememberMe">
+          <span class="checkmark"></span>
+          Remember me
+        </label>
+      </div>
+
       <button type="submit" [disabled]="isSubmitting">
         {{ isSubmitting ? 'Signing In...' : 'Sign In' }}
       </button>
