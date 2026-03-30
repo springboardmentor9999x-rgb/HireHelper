@@ -1,8 +1,9 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
     selector: 'app-verify-otp',
@@ -14,9 +15,8 @@ import { AuthService } from '../../services/auth.service';
 export class VerifyOtp implements OnInit {
     protected email = '';
     protected otp = '';
-    protected errorMessage = signal('');
-    protected successMessage = signal('');
     protected isLoading = signal(false);
+    private toastService = inject(ToastService);
     protected resendCountdown = signal(60);
     private timer: any;
 
@@ -30,7 +30,7 @@ export class VerifyOtp implements OnInit {
         this.route.queryParams.subscribe(params => {
             this.email = params['email'] || '';
             if (!this.email) {
-                this.errorMessage.set('No email found for verification. Please register or login again.');
+                this.toastService.showError('No email found for verification. Please register or login again.');
             } else {
                 this.startCountdown();
             }
@@ -53,40 +53,37 @@ export class VerifyOtp implements OnInit {
         if (this.resendCountdown() > 0 || this.isLoading()) return;
 
         this.isLoading.set(true);
-        this.errorMessage.set('');
-        this.successMessage.set('');
 
         this.authService.resendOTP(this.email).subscribe({
             next: (res) => {
                 this.isLoading.set(false);
-                this.successMessage.set(res.message || 'OTP resent successfully!');
+                this.toastService.showSuccess(res.message || 'OTP resent successfully!');
                 this.startCountdown();
             },
             error: (err) => {
                 this.isLoading.set(false);
-                this.errorMessage.set(err.error?.message || 'Failed to resend OTP. Please try again.');
+                this.toastService.showError(err.error?.message || 'Failed to resend OTP. Please try again.');
             }
         });
     }
 
     onSubmit() {
         if (!this.otp || this.otp.length !== 6 || !/^\d{6}$/.test(this.otp)) {
-            this.errorMessage.set('Please enter a valid 6-digit numeric OTP');
+            this.toastService.showError('Please enter a valid 6-digit numeric OTP');
             return;
         }
 
         this.isLoading.set(true);
-        this.errorMessage.set('');
 
         this.authService.verifyOTP(this.email, this.otp).subscribe({
             next: (res) => {
                 this.isLoading.set(false);
-                this.successMessage.set(res.message || 'Email verified successfully! Redirecting to login...');
-                setTimeout(() => this.router.navigate(['/login']), 3000);
+                this.toastService.showSuccess(res.message || 'Email verified successfully! Welcome.');
+                setTimeout(() => this.router.navigate(['/login']), 2000);
             },
             error: (err) => {
                 this.isLoading.set(false);
-                this.errorMessage.set(err.error?.message || 'Verification failed. Please check your OTP.');
+                this.toastService.showError(err.error?.message || 'Verification failed. Please check your OTP.');
             }
         });
     }

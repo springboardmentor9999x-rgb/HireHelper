@@ -91,26 +91,6 @@
           }
         </div>
 
-        @if (errorMessage()) {
-        <div
-          class="p-4 bg-red-50/50 rounded border border-red-100 flex items-center space-x-3 text-red-600 text-sm animate-shake">
-          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <span class="font-medium">{{ errorMessage() }}</span>
-        </div>
-        }
-
-        @if (successMessage()) {
-        <div
-          class="p-4 bg-emerald-50/50 rounded border border-emerald-100 flex items-center space-x-3 text-emerald-600 text-sm">
-          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-          </svg>
-          <span class="font-medium">{{ successMessage() }}</span>
-        </div>
-        }
 
         <button type="submit" [disabled]="isLoading()"
           class="w-full bg-brand-primary hover:bg-brand-primary-hover text-white font-bold py-4 rounded shadow-lg shadow-brand-primary/10 transition-all active:scale-[0.98] animate-slide-up delay-300 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">

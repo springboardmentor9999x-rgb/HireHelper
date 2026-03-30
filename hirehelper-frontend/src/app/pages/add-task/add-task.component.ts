@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { TaskService } from '../../services/task.service';
+import { TaskService, TASK_CATEGORIES } from '../../services/task.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
     selector: 'app-add-task',
@@ -12,10 +13,10 @@ import { TaskService } from '../../services/task.service';
     styleUrls: ['./add-task.component.css']
 })
 export class AddTaskComponent implements OnInit {
-    taskForm: FormGroup;
+    taskForm!: FormGroup;
     loading = false;
-    errorMessage = '';
-    successMessage = '';
+    categories = TASK_CATEGORIES.filter(c => c !== 'All');
+    private toastService = inject(ToastService);
 
     constructor(
         private fb: FormBuilder,
@@ -28,7 +29,8 @@ export class AddTaskComponent implements OnInit {
             location: ['', [Validators.required]],
             start_time: ['', [Validators.required]],
             end_time: [''],
-            picture_url: ['']
+            picture_url: [''],
+            category: ['Other']
         });
     }
 
@@ -41,16 +43,15 @@ export class AddTaskComponent implements OnInit {
         }
 
         this.loading = true;
-        this.errorMessage = '';
 
         this.taskService.createTask(this.taskForm.value).subscribe({
             next: (res) => {
-                this.successMessage = 'Task created successfully! Redirecting...';
+                this.toastService.showSuccess('Task created successfully! Tracking progress.');
                 this.router.navigate(['/dashboard/my-tasks']);
             },
             error: (err) => {
                 this.loading = false;
-                this.errorMessage = err.error?.message || 'Something went wrong. Please try again.';
+                this.toastService.showError(err.error?.message || 'Something went wrong. Please try again.');
             }
         });
     }

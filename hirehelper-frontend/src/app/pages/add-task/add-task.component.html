@@ -20,36 +20,6 @@
       <div class="h-1 bg-accent"></div>
       <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="p-8 space-y-6">
 
-        <!-- Alerts -->
-        <div *ngIf="errorMessage" class="bg-red-50 border-l-4 border-red-400 p-4 animate-shake">
-          <div class="flex">
-            <div class="flex-shrink-0 text-red-400">
-              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clip-rule="evenodd" />
-              </svg>
-            </div>
-            <div class="ml-3">
-              <p class="text-sm text-red-700">{{ errorMessage }}</p>
-            </div>
-          </div>
-        </div>
-
-        <div *ngIf="successMessage" class="bg-green-50 border-l-4 border-accent p-4">
-          <div class="flex">
-            <div class="flex-shrink-0 text-accent">
-              <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clip-rule="evenodd" />
-              </svg>
-            </div>
-            <div class="ml-3">
-              <p class="text-sm text-green-700">{{ successMessage }}</p>
-            </div>
-          </div>
-        </div>
 
         <!-- Inputs Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -124,6 +94,15 @@
             <input type="text" formControlName="picture_url"
               class="mt-1 block w-full border-border rounded-lg shadow-sm focus:ring-accent focus:border-accent sm:text-sm p-3 border transition-all"
               placeholder="Link to an image illustrating the task">
+          </div>
+
+          <!-- Category -->
+          <div class="col-span-2">
+            <label class="block text-sm font-semibold text-brand-secondary">Category</label>
+            <select formControlName="category"
+              class="mt-1 block w-full border-border rounded-lg shadow-sm focus:ring-accent focus:border-accent sm:text-sm p-3 border transition-all bg-white">
+              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            </select>
           </div>
         </div>
 

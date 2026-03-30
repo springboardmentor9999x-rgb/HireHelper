@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
     selector: 'app-profile',
@@ -18,8 +19,7 @@ export class Profile implements OnInit {
         professional_title: ''
     };
 
-    message = '';
-    isError = false;
+    private toastService = inject(ToastService);
 
     constructor(public authService: AuthService) { }
 
@@ -39,13 +39,10 @@ export class Profile implements OnInit {
     updateProfile() {
         this.authService.updateProfile(this.profileData).subscribe({
             next: (res) => {
-                this.message = 'Profile updated successfully';
-                this.isError = false;
-                setTimeout(() => this.message = '', 3000);
+                this.toastService.showSuccess('Profile updated successfully! Information saved.');
             },
             error: (err) => {
-                this.message = 'Failed to update profile';
-                this.isError = true;
+                this.toastService.showError('Failed to update profile. Please try again.');
             }
         });
     }

@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-register',
@@ -17,9 +18,8 @@ export class Register {
   protected password = '';
   protected confirmPassword = '';
   protected role = 'user';
-  protected errorMessage = signal('');
-  protected successMessage = signal('');
   protected isLoading = signal(false);
+  private toastService = inject(ToastService);
 
   // Field-level error signals
   protected firstNameError = signal('');
@@ -99,8 +99,6 @@ export class Register {
   }
 
   onSubmit() {
-    this.errorMessage.set('');
-
     // Run all validators (run each so all field errors show at once)
     const v1 = this.validateFirstName();
     const v2 = this.validateLastName();
@@ -126,14 +124,14 @@ export class Register {
     this.authService.register(userData).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.successMessage.set('Registration successful! Redirecting to verification...');
+        this.toastService.showSuccess('Registration successful! Check your email for OTP.');
         setTimeout(() => {
           this.router.navigate(['/verify-otp'], { queryParams: { email: this.emailId.trim().toLowerCase() } });
-        }, 2000);
+        }, 1500);
       },
       error: (err) => {
         this.isLoading.set(false);
-        this.errorMessage.set(err.error?.message || 'Registration failed. Please try again.');
+        this.toastService.showError(err.error?.message || 'Registration failed. Please try again.');
       }
     });
   }

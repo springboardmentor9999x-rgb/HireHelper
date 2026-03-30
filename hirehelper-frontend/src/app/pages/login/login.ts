@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -12,9 +13,8 @@ import { AuthService } from '../../services/auth.service';
 export class Login {
   protected email = '';
   protected password = '';
-  protected errorMessage = signal('');
-  protected successMessage = signal('');
   protected isLoading = signal(false);
+  private toastService = inject(ToastService);
 
   // Field errors
   protected emailError = signal('');
@@ -47,9 +47,6 @@ export class Login {
   }
 
   onSubmit() {
-    this.errorMessage.set('');
-    this.successMessage.set('');
-
     const v1 = this.validateEmail();
     const v2 = this.validatePassword();
 
@@ -61,18 +58,18 @@ export class Login {
     this.authService.login(creds).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.successMessage.set('Login successful! Redirecting to dashboard...');
-        setTimeout(() => this.router.navigate(['/dashboard']), 1500);
+        this.toastService.showSuccess('Login successful! Welcome back.');
+        setTimeout(() => this.router.navigate(['/dashboard']), 1000);
       },
       error: (err) => {
         this.isLoading.set(false);
         if (err.status === 403) {
-          this.errorMessage.set('Account not verified. Redirecting to verification...');
+          this.toastService.showInfo('Account not verified. Redirecting...');
           setTimeout(() => {
             this.router.navigate(['/verify-otp'], { queryParams: { email: this.email.trim().toLowerCase() } });
-          }, 2000);
+          }, 1500);
         } else {
-          this.errorMessage.set(err.error?.message || 'Login failed. Please check your credentials.');
+          this.toastService.showError(err.error?.message || 'Login failed. Please check your credentials.');
         }
         console.error('Login error:', err);
       }
