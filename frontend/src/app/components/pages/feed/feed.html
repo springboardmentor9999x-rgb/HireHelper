@@ -1,0 +1,84 @@
+<div class="feed-container">
+  <!-- Header -->
+  <div class="feed-header">
+    <h2>Task Feed</h2>
+    <button class="refresh-btn" (click)="refreshTasks()" [disabled]="loading">
+      {{ loading ? 'Loading...' : 'Refresh' }}
+    </button>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    {{ successMessage }}
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading tasks...</p>
+  </div>
+
+  <!-- Tasks Grid -->
+  <div *ngIf="!loading" class="tasks-grid">
+    <div *ngIf="tasks.length === 0" class="empty-state">
+      <p>No tasks available at the moment.</p>
+    </div>
+
+    <div *ngFor="let task of tasks" class="task-card">
+      <div class="task-header">
+        <h3>{{ task.title }}</h3>
+        <span class="task-status" [style.background]="getCategoryColor(task.category)">
+          {{ task.category }}
+        </span>
+      </div>
+
+      <p class="task-description">{{ truncateText(task.description, 100) }}</p>
+
+      <div class="task-meta">
+        <div class="meta-item">
+          <span class="label">Budget:</span>
+          <span class="value">{{ formatBudget(task.budget) }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="label">Start:</span>
+          <span class="value">{{ formatDate(task.start_time) }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="label">Status:</span>
+          <span class="value status-badge" [class]="'status-' + task.status.toLowerCase()">
+            {{ task.status }}
+          </span>
+        </div>
+        <div class="meta-item" *ngIf="task.owner_email">
+          <span class="label">From:</span>
+          <span class="value">📧 {{ task.owner_email }}</span>
+        </div>
+      </div>
+
+      <div *ngIf="task.location" class="task-location">
+        📍 {{ task.location }}
+      </div>
+
+      <div class="task-footer">
+        <div class="request-status">
+          <span class="status-label" [class.requested]="task.is_requested">
+            {{ task.is_requested ? 'Requested ✓' : 'Not Requested' }}
+          </span>
+        </div>
+        <button 
+          class="btn-request" 
+          (click)="sendRequest(task.id)"
+          [disabled]="isRequestingSending(task.id) || task.is_requested"
+        >
+          <span *ngIf="!isRequestingSending(task.id)">📨 Request</span>
+          <span *ngIf="isRequestingSending(task.id)">Sending...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

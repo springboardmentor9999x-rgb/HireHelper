@@ -1,0 +1,77 @@
+<!-- Overlay -->
+<div 
+  *ngIf="isOpen" 
+  class="notification-overlay" 
+  (click)="close()"
+></div>
+
+<!-- Notification Sidebar -->
+<div [class.open]="isOpen" class="notification-sidebar">
+  <!-- Header -->
+  <div class="notification-sidebar-header">
+    <h2>Notifications</h2>
+    <button class="close-btn" (click)="close()" title="Close">
+      <span>✕</span>
+    </button>
+  </div>
+
+  <!-- Mark All Read Button -->
+  <div class="sidebar-actions">
+    <button 
+      [disabled]="unreadCount === 0 || unreadCount === 0"
+      (click)="markAllAsRead()"
+      class="mark-all-btn"
+      title="Mark all as read"
+    >
+      <span>✓</span> Mark all as read
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading notifications...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && notifications.length === 0" class="empty-state">
+    <div class="empty-icon">🔔</div>
+    <p>No notifications yet</p>
+    <small>You're all caught up!</small>
+  </div>
+
+  <!-- Notifications List -->
+  <div *ngIf="!isLoading && notifications.length > 0" class="notifications-list">
+    <div 
+      *ngFor="let notification of notifications"
+      [class.unread]="!notification.is_read"
+      class="notification-item"
+      (click)="markAsRead(notification, $event)"
+    >
+      <!-- Unread Indicator -->
+      <div *ngIf="!notification.is_read" class="unread-dot"></div>
+
+      <!-- Content -->
+      <div class="notification-content">
+        <p class="notification-body">{{ notification.body }}</p>
+        <small class="notification-time">{{ getTimeAgo(notification.created_at) }}</small>
+      </div>
+
+      <!-- Delete Button -->
+      <button 
+        class="delete-btn"
+        (click)="deleteNotification(notification.id, $event)"
+        title="Delete notification"
+      >
+        ✕
+      </button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="sidebar-footer">
+    <small class="unread-badge">
+      {{ unreadCount }} unread
+    </small>
+  </div>
+</div>

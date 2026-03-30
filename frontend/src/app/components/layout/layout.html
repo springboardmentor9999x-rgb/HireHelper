@@ -1,0 +1,60 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">HireHelper</div>
+    </div>
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard/feed" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">📰</span> Feed
+      </a>
+      <a routerLink="/dashboard/my-tasks" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">✓</span> My Tasks
+      </a>
+      <a routerLink="/dashboard/requests" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">📋</span> Requests
+      </a>
+      <a routerLink="/dashboard/my-requests" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">💬</span> My Requests
+      </a>
+      <a routerLink="/dashboard/add-task" routerLinkActive="active" class="nav-link primary">
+        <span class="nav-icon">➕</span> Add Task
+      </a>
+      <div class="nav-divider"></div>
+      <a routerLink="/dashboard/profile" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">👤</span> Profile
+      </a>
+      <a routerLink="/dashboard/settings" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">⚙️</span> Settings
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()" title="Logout">
+        <span class="logout-icon">🚪</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <!-- Top Notification Bar -->
+    <div class="notification-bar">
+      <button 
+        class="notification-btn" 
+        (click)="toggleNotificationSidebar()"
+        title="Open Notifications"
+      >
+        <span class="notification-icon">🔔</span>
+        <span *ngIf="notificationCount > 0" class="notification-badge">{{ notificationCount }}</span>
+      </button>
+    </div>
+
+    <!-- Notification Sidebar -->
+    <app-notification-sidebar 
+      [isOpen]="showNotificationSidebar"
+      (closeEvent)="closeNotificationSidebar()"
+    ></app-notification-sidebar>
+
+    <section class="page-content">
+      <router-outlet></router-outlet>
+    </section>
+  </div>
+</div>

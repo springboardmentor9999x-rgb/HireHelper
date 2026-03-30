@@ -1,0 +1,252 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Page Container */
+.page {
+  width: 100%;
+  padding: var(--spacing-xl);
+  background-color: var(--gray-50);
+}
+
+.page.card {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Loading State */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-3xl);
+  text-align: center;
+  color: var(--gray-500);
+}
+
+.loading p {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* Error Messages */
+.alert {
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 4px solid;
+}
+
+.alert-error {
+  background-color: var(--danger-50);
+  color: var(--danger-700);
+  border-left-color: var(--danger-600);
+}
+
+.alert-success {
+  background-color: var(--success-50);
+  color: var(--success-700);
+  border-left-color: var(--success-600);
+}
+
+.alert-success {
+  background: #efe;
+  border: 1px solid #cfc;
+  color: #3c3;
+}
+
+/* No Tasks Message */
+.no-tasks {
+  text-align: center;
+  padding: var(--space-xxl) var(--space-lg);
+  color: var(--color-text-muted);
+}
+
+.no-tasks p {
+  font-size: 18px;
+  margin-bottom: var(--space-lg);
+}
+
+/* Tasks Grid */
+.tasks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-lg);
+  width: 100%;
+}
+
+.task-card {
+  background: var(--color-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: all var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.task-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+}
+
+.card-header {
+  padding: var(--space-md);
+  background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.status-open {
+  background: rgba(100, 200, 255, 0.3);
+}
+
+.status-completed {
+  background: rgba(100, 255, 100, 0.3);
+}
+
+.card-body {
+  padding: var(--space-md);
+  flex: 1;
+}
+
+.description {
+  margin: 0 0 var(--space-md) 0;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.task-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.detail-item label {
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.detail-item span {
+  color: var(--color-text);
+}
+
+.card-footer {
+  padding: var(--space-md);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: flex-end;
+}
+
+.btn-small {
+  padding: 6px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.btn-edit {
+  background: var(--color-primary);
+  color: white;
+}
+
+.btn-edit:hover {
+  background: var(--color-primary-dark);
+}
+
+.btn-delete {
+  background: var(--color-error);
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #dc2626;
+}
+
+/* Form Styles */
+.form-control {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: var(--font-size-base);
+  background: var(--color-card);
+  color: var(--color-text);
+  transition: border-color var(--transition);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-control.error {
+  border-color: var(--color-error);
+}
+
+.error-text {
+  color: var(--color-error);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+/* Fade In Animation */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tasks-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page {
+    padding: var(--space-md);
+  }
+}

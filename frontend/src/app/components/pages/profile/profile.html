@@ -1,0 +1,161 @@
+<div class="profile-page card fade-in">
+  <div class="profile-header">
+    <h2>👤 My Profile</h2>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    {{ successMessage }}
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading && !profile" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading profile...</p>
+  </div>
+
+  <!-- Profile Content -->
+  <div *ngIf="profile" class="profile-content">
+    <!-- Profile Picture Section -->
+    <div class="profile-picture-section">
+      <div class="picture-container">
+        <img 
+          *ngIf="profilePicturePreview" 
+          [src]="profilePicturePreview" 
+          alt="Profile Picture"
+          class="profile-picture"
+        />
+        <div *ngIf="!profilePicturePreview" class="picture-placeholder">
+          <div class="placeholder-initials">{{ profile.first_name[0] }}{{ profile.last_name[0] }}</div>
+        </div>
+      </div>
+
+      <label class="upload-button" [class.loading]="uploadingPicture">
+        <input 
+          type="file" 
+          (change)="onFileSelected($event)"
+          accept=".jpg,.jpeg,.png"
+          [disabled]="uploadingPicture"
+          hidden
+        />
+        <span *ngIf="!uploadingPicture">📸 Upload Picture</span>
+        <span *ngIf="uploadingPicture">Uploading...</span>
+      </label>
+
+      <p class="picture-hint">JPG or PNG, max 2MB</p>
+    </div>
+
+    <!-- Profile Information Section (View Mode) -->
+    <div *ngIf="!editing" class="profile-info-section">
+      <div class="info-group">
+        <label>First Name</label>
+        <p class="info-value">{{ profile.first_name }}</p>
+      </div>
+
+      <div class="info-group">
+        <label>Last Name</label>
+        <p class="info-value">{{ profile.last_name }}</p>
+      </div>
+
+      <div class="info-group">
+        <label>Email</label>
+        <p class="info-value">{{ profile.email }}</p>
+      </div>
+
+      <div class="info-group">
+        <label>Phone Number</label>
+        <p class="info-value">{{ profile.phone_number || 'Not set' }}</p>
+      </div>
+
+      <div class="info-group">
+        <label>Member Since</label>
+        <p class="info-value">{{ profile.created_at | date: 'MMM d, yyyy' }}</p>
+      </div>
+
+      <button 
+        class="btn btn-primary" 
+        (click)="toggleEdit()"
+        [disabled]="loading"
+      >
+        ✏️ Edit Profile
+      </button>
+    </div>
+
+    <!-- Profile Edit Form -->
+    <div *ngIf="editing" class="profile-form">
+      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+        <!-- First Name -->
+        <div class="form-group">
+          <label for="first_name">First Name *</label>
+          <input
+            id="first_name"
+            type="text"
+            formControlName="first_name"
+            class="form-control"
+            [class.error]="isFieldInvalid('first_name')"
+          />
+          <div *ngIf="isFieldInvalid('first_name')" class="error-text">
+            <span *ngIf="f['first_name'].errors?.['required']">First name is required</span>
+            <span *ngIf="f['first_name'].errors?.['minlength']">Minimum 2 characters</span>
+          </div>
+        </div>
+
+        <!-- Last Name -->
+        <div class="form-group">
+          <label for="last_name">Last Name *</label>
+          <input
+            id="last_name"
+            type="text"
+            formControlName="last_name"
+            class="form-control"
+            [class.error]="isFieldInvalid('last_name')"
+          />
+          <div *ngIf="isFieldInvalid('last_name')" class="error-text">
+            <span *ngIf="f['last_name'].errors?.['required']">Last name is required</span>
+            <span *ngIf="f['last_name'].errors?.['minlength']">Minimum 2 characters</span>
+          </div>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="form-group">
+          <label for="phone_number">Phone Number *</label>
+          <input
+            id="phone_number"
+            type="tel"
+            formControlName="phone_number"
+            class="form-control"
+            [class.error]="isFieldInvalid('phone_number')"
+          />
+          <div *ngIf="isFieldInvalid('phone_number')" class="error-text">
+            <span *ngIf="f['phone_number'].errors?.['required']">Phone number is required</span>
+            <span *ngIf="f['phone_number'].errors?.['minlength']">Minimum 10 characters</span>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="button-group">
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="profileForm.invalid || loading"
+          >
+            {{ loading ? 'Saving...' : '✓ Save Changes' }}
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-secondary"
+            (click)="toggleEdit()"
+            [disabled]="loading"
+          >
+            ✕ Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

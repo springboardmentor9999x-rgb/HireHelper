@@ -1,0 +1,172 @@
+<div class="page card fade-in">
+  <h2>Add New Task</h2>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    {{ successMessage }}
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Task Form -->
+  <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+    <!-- Required Fields Section Header -->
+    <div style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-weight: 600;">
+      ⭐ Required Fields (marked with *)
+    </div>
+
+    <!-- Title Field -->
+    <div class="form-group">
+      <label for="title">Task Title *</label>
+      <input
+        id="title"
+        type="text"
+        formControlName="title"
+        placeholder="Enter task title"
+        class="form-control"
+        [class.error]="isFieldInvalid('title')"
+      />
+      <div *ngIf="isFieldInvalid('title')" class="error-text">
+        <span *ngIf="f['title'].errors?.['required']">Title is required</span>
+        <span *ngIf="f['title'].errors?.['minlength']">Title must be at least 3 characters</span>
+      </div>
+    </div>
+
+    <!-- Description Field -->
+    <div class="form-group">
+      <label for="description">Description *</label>
+      <textarea
+        id="description"
+        formControlName="description"
+        placeholder="Enter task description"
+        class="form-control"
+        rows="3"
+        [class.error]="isFieldInvalid('description')"
+      ></textarea>
+      <div *ngIf="isFieldInvalid('description')" class="error-text">
+        <span *ngIf="f['description'].errors?.['required']">Description is required</span>
+        <span *ngIf="f['description'].errors?.['minlength']">Description must be at least 10 characters</span>
+      </div>
+    </div>
+
+    <!-- Category Field -->
+    <div class="form-group" style="background: #fffbf0; padding: 16px; border-radius: 12px; border: 3px solid #f59e0b;">
+      <label for="category" style="color: #d97706; font-weight: 700; font-size: 16px;">📋 SELECT CATEGORY *</label>
+      <select
+        id="category"
+        formControlName="category"
+        class="form-control"
+        [class.error]="isFieldInvalid('category')"
+        style="border: 2px solid #f59e0b; background-color: white; margin-top: 8px;"
+      >
+        <option value="">🔽 Choose a Category...</option>
+        <option value="cleaning">🧹 Cleaning</option>
+        <option value="repairs">🔧 Repairs & Maintenance</option>
+        <option value="plumbing">🚰 Plumbing</option>
+        <option value="electrical">⚡ Electrical</option>
+        <option value="painting">🎨 Painting</option>
+        <option value="carpentry">🪵 Carpentry</option>
+        <option value="moving">🚚 Moving & Delivery</option>
+        <option value="gardening">🌱 Gardening</option>
+        <option value="personal">👤 Personal Services</option>
+        <option value="other">📁 Other</option>
+      </select>
+      <div *ngIf="isFieldInvalid('category')" class="error-text">
+        <span *ngIf="f['category'].errors?.['required']">⚠️ Category is required</span>
+      </div>
+    </div>
+
+    <!-- Optional Fields Section Header -->
+    <div style="background: #f3f4f6; color: #374151; padding: 12px 16px; border-radius: 8px; margin: 24px 0 16px 0; font-weight: 600;">
+      ℹ️ Optional Fields (You can skip these)
+    </div>
+
+    <!-- Budget Field -->
+    <div class="form-group">
+      <label for="budget">Budget ($) <span class="optional">(Optional)</span></label>
+      <input
+        id="budget"
+        type="number"
+        formControlName="budget"
+        placeholder="Enter budget (optional)"
+        class="form-control"
+        min="0"
+        step="0.01"
+      />
+    </div>
+    <!-- Location Field -->
+    <div class="form-group">
+      <label for="location">Location *</label>
+      <input
+        id="location"
+        type="text"
+        formControlName="location"
+        placeholder="Enter task location"
+        class="form-control"
+        [class.error]="isFieldInvalid('location')"
+      />
+      <div *ngIf="isFieldInvalid('location')" class="error-text">
+        <span *ngIf="f['location'].errors?.['required']">Location is required</span>
+      </div>
+    </div>
+
+    <!-- Start Time Field -->
+    <div class="form-group">
+      <label for="start_time">Start Time <span class="optional">(Optional)</span></label>
+      <input
+        id="start_time"
+        type="datetime-local"
+        formControlName="start_time"
+        class="form-control"
+      />
+    </div>
+
+    <!-- End Time Field -->
+    <div class="form-group">
+      <label for="end_time">End Time <span class="optional">(Optional)</span></label>
+      <input
+        id="end_time"
+        type="datetime-local"
+        formControlName="end_time"
+        class="form-control"
+      />
+    </div>
+
+    <!-- Image Upload Field -->
+    <div class="form-group">
+      <label for="image">Upload Image <span class="optional">(Optional)</span></label>
+      <input
+        id="image"
+        type="file"
+        accept="image/*"
+        (change)="onImageSelected($event)"
+        class="form-control"
+      />
+      <div *ngIf="selectedImage" class="image-preview">
+        <p>✅ Image selected: {{ selectedImage.name }}</p>
+      </div>
+    </div>
+
+    <!-- Submit Buttons -->
+    <div class="form-group button-group">
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!taskForm.get('title')?.valid || !taskForm.get('description')?.valid || !taskForm.get('category')?.valid || !taskForm.get('location')?.valid || loading"
+      >
+        {{ loading ? 'Creating...' : 'Create Task' }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="resetForm()"
+        [disabled]="loading"
+      >
+        Reset
+      </button>
+    </div>
+  </form>
+</div>

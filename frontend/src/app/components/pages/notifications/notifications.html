@@ -1,0 +1,68 @@
+<div class="notifications-container">
+  <!-- Header -->
+  <div class="notifications-header">
+    <h2>Notifications 🔔</h2>
+    <div class="header-actions">
+      <span class="unread-badge" *ngIf="getUnreadCount() > 0">
+        {{ getUnreadCount() }} Unread
+      </span>
+      <button class="refresh-btn" (click)="refreshNotifications()" [disabled]="loading">
+        {{ loading ? 'Loading...' : '↻ Refresh' }}
+      </button>
+      <button class="clear-btn" (click)="clearAllNotifications()" [disabled]="notifications.length === 0">
+        🗑️ Clear All
+      </button>
+    </div>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    {{ successMessage }}
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading notifications...</p>
+  </div>
+
+  <!-- Notifications List -->
+  <div *ngIf="!loading" class="notifications-list">
+    <!-- Empty State -->
+    <div *ngIf="notifications.length === 0" class="empty-state">
+      <p>No notifications yet! 📭</p>
+    </div>
+
+    <!-- Notification Items -->
+    <div *ngFor="let notification of notifications" 
+         [class.notification-item]="true"
+         [class.unread]="!notification.is_read">
+      
+      <div class="notification-content">
+        <div class="notification-text">
+          <p class="notification-body">{{ notification.body }}</p>
+          <span class="notification-time">{{ formatDate(notification.created_at) }}</span>
+        </div>
+        <div class="notification-status">
+          <span *ngIf="!notification.is_read" class="unread-indicator">●</span>
+        </div>
+      </div>
+
+      <div class="notification-actions">
+        <button 
+          *ngIf="!notification.is_read"
+          class="btn-read" 
+          (click)="markAsRead(notification.id)"
+          [disabled]="isProcessing(notification.id)"
+        >
+          {{ isProcessing(notification.id) ? '...' : '✓ Mark Read' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,47 @@
+<nav class="navbar">
+  <div class="brand">HireHelper</div>
+  <button class="btn btn-secondary" (click)="logout()">Logout</button>
+</nav>
+<main class="dashboard-main container">
+  <h1 class="fade-in">Welcome, {{ userName }}</h1>
+  
+  <div class="dashboard-tabs">
+    <button [class.active]="activeTab === 'tasks'" (click)="activeTab = 'tasks'" class="tab-btn">My Tasks</button>
+    <button [class.active]="activeTab === 'settings'" (click)="activeTab = 'settings'" class="tab-btn">Settings</button>
+  </div>
+
+  <!-- My Tasks Section -->
+  <div *ngIf="activeTab === 'tasks'" class="dashboard-cards fade-in">
+    <h2>My Tasks</h2>
+    <div *ngIf="tasks.length > 0" class="task-list">
+      <div *ngFor="let task of tasks" class="task-card glass-card">
+        <h3>{{ task.title }}</h3>
+        <p>{{ task.description }}</p>
+        <p class="task-meta">📍 {{ task.location }} | 💰 {{ task.budget }}</p>
+      </div>
+    </div>
+    <div *ngIf="tasks.length === 0" class="empty-state">
+      <p>No tasks yet. Create one to get started!</p>
+    </div>
+  </div>
+
+  <!-- Settings Section -->
+  <div *ngIf="activeTab === 'settings'" class="dashboard-cards fade-in">
+    <h2>Settings</h2>
+    <div class="settings-form glass-card">
+      <div class="setting-group">
+        <label>Enable Email Notifications</label>
+        <input type="checkbox" [(ngModel)]="settings.notification_email">
+      </div>
+      <div class="setting-group">
+        <label>Dark Mode</label>
+        <input type="checkbox" [(ngModel)]="settings.dark_mode">
+      </div>
+      <div class="setting-group">
+        <label>Profile Visibility</label>
+        <input type="checkbox" [(ngModel)]="settings.profile_visibility">
+      </div>
+      <button class="btn btn-primary" (click)="saveSettings()">Save Settings</button>
+    </div>
+  </div>
+</main>

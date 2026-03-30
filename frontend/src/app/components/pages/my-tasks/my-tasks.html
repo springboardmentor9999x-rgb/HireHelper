@@ -1,0 +1,75 @@
+<div class="my-tasks-container">
+  <!-- Header -->
+  <div class="my-tasks-header">
+    <h2>My Tasks</h2>
+    <button class="btn-add-task" (click)="addNewTask()" [disabled]="loading">
+      ➕ Add New Task
+    </button>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    {{ successMessage }}
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading your tasks...</p>
+  </div>
+
+  <!-- Tasks Grid -->
+  <div *ngIf="!loading" class="tasks-grid">
+    <div *ngIf="tasks.length === 0" class="empty-state">
+      📭
+      <p>No tasks yet.</p>
+      <p class="empty-subtitle">Create your first task to get started!</p>
+    </div>
+
+    <div *ngFor="let task of tasks" class="task-card">
+      <div class="task-header">
+        <h3>{{ task.title }}</h3>
+        <span class="task-status" [style.background]="getCategoryColor(task.category)">
+          {{ task.category }}
+        </span>
+      </div>
+
+      <p class="task-description">{{ task.description }}</p>
+
+      <div class="task-meta">
+        <div class="meta-item">
+          <span class="label">Budget:</span>
+          <span class="value">{{ formatBudget(task.budget) }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="label">Status:</span>
+          <span class="value status-badge" [class]="'status-' + task.status.toLowerCase()">
+            {{ task.status }}
+          </span>
+        </div>
+        <div class="meta-item">
+          <span class="label">Created:</span>
+          <span class="value">{{ formatDate(task.created_at) }}</span>
+        </div>
+      </div>
+
+      <div *ngIf="task.location" class="task-location">
+        📍 {{ task.location }}
+      </div>
+
+      <div class="task-footer">
+        <button class="btn-edit" (click)="editTask(task.id)" [disabled]="loading">
+          ✏️ Edit
+        </button>
+        <button class="btn-delete" (click)="deleteTask(task.id)" [disabled]="loading">
+          🗑️ Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

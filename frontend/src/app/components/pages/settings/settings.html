@@ -1,0 +1,341 @@
+<div class="settings-container">
+  <!-- Header -->
+  <div class="settings-header">
+    <h1>Settings</h1>
+    <p>Manage your HireHelper account and preferences</p>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    ✓ {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-error">
+    ✕ {{ errorMessage }}
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="spinner-container">
+    <div class="spinner"></div>
+    <p>Loading settings...</p>
+  </div>
+
+  <!-- Settings Content -->
+  <div *ngIf="!loading && settings" class="settings-content">
+    <!-- SECTION 1: Profile Settings -->
+    <div class="settings-section">
+      <div class="section-icon">👤</div>
+      <h3>Profile Settings</h3>
+      <p class="section-description">Manage your basic information</p>
+
+      <!-- Profile Completion Progress -->
+      <div class="progress-section">
+        <div class="progress-label">
+          <span>Profile Completion</span>
+          <span class="progress-percent">{{ profileCompletion }}%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="profileCompletion"></div>
+        </div>
+      </div>
+
+      <form [formGroup]="profileForm" class="settings-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="first_name">First Name</label>
+            <input
+              id="first_name"
+              type="text"
+              formControlName="first_name"
+              placeholder="Enter first name"
+              class="form-control"
+            />
+          </div>
+          <div class="form-group">
+            <label for="last_name">Last Name</label>
+            <input
+              id="last_name"
+              type="text"
+              formControlName="last_name"
+              placeholder="Enter last name"
+              class="form-control"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input
+            id="phone"
+            type="tel"
+            formControlName="phone_number"
+            placeholder="Enter phone number"
+            class="form-control"
+          />
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="updateProfile()"
+          [disabled]="!profileForm.valid || saving"
+        >
+          {{ saving ? 'Saving...' : 'Save Profile' }}
+        </button>
+      </form>
+
+      <div class="member-info">
+        <p>Member since: <strong>{{ formatDate(settings.memberSince) }}</strong></p>
+        <p *ngIf="settings.lastLogin">Last login: <strong>{{ formatDate(settings.lastLogin) }}</strong></p>
+      </div>
+    </div>
+
+    <!-- SECTION 2: Notification Settings -->
+    <div class="settings-section">
+      <div class="section-icon">🔔</div>
+      <h3>Notifications</h3>
+      <p class="section-description">Control how you receive updates</p>
+
+      <div class="settings-toggles">
+        <div class="toggle-item">
+          <div class="toggle-info">
+            <h4>Email Notifications</h4>
+            <p>Receive notifications via email</p>
+          </div>
+          <label class="toggle-switch">
+            <input
+              type="checkbox"
+              [checked]="settings.notifications.email"
+              (change)="toggleEmailNotifications()"
+              [disabled]="saving"
+            />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-item">
+          <div class="toggle-info">
+            <h4>Push Notifications</h4>
+            <p>Receive browser push notifications</p>
+          </div>
+          <label class="toggle-switch">
+            <input
+              type="checkbox"
+              [checked]="settings.notifications.push"
+              (change)="togglePushNotifications()"
+              [disabled]="saving"
+            />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: Appearance -->
+    <div class="settings-section">
+      <div class="section-icon">🎨</div>
+      <h3>Appearance</h3>
+      <p class="section-description">Customize how the app looks</p>
+
+      <div class="settings-toggles">
+        <div class="toggle-item">
+          <div class="toggle-info">
+            <h4>Dark Mode</h4>
+            <p>Use dark theme for reduced eye strain</p>
+          </div>
+          <label class="toggle-switch">
+            <input
+              type="checkbox"
+              [checked]="settings.theme.darkMode"
+              (change)="toggleDarkMode()"
+              [disabled]="saving"
+            />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: Privacy -->
+    <div class="settings-section">
+      <div class="section-icon">🔒</div>
+      <h3>Privacy</h3>
+      <p class="section-description">Control your profile visibility</p>
+
+      <div class="settings-toggles">
+        <div class="toggle-item">
+          <div class="toggle-info">
+            <h4>Public Profile</h4>
+            <p>Allow other users to view your profile</p>
+          </div>
+          <label class="toggle-switch">
+            <input
+              type="checkbox"
+              [checked]="settings.privacy.profileVisibility"
+              (change)="toggleProfileVisibility()"
+              [disabled]="saving"
+            />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 5: Language -->
+    <div class="settings-section">
+      <div class="section-icon">🌍</div>
+      <h3>Language</h3>
+      <p class="section-description">Choose your preferred language</p>
+
+      <div class="language-options">
+        <button
+          *ngFor="let lang of languages"
+          type="button"
+          class="language-btn"
+          [class.active]="settings.language === lang"
+          (click)="updateLanguage(lang)"
+          [disabled]="saving"
+        >
+          {{ lang }}
+        </button>
+      </div>
+    </div>
+
+    <!-- SECTION 6: Security -->
+    <div class="settings-section">
+      <div class="section-icon">🔐</div>
+      <h3>Security</h3>
+      <p class="section-description">Manage your account security</p>
+
+      <div class="security-buttons">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="showPasswordModal = true"
+          [disabled]="saving"
+        >
+          Change Password
+        </button>
+      </div>
+    </div>
+
+    <!-- SECTION 7: Account Management -->
+    <div class="settings-section danger">
+      <div class="section-icon danger-icon">⚠️</div>
+      <h3>Account Management</h3>
+      <p class="section-description">Dangerous zone - Proceed with caution</p>
+
+      <button
+        type="button"
+        class="btn btn-danger"
+        (click)="showDeleteModal = true"
+        [disabled]="saving"
+      >
+        Delete Account
+      </button>
+    </div>
+  </div>
+
+  <!-- Change Password Modal -->
+  <div *ngIf="showPasswordModal" class="modal-overlay" (click)="showPasswordModal = false">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>🔐 Change Password</h3>
+      <form [formGroup]="passwordForm">
+        <div class="form-group">
+          <label for="current_password">Current Password</label>
+          <input
+            id="current_password"
+            type="password"
+            formControlName="current_password"
+            placeholder="Enter current password"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="new_password">New Password</label>
+          <input
+            id="new_password"
+            type="password"
+            formControlName="new_password"
+            placeholder="Enter new password (min 6 chars)"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="confirm_password">Confirm Password</label>
+          <input
+            id="confirm_password"
+            type="password"
+            formControlName="confirm_password"
+            placeholder="Confirm new password"
+            class="form-control"
+          />
+        </div>
+
+        <div *ngIf="passwordForm.errors?.['passwordMismatch']" class="error-text">
+          Passwords do not match
+        </div>
+
+        <div class="modal-buttons">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="showPasswordModal = false"
+            [disabled]="saving"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="changePassword()"
+            [disabled]="!passwordForm.valid || saving"
+          >
+            {{ saving ? 'Updating...' : 'Change Password' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Account Modal -->
+  <div *ngIf="showDeleteModal" class="modal-overlay" (click)="showDeleteModal = false">
+    <div class="modal danger-modal" (click)="$event.stopPropagation()">
+      <h3>⚠️ Delete Account</h3>
+      <p>This action cannot be undone. All your data will be permanently deleted.</p>
+
+      <form [formGroup]="deleteForm">
+        <div class="form-group">
+          <label for="delete_password">Confirm Your Password</label>
+          <input
+            id="delete_password"
+            type="password"
+            formControlName="password"
+            placeholder="Enter your password"
+            class="form-control"
+          />
+        </div>
+
+        <div class="modal-buttons">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="showDeleteModal = false"
+            [disabled]="saving"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            (click)="deleteAccount()"
+            [disabled]="!deleteForm.valid || saving"
+          >
+            {{ saving ? 'Deleting...' : 'Delete Account' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

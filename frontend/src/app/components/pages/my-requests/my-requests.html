@@ -1,0 +1,75 @@
+<div class="my-requests-container">
+  <!-- Header -->
+  <div class="requests-header">
+    <h2>My Requests</h2>
+    <button class="refresh-btn" (click)="refresh()" [disabled]="loading">
+      {{ loading ? 'Loading...' : 'Refresh' }}
+    </button>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    ✓ {{ successMessage }}
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    ✕ {{ errorMessage }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading your requests...</p>
+  </div>
+
+  <!-- Requests List -->
+  <div *ngIf="!loading" class="requests-list">
+    <div *ngIf="requests.length === 0" class="empty-state">
+      <div class="empty-icon">📭</div>
+      <p>You haven't sent any requests yet.</p>
+      <p class="empty-hint">Browse the feed and request tasks from other users.</p>
+    </div>
+
+    <div *ngFor="let request of requests" class="request-card">
+      <div class="request-header">
+        <div class="request-title">
+          <h3>{{ request.title }}</h3>
+          <span class="location">📍 {{ request.location }}</span>
+        </div>
+        <span [class]="'status-badge ' + getStatusBadgeClass(request.status)">
+          {{ request.status }}
+        </span>
+      </div>
+
+      <div class="request-info">
+        <div class="info-item">
+          <span class="label">Task Owner:</span>
+          <span class="value">{{ request.task_owner_name || 'Unknown' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Requested on:</span>
+          <span class="value">{{ formatDate(request.created_at) }}</span>
+        </div>
+      </div>
+
+      <div class="request-actions">
+        <button 
+          *ngIf="request.status === 'PENDING'"
+          class="btn-cancel" 
+          (click)="cancelRequest(request.id, request.title)"
+          [disabled]="isCancelling(request.id)"
+        >
+          <span *ngIf="!isCancelling(request.id)">Cancel Request</span>
+          <span *ngIf="isCancelling(request.id)">Cancelling...</span>
+        </button>
+        <span *ngIf="request.status === 'ACCEPTED'" class="accepted-message">
+          ✓ Accepted - Contact the task owner to proceed
+        </span>
+        <span *ngIf="request.status === 'REJECTED'" class="rejected-message">
+          Request was rejected
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

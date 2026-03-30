@@ -1,0 +1,73 @@
+<div class="auth-page">
+  <div class="auth-card glass-card fade-in">
+    <h2 class="auth-title">Verify Your Email</h2>
+    <p class="auth-subtitle">Enter the 6-digit OTP sent to {{ email }}</p>
+
+    <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()">
+      <!-- OTP Input -->
+      <div class="form-group">
+        <label for="otp">Enter OTP</label>
+        <input
+          type="text"
+          id="otp"
+          formControlName="otp"
+          class="form-control otp-input"
+          placeholder="000000"
+          maxlength="6"
+          inputmode="numeric"
+          [class.is-invalid]="submitted && f['otp'].errors"
+        />
+        <div class="invalid-feedback" *ngIf="submitted && f['otp'].errors">
+          <span *ngIf="f['otp'].errors['required']">
+            OTP is required
+          </span>
+          <span *ngIf="f['otp'].errors['minlength'] || f['otp'].errors['maxlength']">
+            OTP must be exactly 6 digits
+          </span>
+          <span *ngIf="f['otp'].errors['pattern']">
+            OTP must contain only numbers
+          </span>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div class="alert alert-danger" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Success Message -->
+      <div class="alert alert-success" *ngIf="successMessage">
+        {{ successMessage }}
+      </div>
+
+      <!-- Verify Button -->
+      <button
+        type="submit"
+        class="btn btn-primary btn-block"
+        [disabled]="loading"
+      >
+        <span *ngIf="loading" class="spinner-border spinner-border-sm mr-2"></span>
+        {{ loading ? 'Verifying...' : 'Verify OTP' }}
+      </button>
+    </form>
+
+    <!-- Resend OTP Section -->
+    <div class="resend-section">
+      <p class="resend-text">Didn't receive the OTP?</p>
+      <button
+        type="button"
+        class="btn btn-link btn-resend"
+        (click)="onResendOTP()"
+        [disabled]="resendLoading || resendCooldown > 0"
+      >
+        <span *ngIf="resendLoading" class="spinner-border spinner-border-sm mr-2"></span>
+        {{ resendLoading ? 'Sending...' : (resendCooldown > 0 ? 'Resend in ' + resendCooldown + 's' : 'Resend OTP') }}
+      </button>
+    </div>
+
+    <!-- Back to Register Link -->
+    <p class="auth-footer">
+      Want to register again? <a routerLink="/register">Go back</a>
+    </p>
+  </div>
+</div>

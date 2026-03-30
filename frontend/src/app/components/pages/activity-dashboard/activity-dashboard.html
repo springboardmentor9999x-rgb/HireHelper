@@ -1,0 +1,113 @@
+<div class="activity-page card fade-in">
+  <div class="activity-header">
+    <h2>📊 Activity Dashboard</h2>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading && !activity" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading activity...</p>
+  </div>
+
+  <!-- Activity Content -->
+  <div *ngIf="activity" class="activity-content">
+    <div class="stats-grid">
+      <!-- Total Tasks Created -->
+      <div class="stat-card">
+        <div class="stat-icon">📝</div>
+        <div class="stat-info">
+          <h3>Total Tasks Created</h3>
+          <p class="stat-value">{{ activity.total_tasks_created }}</p>
+        </div>
+      </div>
+
+      <!-- Tasks Completed -->
+      <div class="stat-card">
+        <div class="stat-icon">✓</div>
+        <div class="stat-info">
+          <h3>Tasks Completed</h3>
+          <p class="stat-value">{{ activity.tasks_completed }}</p>
+          <div class="progress-bar">
+            <div 
+              class="progress-fill" 
+              [style.width.%]="getActivityPercentage(activity.tasks_completed, activity.total_tasks_created)"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tasks Pending -->
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-info">
+          <h3>Tasks Pending</h3>
+          <p class="stat-value">{{ activity.tasks_pending }}</p>
+          <p class="stat-subtitle">In progress or open</p>
+        </div>
+      </div>
+
+      <!-- Requests Received -->
+      <div class="stat-card">
+        <div class="stat-icon">📨</div>
+        <div class="stat-info">
+          <h3>Requests Received</h3>
+          <p class="stat-value">{{ activity.requests_received }}</p>
+          <p class="stat-subtitle">Help requests from others</p>
+        </div>
+      </div>
+
+      <!-- Requests Sent -->
+      <div class="stat-card">
+        <div class="stat-icon">📤</div>
+        <div class="stat-info">
+          <h3>Requests Sent</h3>
+          <p class="stat-value">{{ activity.requests_sent }}</p>
+          <p class="stat-subtitle">Help requests you made</p>
+        </div>
+      </div>
+
+      <!-- Completion Rate -->
+      <div class="stat-card">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-info">
+          <h3>Completion Rate</h3>
+          <p class="stat-value">
+            {{ activity.total_tasks_created > 0 
+              ? (activity.tasks_completed / activity.total_tasks_created * 100 | number:'1.0-0') 
+              : 0 
+            }}%
+          </p>
+          <p class="stat-subtitle">Tasks completed</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="summary-section">
+      <h3>📈 Summary</h3>
+      <div class="summary-items">
+        <div class="summary-item">
+          <span class="summary-label">Total Tasks:</span>
+          <span class="summary-value">{{ activity.total_tasks_created }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Completed:</span>
+          <span class="summary-value">{{ activity.tasks_completed }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Pending:</span>
+          <span class="summary-value">{{ activity.tasks_pending }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Active Requests:</span>
+          <span class="summary-value">{{ activity.requests_received + activity.requests_sent }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

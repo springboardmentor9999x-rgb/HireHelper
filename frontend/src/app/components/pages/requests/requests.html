@@ -1,0 +1,105 @@
+<div class="requests-container">
+  <!-- Header -->
+  <div class="requests-header">
+    <h2>Received Requests</h2>
+    <button class="refresh-btn" (click)="refresh()" [disabled]="loading">
+      {{ loading ? 'Loading...' : 'Refresh' }}
+    </button>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    ✓ {{ successMessage }}
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    ✕ {{ errorMessage }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading received requests...</p>
+  </div>
+
+  <!-- Received Requests List -->
+  <div *ngIf="!loading" class="requests-list">
+    <div *ngIf="requests.length === 0" class="empty-state">
+      <div class="empty-icon">📭</div>
+      <p>No requests received yet.</p>
+      <p class="empty-hint">Create tasks and users will start requesting them.</p>
+    </div>
+
+    <div *ngFor="let request of requests" class="request-card">
+      <div class="request-header">
+        <div class="request-info-left">
+          <h3>{{ request.title }}</h3>
+          <span class="location">📍 {{ request.location }}</span>
+        </div>
+        <div class="request-status-group">
+          <span [class]="'status-badge ' + getStatusBadgeClass(request.status)">
+            {{ request.status }}
+          </span>
+          <span *ngIf="isProcessing(request.id)" class="pending-indicator">
+            ⏳ PENDING
+          </span>
+        </div>
+      </div>
+
+      <div class="requester-info">
+        <div class="requester-name">
+          <span class="label">From:</span>
+          <span class="name">👤 {{ getRequesterName(request) }}</span>
+        </div>
+        <div class="requester-email">
+          <span class="label">Email:</span>
+          <span class="email">{{ request.requester_email }}</span>
+        </div>
+        <div class="requested-date">
+          <span class="label">Requested on:</span>
+          <span class="date">{{ formatDate(request.created_at) }}</span>
+        </div>
+      </div>
+
+      <div class="request-actions">
+        <button 
+          *ngIf="request.status === 'PENDING'"
+          class="btn-accept" 
+          (click)="acceptRequest(request.id, getRequesterName(request))"
+          [disabled]="isProcessing(request.id)"
+        >
+          <span *ngIf="!isProcessing(request.id)">✓ Accept</span>
+          <span *ngIf="isProcessing(request.id)">Processing...</span>
+        </button>
+        <button 
+          *ngIf="request.status === 'PENDING'"
+          class="btn-reject" 
+          (click)="rejectRequest(request.id, getRequesterName(request))"
+          [disabled]="isProcessing(request.id)"
+        >
+          <span *ngIf="!isProcessing(request.id)">✕ Reject</span>
+          <span *ngIf="isProcessing(request.id)">Processing...</span>
+        </button>
+        <span *ngIf="request.status === 'ACCEPTED'" class="accepted-message">
+          ✓ You accepted this request
+        </span>
+        <button 
+          *ngIf="request.status === 'ACCEPTED' && !isTaskClosed(request.task_id)"
+          class="btn-close" 
+          (click)="closeTask(request.task_id)"
+          [disabled]="isProcessing(request.id)"
+        >
+          <span *ngIf="!isProcessing(request.id)">🔒 Close Task</span>
+          <span *ngIf="isProcessing(request.id)">Closing...</span>
+        </button>
+        <span *ngIf="request.status === 'ACCEPTED' && isTaskClosed(request.task_id)" class="closed-message">
+          ✓ Task has been closed
+        </span>
+        <span *ngIf="request.status === 'REJECTED'" class="rejected-message">
+          ✕ You rejected this request
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
