@@ -121,4 +121,11 @@ export class NotificationSidebarComponent implements OnInit, OnDestroy {
     
     return date.toLocaleDateString();
   }
+
+  getNotificationBody(body: string | undefined | null): string {
+    if (!body || body === 'undefined' || body === 'null') {
+      return 'You have a new notification';
+    }
+    return body;
+  }
 }

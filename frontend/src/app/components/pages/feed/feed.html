@@ -65,17 +65,13 @@
       </div>
 
       <div class="task-footer">
-        <div class="request-status">
-          <span class="status-label" [class.requested]="task.is_requested">
-            {{ task.is_requested ? 'Requested ✓' : 'Not Requested' }}
-          </span>
-        </div>
         <button 
           class="btn-request" 
           (click)="sendRequest(task.id)"
           [disabled]="isRequestingSending(task.id) || task.is_requested"
         >
-          <span *ngIf="!isRequestingSending(task.id)">📨 Request</span>
+          <span *ngIf="!isRequestingSending(task.id) && !task.is_requested">📨 Request</span>
+          <span *ngIf="!isRequestingSending(task.id) && task.is_requested">✓ Requested</span>
           <span *ngIf="isRequestingSending(task.id)">Sending...</span>
         </button>
       </div>

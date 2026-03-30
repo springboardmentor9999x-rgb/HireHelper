@@ -123,6 +123,13 @@ export class NotificationsComponent implements OnInit {
     return this.notifications.filter(n => !n.is_read).length;
   }
 
+  getNotificationBody(body: string | undefined | null): string {
+    if (!body || body === 'undefined' || body === 'null') {
+      return 'You have a new notification';
+    }
+    return body;
+  }
+
   refreshNotifications() {
     this.loadNotifications();
   }

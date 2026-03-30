@@ -53,7 +53,7 @@
 
       <!-- Content -->
       <div class="notification-content">
-        <p class="notification-body">{{ notification.body }}</p>
+        <p class="notification-body">{{ getNotificationBody(notification.body) }}</p>
         <small class="notification-time">{{ getTimeAgo(notification.created_at) }}</small>
       </div>
 

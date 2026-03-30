@@ -229,6 +229,7 @@ exports.getFeed = async (req, res) => {
        FROM tasks t
        JOIN users u ON t.user_id = u.id
        WHERE t.user_id != $1 
+       AND LOWER(t.status) != 'closed'
        ORDER BY t.created_at DESC`,
       [userId]
     );
