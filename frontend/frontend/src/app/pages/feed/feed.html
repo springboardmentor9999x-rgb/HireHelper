@@ -27,7 +27,10 @@
   <div class="task-grid" *ngIf="!loading && !error && tasks.length > 0">
     <article class="task-card" *ngFor="let task of tasks">
       <div class="card-glow"></div>
-      <img *ngIf="task.picture" class="task-image" [src]="task.picture" [alt]="task.title" />
+      <div class="task-image-wrap">
+        <img *ngIf="task.picture" class="task-image" [src]="task.picture" [alt]="task.title" />
+        <span class="offer-image-badge" *ngIf="getTopOffer() as topOffer">{{ topOffer.discount }}% OFF</span>
+      </div>
       <div class="task-content-scroll">
         <div class="task-head">
           <div>

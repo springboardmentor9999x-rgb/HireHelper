@@ -137,10 +137,12 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 22px;
+  align-items: start;
 }
 
 .request-card {
   position: relative;
+  overflow: hidden;
   height: 420px;
   display: flex;
   flex-direction: column;
@@ -149,6 +151,23 @@
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
   box-shadow: var(--shadow);
+}
+
+.request-content-scroll {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 6px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.request-content-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 .card-glow {
@@ -184,6 +203,7 @@
   font-family: Georgia, "Times New Roman", serif;
   font-size: 2rem;
   color: var(--text-strong);
+  overflow-wrap: anywhere;
 }
 
 .status-chip {
@@ -198,13 +218,13 @@
   letter-spacing: 0.14em;
   color: var(--accent);
   background: var(--accent-soft);
+  flex-shrink: 0;
 }
 
 .request-meta {
   display: grid;
   gap: 12px;
-  margin: 18px 0 auto 0;
-  flex: 1;
+  margin: 18px 0 0;
 }
 
 .request-meta div {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule, NgIf } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -33,17 +33,20 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    const storedUser = this.auth.getStoredUser();
-    this.user = storedUser
-      ? {
-          ...storedUser,
-          profile_picture: this.normalizeProfilePictureUrl(storedUser.profile_picture)
-        }
-      : null;
+    this.auth.user$.subscribe((user) => {
+      this.user = user
+        ? {
+            ...user,
+            profile_picture: this.normalizeProfilePictureUrl(user.profile_picture)
+          }
+        : null;
+      this.cdr.detectChanges();
+    });
 
     this.auth.getCurrentUser().subscribe({
       next: (user) => {
@@ -51,8 +54,8 @@ export class ProfileComponent implements OnInit {
           ...user,
           profile_picture: this.normalizeProfilePictureUrl(user.profile_picture)
         };
-        this.user = normalizedUser;
         this.auth.saveUser(normalizedUser);
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = err.error?.message || 'Failed to load profile';
@@ -92,9 +95,26 @@ export class ProfileComponent implements OnInit {
     ).subscribe({
       next: (response) => {
         if (this.user) {
-          this.user.profile_picture = this.normalizeProfilePictureUrl(response.profile_picture);
-          this.auth.saveUser(this.user);
+          const updatedUser = {
+            ...this.user,
+            profile_picture: this.normalizeProfilePictureUrl(response.profile_picture)
+          };
+          this.auth.saveUser(updatedUser);
+          this.user = updatedUser;
         }
+
+        this.cdr.detectChanges();
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Photo uploaded successfully',
+          toast: true,
+          position: 'top-end',
+          timer: 2200,
+          showConfirmButton: false,
+          background: 'linear-gradient(135deg, #10b981, #059669)',
+          color: '#ffffff'
+        });
       },
       error: (err) => {
         if (err?.name === 'TimeoutError') {
@@ -110,7 +130,7 @@ export class ProfileComponent implements OnInit {
     if (!url) {
       return undefined;
     }
-    if (url.startsWith('http://') || url.startsWith('https://')) {
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
       return url;
     }
     return `${this.apiOrigin}${url.startsWith('/') ? '' : '/'}${url}`;

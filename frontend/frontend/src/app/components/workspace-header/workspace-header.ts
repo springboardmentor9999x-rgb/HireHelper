@@ -1,4 +1,4 @@
-import { Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService, AppUser } from '../../services/auth.service';
@@ -31,17 +31,20 @@ export class WorkspaceHeaderComponent implements OnInit, OnDestroy {
   constructor(
     private auth: AuthService,
     private taskService: TaskService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    const storedUser = this.auth.getStoredUser();
-    this.user = storedUser
-      ? {
-          ...storedUser,
-          profile_picture: this.normalizeProfilePictureUrl(storedUser.profile_picture)
-        }
-      : null;
+    this.auth.user$.subscribe((user) => {
+      this.user = user
+        ? {
+            ...user,
+            profile_picture: this.normalizeProfilePictureUrl(user.profile_picture)
+          }
+        : null;
+      this.cdr.detectChanges();
+    });
 
     this.auth.getCurrentUser().subscribe({
       next: (user) => {
@@ -49,8 +52,8 @@ export class WorkspaceHeaderComponent implements OnInit, OnDestroy {
           ...user,
           profile_picture: this.normalizeProfilePictureUrl(user.profile_picture)
         };
-        this.user = normalizedUser;
         this.auth.saveUser(normalizedUser);
+        this.cdr.detectChanges();
       }
     });
 
@@ -63,6 +66,17 @@ export class WorkspaceHeaderComponent implements OnInit, OnDestroy {
       clearInterval(this.notificationPollTimer);
       this.notificationPollTimer = null;
     }
+  }
+
+  markAllAsRead(): void {
+    this.taskService.markAllNotificationsAsRead().subscribe({
+      next: () => {
+        this.notifications = this.notifications.map(n => ({ ...n, is_read: true }));
+        this.hasNotificationDot = false;
+        this.loadNotifications(false); // Reload to sync with backend
+      },
+      error: (err) => console.error('Mark all read failed:', err)
+    });
   }
 
   onNotificationButtonClick(): void {
@@ -116,7 +130,7 @@ export class WorkspaceHeaderComponent implements OnInit, OnDestroy {
     if (!url) {
       return undefined;
     }
-    if (url.startsWith('http://') || url.startsWith('https://')) {
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
       return url;
     }
     return `${this.apiOrigin}${url.startsWith('/') ? '' : '/'}${url}`;
@@ -143,6 +157,10 @@ export class WorkspaceHeaderComponent implements OnInit, OnDestroy {
         if (newestId) {
           this.latestNotificationId = newestId;
         }
+      },
+      error: (err) => {
+        console.error('Load notifications failed:', err);
+        this.notifications = [];
       }
     });
   }

@@ -13,18 +13,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   templateUrl: './workspace-shell.html',
   styleUrls: ['./workspace-shell.css']
 })
-export class WorkspaceShellComponent implements OnInit {
-  notificationCount = 0;
-
+export class WorkspaceShellComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
-  private taskService = inject(TaskService);
-
-  ngOnInit(): void {
-    this.taskService.notifications$.subscribe(count => {
-      this.notificationCount = count;
-    });
-  }
 
   logout(): void {
     this.auth.logout();

@@ -53,10 +53,11 @@ exports.registerUser = async (req, res) => {
              last_name=$2,
              password=$3,
              phone_number=$4,
-             otp=$5,
-             otp_expiry=$6
-         WHERE email_id=$7`,
-        [first_name, last_name, hashedPassword, phone_number, otp, expiry, email_id]
+             profile_picture=$5,
+             otp=$6,
+             otp_expiry=$7
+         WHERE email_id=$8`,
+        [first_name, last_name, hashedPassword, phone_number, profile_picture || null, otp, expiry, email_id]
       );
 
       await sendOtpEmail(email_id, otp);
@@ -173,7 +174,8 @@ exports.loginUser = async (req, res) => {
       last_name: user.rows[0].last_name,
       email_id: user.rows[0].email_id,
       phone_number: user.rows[0].phone_number,
-      is_verified: user.rows[0].is_verified
+      is_verified: user.rows[0].is_verified,
+      profile_picture: user.rows[0].profile_picture
     };
 
     return res.json({

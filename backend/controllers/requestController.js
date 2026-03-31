@@ -86,15 +86,15 @@ async function getTaskStatusColumnType() {
   return cachedTaskStatusType;
 }
 
-async function createNotification(userId, message) {
+async function createNotification(userId, message, taskId = null) {
   if (!userId || !message) {
     return;
   }
 
   await pool.query(
-    `INSERT INTO notifications (user_id, message, body)
-     VALUES ($1, $2, $2)`,
-    [userId, message]
+    `INSERT INTO notifications (user_id, task_id, message, body)
+     VALUES ($1, $2, $3, $3)`,
+    [userId, taskId, message]
   );
 }
 
@@ -153,6 +153,17 @@ exports.createRequest = async (req, res) => {
 
     const task = taskResult.rows[0];
 
+    const requesterResult = await pool.query(
+      `SELECT first_name, last_name
+       FROM users
+       WHERE id = $1
+       LIMIT 1`,
+      [requester_id]
+    );
+
+    const requester = requesterResult.rows[0] || {};
+    const requesterName = `${requester.first_name || ""} ${requester.last_name || ""}`.trim() || "Someone";
+
     if (task.user_id === requester_id) {
       return res.status(400).json({ message: "You cannot request your own task" });
     }
@@ -185,7 +196,14 @@ exports.createRequest = async (req, res) => {
 
     await createNotification(
       task.user_id,
-      `Someone requested to help with your task${task.title ? `: "${task.title}"` : ""}.`
+      `${requesterName} requested to help with your task${task.title ? `: "${task.title}"` : ""}.`,
+      task_id
+    );
+
+    await createNotification(
+      requester_id,
+      `You requested to help with "${task.title || "a task"}".`,
+      task_id
     );
 
     return res.status(201).json({
@@ -211,9 +229,11 @@ exports.updateRequestStatus = async (req, res) => {
     }
 
     const requestResult = await pool.query(
-      `SELECT r.id, r.task_id, r.requester_id, t.user_id AS owner_id, t.title
+      `SELECT r.id, r.task_id, r.requester_id, t.user_id AS owner_id, t.title,
+              owner.first_name AS owner_first_name, owner.last_name AS owner_last_name
        FROM requests r
        JOIN tasks t ON t.id = r.task_id
+       JOIN users owner ON owner.id = t.user_id
        WHERE r.id = $1
        LIMIT 1`,
       [id]
@@ -224,6 +244,7 @@ exports.updateRequestStatus = async (req, res) => {
     }
 
     const request = requestResult.rows[0];
+    const ownerName = `${request.owner_first_name || ""} ${request.owner_last_name || ""}`.trim() || "The task owner";
 
     if (request.owner_id !== ownerId) {
       return res.status(403).json({ message: "You are not allowed to update this request" });
@@ -253,7 +274,8 @@ exports.updateRequestStatus = async (req, res) => {
 
     await createNotification(
       request.requester_id,
-      `Your request for "${request.title || "a task"}" was ${String(status).toUpperCase().toLowerCase()}.`
+      `${ownerName} ${String(status).toUpperCase().toLowerCase()} your request for "${request.title || "a task"}".`,
+      request.task_id
     );
 
     return res.json({

@@ -25,6 +25,7 @@ async function initDbSchema() {
     CREATE TABLE IF NOT EXISTS notifications (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      task_id UUID REFERENCES tasks(id) ON DELETE CASCADE,
       message TEXT NOT NULL DEFAULT '',
       body TEXT,
       is_read BOOLEAN NOT NULL DEFAULT false,
@@ -39,6 +40,11 @@ async function initDbSchema() {
   await pool.query(`
     ALTER TABLE IF EXISTS notifications
     ADD COLUMN IF NOT EXISTS body TEXT;
+  `);
+
+  await pool.query(`
+    ALTER TABLE IF EXISTS notifications
+    ADD COLUMN IF NOT EXISTS task_id UUID REFERENCES tasks(id) ON DELETE CASCADE;
   `);
 
   await pool.query(`

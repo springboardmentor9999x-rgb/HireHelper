@@ -20,11 +20,12 @@
         </button>
 
         <div class="notification-panel" *ngIf="showNotifications">
+          <button class="mark-all-read-btn" (click)="markAllAsRead()">Mark all as read</button>
           <p class="notification-title">Recent updates</p>
           <p class="notification-empty" *ngIf="notifications.length === 0">No notifications yet.</p>
 
           <div class="notification-list" *ngIf="notifications.length > 0">
-            <article class="notification-item" *ngFor="let notification of notifications">
+            <article class="notification-item" [class.read]="notification.is_read" *ngFor="let notification of notifications">
               <p>{{ notification.message }}</p>
               <span>{{ notification.created_at | date:'medium' }}</span>
             </article>

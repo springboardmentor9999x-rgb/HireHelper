@@ -14,6 +14,7 @@ import { finalize } from 'rxjs';
   styleUrls: ['./login.css']
 })
 export class LoginComponent {
+  private readonly rememberedLoginKey = 'hirehelperRememberedLogin';
 
   email = '';
   password = '';
@@ -25,7 +26,9 @@ export class LoginComponent {
     private auth: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    this.loadRememberedLogin();
+  }
 
   login() {
     this.error = '';
@@ -43,6 +46,7 @@ export class LoginComponent {
     )
     .subscribe({
       next: (res:any) => {
+        this.persistRememberedLogin();
         this.auth.saveToken(res.token);
         this.auth.saveUser(res.user);
         this.router.navigate(['/dashboard']);
@@ -54,5 +58,50 @@ export class LoginComponent {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  private loadRememberedLogin(): void {
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      return;
+    }
+
+    const savedLogin = localStorage.getItem(this.rememberedLoginKey);
+    if (!savedLogin) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(savedLogin) as {
+        email?: string;
+        password?: string;
+        rememberMe?: boolean;
+      };
+
+      this.email = parsed.email || '';
+      this.password = parsed.password || '';
+      this.rememberMe = !!parsed.rememberMe;
+    } catch {
+      localStorage.removeItem(this.rememberedLoginKey);
+    }
+  }
+
+  private persistRememberedLogin(): void {
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      return;
+    }
+
+    if (!this.rememberMe) {
+      localStorage.removeItem(this.rememberedLoginKey);
+      return;
+    }
+
+    localStorage.setItem(
+      this.rememberedLoginKey,
+      JSON.stringify({
+        email: this.email.trim().toLowerCase(),
+        password: this.password,
+        rememberMe: true
+      })
+    );
   }
 }

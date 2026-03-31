@@ -4,8 +4,9 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { WorkspaceHeaderComponent } from '../../components/workspace-header/workspace-header';
+import { TaskService } from '../../services/task.service';
 
-interface OfferItem {
+export interface OfferItem {
   id: string;
   title: string;
   details: string;
@@ -29,7 +30,10 @@ export class OffersComponent implements OnInit {
 
   offerForm;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private taskService: TaskService
+  ) {
     this.offerForm = this.fb.group({
       title: ['', [Validators.required, Validators.maxLength(100)]],
       details: ['', [Validators.required, Validators.maxLength(600)]],
@@ -66,6 +70,9 @@ export class OffersComponent implements OnInit {
 
     this.offers = [nextOffer, ...this.offers];
     this.persistOffers();
+    this.taskService.addLocalNotification(
+      `Offer created: "${nextOffer.title}" with ${nextOffer.discount}% off.`
+    );
 
     this.submitting = false;
     this.offerForm.reset();

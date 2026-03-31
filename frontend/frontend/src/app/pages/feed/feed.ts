@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { TaskItem, TaskService } from '../../services/task.service';
 import { finalize, timeout } from 'rxjs';
 import { WorkspaceHeaderComponent } from '../../components/workspace-header/workspace-header';
+import { OfferItem } from '../offers/offers';
 
 @Component({
   selector: 'app-feed',
@@ -15,6 +16,7 @@ import { WorkspaceHeaderComponent } from '../../components/workspace-header/work
 })
 export class FeedComponent implements OnInit {
   tasks: TaskItem[] = [];
+  offers: OfferItem[] = [];
   loading = true;
   error = '';
   actionMessage = '';
@@ -29,6 +31,7 @@ export class FeedComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadOffers();
     this.loadTasks();
     this.loadRequestedTasks();
   }
@@ -103,5 +106,18 @@ export class FeedComponent implements OnInit {
 
   isRequestDisabled(task: TaskItem): boolean {
     return task.status !== 'OPEN' || this.requestedTaskIds.has(task.id);
+  }
+
+  getTopOffer(): OfferItem | null {
+    if (this.offers.length === 0) {
+      return null;
+    }
+
+    return [...this.offers]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+  }
+
+  private loadOffers(): void {
+    this.offers = this.taskService.getStoredOffers<OfferItem>();
   }
 }

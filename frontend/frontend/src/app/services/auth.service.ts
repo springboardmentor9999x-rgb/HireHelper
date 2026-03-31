@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 
 export interface AppUser {
   id: string;
@@ -19,8 +19,12 @@ export class AuthService {
 
   baseUrl = "http://localhost:5000/api/auth";
   userBaseUrl = "http://localhost:5000/api/users";
+  private readonly userSubject = new BehaviorSubject<AppUser | null>(null);
+  readonly user$ = this.userSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.userSubject.next(this.getStoredUser());
+  }
 
   private hasStorage(): boolean {
     return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
@@ -57,7 +61,9 @@ export class AuthService {
   }
 
   getCurrentUser(): Observable<AppUser> {
-    return this.http.get<AppUser>(`${this.userBaseUrl}/me`);
+    return this.http.get<AppUser>(`${this.userBaseUrl}/me`).pipe(
+      tap((user) => this.saveUser(user))
+    );
   }
 
 
@@ -68,13 +74,16 @@ export class AuthService {
   }
 
   saveUser(user: AppUser | Record<string, unknown>): void {
+    const typedUser = user as AppUser;
+
     if (!this.hasStorage()) {
+      this.userSubject.next(typedUser);
       return;
     }
 
-    localStorage.setItem('user', JSON.stringify(user));
-    const typedUser = user as Partial<AppUser>;
+    localStorage.setItem('user', JSON.stringify(typedUser));
     localStorage.setItem('userName', typedUser.first_name || 'User');
+    this.userSubject.next(typedUser);
   }
 
   getStoredUser(): AppUser | null {
@@ -105,6 +114,7 @@ export class AuthService {
       localStorage.removeItem('user');
       localStorage.removeItem('userName');
     }
+    this.userSubject.next(null);
   }
 
   isLoggedIn(){

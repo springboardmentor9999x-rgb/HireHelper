@@ -3,6 +3,18 @@ const { mapStatusValueForColumnType, normalizeTask } = require("../utils/taskSta
 
 let cachedStatusType = null;
 
+async function createNotification(userId, message, taskId = null) {
+  if (!userId || !message) {
+    return;
+  }
+
+  await pool.query(
+    `INSERT INTO notifications (user_id, task_id, message, body)
+     VALUES ($1, $2, $3, $3)`,
+    [userId, taskId, message]
+  );
+}
+
 async function getStatusColumnType() {
   if (cachedStatusType) {
     return cachedStatusType;
@@ -122,6 +134,12 @@ exports.addTask = async (req, res) => {
       ]
     );
 
+    await createNotification(
+      user_id,
+      `Task created successfully${normalizedTitle ? `: "${normalizedTitle}"` : ""}.`,
+      newTask.rows[0].id
+    );
+
     res.status(201).json({
       message: "Task created successfully",
       task: normalizeTask(newTask.rows[0]),
@@ -204,7 +222,7 @@ exports.updateTask = async (req, res) => {
     }
 
     const taskCheck = await pool.query(
-      `SELECT id, user_id
+      `SELECT id, user_id, title
        FROM tasks
        WHERE id = $1
        LIMIT 1`,
@@ -291,6 +309,11 @@ exports.deleteTask = async (req, res) => {
     if (taskCheck.rows[0].user_id !== user_id) {
       return res.status(403).json({ message: "You are not allowed to delete this task" });
     }
+
+    await createNotification(
+      user_id,
+      `Task deleted successfully${taskCheck.rows[0].title ? `: "${taskCheck.rows[0].title}"` : ""}.`
+    );
 
     await pool.query(
       `DELETE FROM tasks

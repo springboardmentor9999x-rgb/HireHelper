@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -29,6 +29,7 @@ export class DashboardComponent implements OnInit {
   constructor(
     private auth: AuthService,
     private taskService: TaskService,
+    private cdr: ChangeDetectorRef,
     private router: Router
   ) {
     const user = this.auth.getStoredUser();
@@ -73,6 +74,10 @@ export class DashboardComponent implements OnInit {
           helpers: acceptedHelpers.size,
           openTasks: feedTasks.filter((task) => task.status === 'OPEN').length
         };
+        
+        console.log('Dashboard stats updated:', this.stats);
+        console.log('API Results:', { feedTasks: feedTasks.length, receivedRequests: receivedRequests.length, myRequests: myRequests.length });
+        this.cdr.detectChanges();
       });
   }
 

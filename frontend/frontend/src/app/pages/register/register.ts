@@ -36,6 +36,32 @@ export class RegisterComponent {
     this.phone_number = (value || '').replace(/\D/g, '').slice(0, 10);
   }
 
+  onProfilePictureSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) {
+      this.profile_picture = '';
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      this.error = 'Please select a valid image file';
+      input.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.profile_picture = typeof reader.result === 'string' ? reader.result : '';
+    };
+    reader.onerror = () => {
+      this.error = 'Failed to read selected image';
+      this.profile_picture = '';
+    };
+    reader.readAsDataURL(file);
+  }
+
   register(){
     this.error = '';
 

@@ -4,13 +4,17 @@ exports.getNotifications = async (req, res) => {
   try {
     const userId = req.user.id;
     const notifications = await pool.query(
-      `SELECT id,
-              COALESCE(message, body, '') AS message,
-              is_read,
-              created_at
-       FROM notifications
-       WHERE user_id = $1
-       ORDER BY created_at DESC`,
+      `SELECT 
+        n.id,
+        n.task_id,
+        COALESCE(n.message, n.body, '') AS message,
+        n.is_read,
+        n.created_at,
+        t.title as task_title
+       FROM notifications n
+        LEFT JOIN tasks t ON n.task_id = t.id
+       WHERE n.user_id = $1
+       ORDER BY n.created_at DESC`,
       [userId]
     );
 

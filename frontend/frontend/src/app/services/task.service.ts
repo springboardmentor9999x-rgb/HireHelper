@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable, BehaviorSubject } from 'rxjs';
+import { map, Observable, BehaviorSubject, of } from 'rxjs';
 import { tap, take } from 'rxjs/operators';
 
 export interface TaskPayload {
@@ -67,12 +67,14 @@ export interface ReceivedRequestItem extends TaskRequest {
 
 export interface NotificationItem {
   id: string;
-  task_id: string;
-  status: string;
+  task_id?: string;
+  status?: string;
   created_at: string;
-  audience: string;
+  audience?: string;
   message: string;
   is_read?: boolean;
+  requester_name?: string;
+  task_title?: string;
 }
 
 @Injectable({
@@ -82,6 +84,8 @@ export class TaskService {
   private readonly baseUrl = 'http://localhost:5000/api/tasks';
   private readonly requestUrl = 'http://localhost:5000/api/requests';
   private readonly pendingTaskKey = 'pendingCreatedTask';
+  private readonly localNotificationsKey = 'hirehelper_local_notifications';
+  private readonly offersStorageKey = 'hirehelper_offers';
   private notificationSubject = new BehaviorSubject<number>(0);
   notifications$ = this.notificationSubject.asObservable();
 
@@ -127,12 +131,25 @@ export class TaskService {
 
   getNotifications(): Observable<NotificationItem[]> {
     return this.http.get<unknown>('http://localhost:5000/api/notifications').pipe(
-      map((response) => this.normalizeNotificationList(response)),
+      map((response) => {
+        const notifications = [
+          ...this.getLocalNotifications(),
+          ...this.normalizeNotificationList(response)
+        ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+        return notifications;
+      }),
       tap((notifications) => this.notificationSubject.next(notifications.length))
     );
   }
 
   deleteNotification(id: string): Observable<{ message: string }> {
+    if (this.isLocalNotification(id)) {
+      this.removeLocalNotification(id);
+      this.refreshNotificationCount();
+      return of({ message: 'Notification deleted successfully' });
+    }
+
     return this.http.delete<{ message: string }>(`http://localhost:5000/api/notifications/${id}`).pipe(
       tap(() => this.refreshNotificationCount())
     );
@@ -140,12 +157,40 @@ export class TaskService {
 
   deleteAllNotifications(): Observable<{ message: string; deletedCount: number }> {
     return this.http.delete<{ message: string; deletedCount: number }>('http://localhost:5000/api/notifications').pipe(
-      tap(() => this.notificationSubject.next(0))
+      tap(() => {
+        this.clearLocalNotifications();
+        this.notificationSubject.next(0);
+      })
     );
   }
 
   markAllNotificationsAsRead(): Observable<{ message: string; updatedCount: number }> {
-    return this.http.put<{ message: string; updatedCount: number }>('http://localhost:5000/api/notifications/read-all', {});
+    return this.http.put<{ message: string; updatedCount: number }>('http://localhost:5000/api/notifications/read-all', {}).pipe(
+      tap(() => this.markLocalNotificationsAsRead())
+    );
+  }
+
+  addLocalNotification(message: string, taskId?: string): void {
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      return;
+    }
+
+    const trimmedMessage = message.trim();
+    if (!trimmedMessage) {
+      return;
+    }
+
+    const notifications = this.getLocalNotifications();
+    notifications.unshift({
+      id: `local-${crypto.randomUUID()}`,
+      task_id: taskId,
+      message: trimmedMessage,
+      created_at: new Date().toISOString(),
+      is_read: false
+    });
+
+    this.saveLocalNotifications(notifications);
+    this.refreshNotificationCount();
   }
 
   private refreshNotificationCount(): void {
@@ -198,6 +243,77 @@ export class TaskService {
     }
 
     localStorage.removeItem(this.pendingTaskKey);
+  }
+
+  getStoredOffers<T>(): T[] {
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      return [];
+    }
+
+    const raw = localStorage.getItem(this.offersStorageKey);
+    if (!raw) {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as T[];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      localStorage.removeItem(this.offersStorageKey);
+      return [];
+    }
+  }
+
+  private getLocalNotifications(): NotificationItem[] {
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      return [];
+    }
+
+    const raw = localStorage.getItem(this.localNotificationsKey);
+    if (!raw) {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as NotificationItem[];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      localStorage.removeItem(this.localNotificationsKey);
+      return [];
+    }
+  }
+
+  private saveLocalNotifications(notifications: NotificationItem[]): void {
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      return;
+    }
+
+    localStorage.setItem(this.localNotificationsKey, JSON.stringify(notifications));
+  }
+
+  private removeLocalNotification(id: string): void {
+    const notifications = this.getLocalNotifications().filter((notification) => notification.id !== id);
+    this.saveLocalNotifications(notifications);
+  }
+
+  private clearLocalNotifications(): void {
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      return;
+    }
+
+    localStorage.removeItem(this.localNotificationsKey);
+  }
+
+  private markLocalNotificationsAsRead(): void {
+    const notifications = this.getLocalNotifications().map((notification) => ({
+      ...notification,
+      is_read: true
+    }));
+    this.saveLocalNotifications(notifications);
+  }
+
+  private isLocalNotification(id: string): boolean {
+    return id.startsWith('local-');
   }
 
   private normalizeTaskList(response: unknown): TaskItem[] {
