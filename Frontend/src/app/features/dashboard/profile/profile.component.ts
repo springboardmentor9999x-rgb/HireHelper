@@ -5,6 +5,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { LanguageService } from '../../../core/services/language.service';
 import { HttpClientModule } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
+import { ModalService } from '../../../core/services/modal.service';
 
 @Component({
   selector: 'app-profile',
@@ -38,7 +39,8 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private langService: LanguageService
+    private langService: LanguageService,
+    private modalService: ModalService
   ) {}
 
   get passwordMismatch(): boolean {
@@ -88,7 +90,7 @@ export class ProfileComponent implements OnInit {
 
   saveProfile() {
     if (this.passwordMismatch) {
-      alert(this.labels.passwordMismatch || 'Passwords do not match!');
+      this.modalService.show('Error', this.labels.passwordMismatch || 'Passwords do not match!', 'error');
       return;
     }
 
@@ -108,11 +110,11 @@ export class ProfileComponent implements OnInit {
         this.confirmPasswordInput = '';
         this.selectedFile = null;
         localStorage.setItem('professionalDetails', JSON.stringify(this.professionalDetails));
-        alert('Profile updated successfully!');
+        this.modalService.show('Success', 'Profile updated successfully!', 'success');
       },
       error: (err) => {
         console.error(err);
-        alert('Failed to update profile.');
+        this.modalService.show('Error', 'Failed to update profile.', 'error');
       }
     });
   }

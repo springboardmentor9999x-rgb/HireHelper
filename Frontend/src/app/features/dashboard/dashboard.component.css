@@ -137,7 +137,7 @@
 }
 
 .content-area {
-    padding: 30px;
+    padding: 10px 30px 30px;
     flex: 1;
 }
 
@@ -188,4 +188,18 @@
 .profile-dropdown li a:hover {
     background-color: var(--hover-bg, #f5fdf5);
     color: var(--primary-color);
+}
+
+.badge {
+  background-color: var(--danger, #ff4d4f);
+  color: white;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0 5px;
 }

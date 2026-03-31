@@ -1,0 +1,18 @@
+<div class="modal-overlay" *ngIf="modalData">
+  <div class="modal-content" [ngClass]="modalData.type">
+    <div class="modal-header">
+      <div class="modal-icon">
+         <span *ngIf="modalData.type === 'success'">✔️</span>
+         <span *ngIf="modalData.type === 'error'">❌</span>
+         <span *ngIf="modalData.type === 'info'">ℹ️</span>
+      </div>
+      <h3>{{ modalData.title }}</h3>
+    </div>
+    <div class="modal-body">
+      {{ modalData.message }}
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" (click)="close()">OK</button>
+    </div>
+  </div>
+</div>

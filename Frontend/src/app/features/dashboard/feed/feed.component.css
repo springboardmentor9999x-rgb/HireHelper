@@ -1,7 +1,7 @@
 .feed-container {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 1rem;
 }
 
 .feed-header {
@@ -73,23 +73,26 @@
 
 /* Feed List */
 .feed-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 2rem;
 }
 
 .feed-card {
   background: var(--white, white);
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   border: 1px solid var(--border-color, #f3f4f6);
-  transition: transform 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .feed-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px var(--card-hover, rgba(0, 0, 0, 0.1));
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
 }
 
 /* Card Header */
@@ -171,6 +174,9 @@
 /* Card Body */
 .feed-card-body {
   padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .task-title {
@@ -190,7 +196,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: 1.25rem;
-  padding-top: 1rem;
+  padding-top: 1.25rem;
+  margin-top: auto;
   border-top: 1px solid var(--border-color, #f3f4f6);
 }
 
@@ -205,17 +212,24 @@
   margin-right: 0.5rem;
 }
 
-.task-image-container {
-  margin-top: 1.25rem;
-  border-radius: 8px;
+/* Card Hero Image (Premium Aesthetic) */
+.card-hero-image {
+  width: 100%;
+  height: 200px;
   overflow: hidden;
-  max-height: 300px;
+  background-color: #f3f4f6;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
 }
 
-.task-image {
+.card-hero-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.feed-card:hover .card-hero-image img {
+  transform: scale(1.05);
 }
 
 /* Card Footer */

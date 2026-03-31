@@ -19,6 +19,9 @@ export class AddTaskComponent implements OnInit {
   isLoading = false;
   minDateTime: string = '';
   labels: any = {};
+  imageType: 'file' | 'url' = 'file';
+  selectedFile: File | null = null;
+  imagePreview: string | ArrayBuffer | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -55,6 +58,40 @@ export class AddTaskComponent implements OnInit {
     });
   }
 
+  onFileSelected(event: any): void {
+    if (event.target.files && event.target.files.length > 0) {
+      this.selectedFile = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = e => this.imagePreview = reader.result;
+      reader.readAsDataURL(this.selectedFile as Blob);
+    }
+  }
+
+  onUrlChange(event: any): void {
+    const value = event.target.value;
+    this.imagePreview = value ? value : null;
+  }
+
+  removeImage(): void {
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.taskForm.get('picture')?.setValue('');
+    const fileInput = document.getElementById('pictureFile') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+  }
+
+  triggerFileInput(): void {
+    const fileInput = document.getElementById('pictureFile') as HTMLInputElement;
+    if (fileInput) fileInput.click();
+  }
+
+  toggleImageType(type: 'file' | 'url'): void {
+    this.imageType = type;
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.taskForm.get('picture')?.setValue('');
+  }
+
   onSubmit(): void {
     if (this.taskForm.invalid) {
       this.taskForm.markAllAsTouched();
@@ -79,7 +116,25 @@ export class AddTaskComponent implements OnInit {
     delete formVal.pay_currency;
     delete formVal.pay_type;
 
-    this.taskService.addTask(formVal).subscribe({
+    let payload: any;
+    
+    if (this.imageType === 'file' && this.selectedFile) {
+      const formData = new FormData();
+      Object.keys(formVal).forEach(key => {
+        if (formVal[key] !== null && formVal[key] !== undefined && key !== 'picture') {
+          formData.append(key, formVal[key]);
+        }
+      });
+      formData.append('picture', this.selectedFile);
+      payload = formData;
+    } else {
+      if (this.imageType === 'file') {
+        formVal.picture = '';
+      }
+      payload = formVal;
+    }
+
+    this.taskService.addTask(payload).subscribe({
       next: () => {
         this.isLoading = false;
         this.router.navigate(['/dashboard/my-tasks']);

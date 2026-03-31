@@ -1,5 +1,5 @@
 .requests-container {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
 }
@@ -386,4 +386,210 @@
   padding: 0.75rem;
   border-radius: 8px;
   display: inline-block;
+}
+
+/* New Grid and Side Panel Styles */
+.request-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 2rem;
+}
+
+.task-card {
+  background: var(--white, white);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--border-color, #f3f4f6);
+  display: flex;
+  flex-direction: column;
+}
+
+.task-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+.task-card-body {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.req-count-badge {
+  background-color: #eef2ff;
+  color: #4f46e5;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  display: inline-flex;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-top: auto;
+  align-self: flex-start;
+}
+
+/* Side Panel */
+.side-panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0; right: 0; bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  backdrop-filter: blur(2px);
+  z-index: 1040;
+}
+
+.side-panel {
+  position: fixed;
+  top: 0;
+  right: -500px;
+  width: 100%;
+  max-width: 480px;
+  height: 100vh;
+  background: var(--white, white);
+  box-shadow: -5px 0 25px rgba(0,0,0,0.1);
+  z-index: 1050;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.side-panel.open {
+  right: 0;
+}
+
+.side-panel-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color, #f3f4f6);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--background-bg, #fcfcfc);
+}
+
+.side-panel-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  background-color: var(--background-bg, #f9fafb);
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--text-light, #6b7280);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.btn-close:hover {
+  color: var(--text-color, #111827);
+}
+
+/* Chat List WhatsApp Style */
+.chat-list {
+  display: flex;
+  flex-direction: column;
+}
+.chat-list-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color, #f3f4f6);
+  cursor: pointer;
+  transition: background 0.2s;
+  background: white;
+}
+.chat-list-item:hover {
+  background: var(--hover-bg, #f9fafb);
+}
+.chat-avatar {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+.chat-avatar-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid #e5e7eb;
+}
+.chat-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow: hidden;
+}
+.chat-info-top, .chat-info-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.chat-name {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--text-color, #111827);
+}
+.chat-time {
+  font-size: 0.75rem;
+  color: var(--text-light, #9ca3af);
+}
+.chat-preview {
+  font-size: 0.9rem;
+  color: var(--text-light, #6b7280);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Chat View WhatsApp Style */
+.chat-bubble {
+  max-width: 80%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px;
+  position: relative;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+.chat-bubble-them {
+  background: white;
+  color: #111827;
+  align-self: flex-start;
+  border-top-left-radius: 4px;
+}
+.chat-bubble-me {
+  background: #d9fdd3;
+  color: #111827;
+  align-self: flex-end;
+  border-top-right-radius: 4px;
+}
+.bubble-meta {
+  font-size: 0.65rem;
+  color: #6b7280;
+  text-align: right;
+  margin-top: 4px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+.btn-send:disabled {
+  background: #9ca3af !important;
+  cursor: not-allowed;
 }

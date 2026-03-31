@@ -16,19 +16,10 @@
     <p>{{ labels.noAppliedDesc || 'When you offer to help with someone\'s task, it will appear here.' }}</p>
   </div>
 
-  <div class="applied-list" *ngIf="!isLoading && appliedTasks.length > 0">
-    <div class="applied-card" *ngFor="let item of appliedTasks">
-      <div class="applied-card-header">
-        <div class="owner-info">
-          <div class="owner-avatar" *ngIf="!item.owner_picture">
-            {{ item.owner_first_name ? item.owner_first_name.charAt(0).toUpperCase() : '?' }}
-          </div>
-          <img *ngIf="item.owner_picture" [src]="apiUrl + item.owner_picture" alt="Avatar" class="owner-avatar-img" />
-          <div class="owner-details">
-            <span class="owner-name">{{ item.owner_first_name }} {{ item.owner_last_name }}</span>
-            <span class="posted-time">{{ labels.taskPosted || 'Task posted' }} {{ item.task_created_at | date:'medium' }}</span>
-          </div>
-        </div>
+  <div class="applied-grid" *ngIf="!isLoading && appliedTasks.length > 0">
+    <div class="task-card" *ngFor="let item of appliedTasks" (click)="openSidePanel(item)" style="cursor: pointer;">
+      <div class="task-card-header">
+        <h4 class="task-title" style="margin: 0;">{{ item.title }}</h4>
         <span class="status-badge"
           [ngClass]="{
             'status-pending': item.request_status === 'pending',
@@ -38,91 +29,98 @@
           {{ item.request_status | uppercase }}
         </span>
       </div>
-
-      <div class="applied-card-body">
-        <h4 class="task-title">{{ item.title }}</h4>
-        <p class="task-desc" *ngIf="item.description">{{ item.description }}</p>
-        <div class="task-meta" *ngIf="item.location">
-          <span>{{ item.location }}</span>
-        </div>
-        <div class="task-meta" *ngIf="item.pay">
-          <span>Pay Offered: {{ item.pay }}</span>
-        </div>
-        <p class="applied-at">{{ labels.youApplied || 'You applied' }} {{ item.requested_at | date:'medium' }}</p>
-      </div>
-
-      <!-- Preview of Last Message -->
-      <div class="applied-card-body conversation-preview" *ngIf="!item.isExpanded" (click)="item.isExpanded = true">
-        <h4 class="conversation-preview-title">
-          {{ item.conversation?.length > 0 ? ('Last message from ' + item.conversation[item.conversation.length-1].sender + ':') : 'Your Proposal Message:' }}
-        </h4>
-        <p class="conversation-preview-text">
-          "{{ item.conversation?.length > 0 ? item.conversation[item.conversation.length-1].text : item.message }}"
-        </p>
-        <div class="conversation-preview-hint">Click to view full conversation</div>
-      </div>
-
-      <!-- Full Conversation (Expanded) -->
-      <div class="applied-card-body conversation-expanded" *ngIf="item.isExpanded">
-        <div class="conversation-header">
-          <h4>Conversation History</h4>
-          <span (click)="item.isExpanded = false" class="conversation-close">Close &times;</span>
-        </div>
-        
-        <!-- Original message -->
-        <div style="margin-bottom: 1rem;">
-          <div class="conversation-msg-meta">You ({{ item.requested_at | date:'short' }})</div>
-          <div class="conversation-msg-bubble-original">
-            {{ item.message }}
+      <div class="task-card-body">
+        <p class="task-desc" *ngIf="item.description">{{ item.description | slice:0:100 }}{{ item.description.length > 100 ? '...' : '' }}</p>
+        <div class="owner-info" style="margin-top: auto; padding-top: 1rem; border-top: 1px solid #f3f4f6; display: flex; align-items: center; gap: 0.75rem;">
+          <div class="owner-avatar" *ngIf="!item.owner_picture" style="width: 32px; height: 32px; font-size: 0.85rem;">
+            {{ item.owner_first_name ? item.owner_first_name.charAt(0).toUpperCase() : '?' }}
+          </div>
+          <img *ngIf="item.owner_picture" [src]="apiUrl + item.owner_picture" alt="Avatar" class="owner-avatar-img" style="width: 32px; height: 32px;" />
+          <div class="owner-details">
+            <span class="owner-name" style="font-size: 0.9rem;">{{ item.owner_first_name }} {{ item.owner_last_name }}</span>
+            <span class="posted-time" style="font-size: 0.75rem;">Applied: {{ item.requested_at | date:'mediumDate' }}</span>
           </div>
         </div>
-
-        <!-- Replies array -->
-        <div *ngFor="let msg of item.conversation" style="margin-bottom: 1rem;">
-          <div class="conversation-msg-meta">
-            {{ msg.sender }} <span *ngIf="msg.timestamp">({{ msg.timestamp | date:'short' }})</span>
-          </div>
-          <div class="conversation-msg-bubble-reply">
-            {{ msg.text }}
-          </div>
-        </div>
-      </div>
-
-      <div class="applied-card-footer" style="display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <div class="status-message" *ngIf="item.request_status === 'pending'" style="margin: 0;">
-            <span class="status-dot pending"></span>
-            {{ labels.waitingResponse || 'Waiting for the task owner to respond...' }}
-          </div>
-          <div class="status-message" *ngIf="item.request_status === 'accepted'" style="margin: 0;">
-            <span class="status-dot accepted"></span>
-            {{ labels.requestAccepted || 'Your request was accepted!' }}
-          </div>
-          <div class="status-message" *ngIf="item.request_status === 'rejected'" style="margin: 0;">
-            <span class="status-dot rejected"></span>
-            {{ labels.requestDeclined || 'Your request was declined.' }}
-          </div>
-        </div>
-
-        <button class="btn btn-outline btn-sm" *ngIf="item.request_status !== 'rejected'" (click)="openReplyModal(item.request_id)">
-          {{ labels.reply || 'Reply' }}
-        </button>
       </div>
     </div>
   </div>
 
-  <!-- Reply Modal -->
-  <div class="modal-overlay" *ngIf="replyingRequestId">
-    <div class="modal-content">
-      <h3>{{ labels.replyToOwner || 'Reply to Task Owner' }}</h3>
-      <p style="margin-bottom: 1rem; color: #6b7280; font-size: 0.95rem;">
-        Write a message to respond to the task owner. They will receive an email notification.
-      </p>
-      <textarea [(ngModel)]="replyMessage" class="form-control" rows="4" placeholder="Your reply..."></textarea>
-      
-      <div class="modal-actions" style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end;">
-        <button class="btn btn-outline" style="margin: 0;" (click)="cancelReply()">{{ labels.cancel || 'Cancel' }}</button>
-        <button class="btn btn-primary" (click)="sendReply()" [disabled]="!replyMessage.trim()">{{ labels.send || 'Send Reply' }}</button>
+  <!-- Side Panel for Messages -->
+  <div class="side-panel-overlay" *ngIf="sidePanelOpen" (click)="closeSidePanel()"></div>
+  <div class="side-panel" [ngClass]="{'open': sidePanelOpen}">
+    <div class="side-panel-header">
+      <div>
+        <h3 style="margin: 0; font-size: 1.25rem;">{{ selectedRequest?.title }}</h3>
+        <p style="margin: 0; font-size: 0.85rem; color: #6b7280; margin-top: 5px;">
+          Task Owner: {{ selectedRequest?.owner_first_name }} {{ selectedRequest?.owner_last_name }}
+        </p>
+      </div>
+      <div style="display:flex; gap: 0.5rem; align-items:center;">
+        <button class="btn-icon" style="color: #ef4444; border:none; background:none; cursor:pointer;" title="Delete Request" (click)="deleteRequest(selectedRequest.request_id)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+        </button>
+        <button class="btn-close" (click)="closeSidePanel()">&times;</button>
+      </div>
+    </div>
+
+    <div class="side-panel-body" *ngIf="selectedRequest">
+      <div style="background: #fff; padding: 1.5rem; border-radius: 12px; border: 1px solid #f3f4f6; margin-bottom: 1.5rem;">
+        <h4 style="margin: 0 0 1rem 0;">Overview</h4>
+        <div class="task-meta" *ngIf="selectedRequest?.location" style="margin-bottom: 0.5rem; font-size: 0.9rem;">
+          <span><strong>Location:</strong> {{ selectedRequest.location }}</span>
+        </div>
+        <div class="task-meta" *ngIf="selectedRequest?.pay" style="margin-bottom: 0.5rem; font-size: 0.9rem;">
+          <span><strong>Pay:</strong> {{ selectedRequest.pay }}</span>
+        </div>
+        <div class="task-meta" style="margin-bottom: 1rem; font-size: 0.9rem;">
+          <span><strong>Status:</strong> <span class="status-badge status-{{selectedRequest?.request_status === 'accepted' ? 'accepted' : (selectedRequest?.request_status === 'rejected' ? 'rejected' : 'pending') }}">{{ selectedRequest.request_status | uppercase }}</span></span>
+        </div>
+      </div>
+
+      <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem;">Messages</h4>
+      <div class="conversation-expanded" style="background: #fff; padding: 1.5rem; border-radius: 12px; border: 1px solid #f3f4f6;">
+        <!-- Original Proposal -->
+        <div style="margin-bottom: 1rem;">
+          <div class="conversation-msg-meta">You ({{ selectedRequest.requested_at | date:'medium' }})</div>
+          <div class="conversation-msg-bubble-original">
+            {{ selectedRequest.message }}
+          </div>
+        </div>
+
+        <!-- Conversation History -->
+        <div *ngFor="let msg of selectedRequest.conversation" style="margin-bottom: 1rem;">
+          <div class="conversation-msg-meta">
+            {{ msg.sender }} <span *ngIf="msg.timestamp">({{ msg.timestamp | date:'shortTime' }})</span>
+            <span *ngIf="msg.sender_id === currentUserId" style="float: right; margin-left: 10px;">
+               <svg *ngIf="msg.read" style="width: 16px; height: 16px; color: #3b82f6;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline><polyline points="24 6 13 17 8 12"></polyline></svg>
+               <svg *ngIf="!msg.read" style="width: 16px; height: 16px; color: #9ca3af;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span>
+          </div>
+          <div [ngClass]="msg.sender_id === currentUserId ? 'conversation-msg-bubble-reply' : 'conversation-msg-bubble-original'">
+            {{ msg.text }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-area" *ngIf="selectedRequest?.request_status !== 'rejected'" style="padding: 1rem; background: #f0f2f5; display: flex; gap: 0.5rem; align-items: center; border-top: 1px solid #f3f4f6;">
+        <input type="text" [(ngModel)]="replyMessage" placeholder="Type a message..." (keyup.enter)="sendReply()" 
+               style="flex: 1; padding: 0.75rem 1.25rem; border-radius: 9999px; border: 1px solid #d1d5db; outline: none; font-size: 0.95rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05);" />
+        <button class="btn-send" (click)="sendReply()" [disabled]="!replyMessage.trim()"
+                style="width: 44px; height: 44px; border-radius: 50%; background: #25d366; color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
+           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+    </div>
+  </div>
+
+  <!-- Custom Confirm Modal -->
+  <div class="modal-overlay" *ngIf="isConfirmModalOpen">
+    <div class="modal-content" style="background: white; width: 90%; max-width: 400px; padding: 2rem; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+      <h3 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.25rem; color: #111827;">{{ confirmModalTitle }}</h3>
+      <p style="margin-bottom: 2rem; font-size: 1rem; color: #4b5563;">{{ confirmModalMessage }}</p>
+      <div class="modal-actions" style="display: flex; gap: 1rem; justify-content: flex-end;">
+        <button class="btn btn-outline" style="background: transparent; color: #374151; border: 1px solid #d1d5db; padding: 0.5rem 1.5rem; border-radius: 6px; cursor: pointer;" (click)="closeConfirmModal()">Cancel</button>
+        <button class="btn" [ngClass]="confirmModalButtonClass" style="background: #ef4444; color: white; border: none; padding: 0.5rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: 500;" (click)="executeConfirmModal()">{{ confirmModalButtonText }}</button>
       </div>
     </div>
   </div>

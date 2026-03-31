@@ -10,8 +10,13 @@ const pool = new Pool({
 });
 
 exports.createTask = async (req, res) => {
-  const { title, description, location, start_time, end_time, picture, pay } = req.body;
+  const { title, description, location, start_time, end_time, pay } = req.body;
+  let picture = req.body.picture || null;
   const user_id = req.user.id;
+
+  if (req.file) {
+      picture = `/uploads/${req.file.filename}`;
+  }
 
   if (!title) {
     return res.status(400).json({ msg: 'Title is required' });
@@ -141,8 +146,9 @@ exports.requestTask = async (req, res) => {
     );
 
     // Get owner email and preferences to notify them
+    let ownerInfo;
     try {
-      const ownerInfo = await pool.query(
+      ownerInfo = await pool.query(
         `SELECT u.email_id, u.first_name, u.email_notifications, t.title 
          FROM task t JOIN users u ON t.user_id = u.id WHERE t.id = $1`,
         [task_id]
@@ -160,6 +166,20 @@ exports.requestTask = async (req, res) => {
       }
     } catch (emailErr) {
       console.error('Error sending application email:', emailErr);
+    }
+
+    // Create Notification
+    try {
+      const taskTitle = ownerInfo && ownerInfo.rows.length > 0 ? ownerInfo.rows[0].title : 'your task';
+      const userRes = await pool.query('SELECT first_name FROM users WHERE id = $1', [requester_id]);
+      const reqName = userRes.rows.length > 0 ? userRes.rows[0].first_name : 'Someone';
+
+      await pool.query(
+        `INSERT INTO notification (user_id, body, link) VALUES ($1, $2, $3)`,
+        [taskCheck.rows[0].user_id, `${reqName} requested to help with "${taskTitle}".`, '/dashboard/requests']
+      );
+    } catch (notifErr) {
+      console.error('Error creating notification:', notifErr);
     }
 
     res.status(201).json({ msg: 'Request sent successfully', request: result.rows[0] });
@@ -252,7 +272,7 @@ exports.updateRequestStatus = async (req, res) => {
     );
 
     if (status === 'accepted') {
-      // 1. Close the task
+      // 1. Assign the task
       await pool.query("UPDATE task SET status = 'closed' WHERE id = $1", [row.task_id]);
 
       // 2. Reject other requests for the same task
@@ -279,6 +299,24 @@ exports.updateRequestStatus = async (req, res) => {
       } catch (emailErr) {
         console.error('Error sending status email:', emailErr);
       }
+    }
+
+    // 4. Create Notification
+    try {
+      let messageBody = '';
+      if (status === 'accepted') {
+        messageBody = `Your request to help with "${row.title}" has been accepted!`;
+      } else if (status === 'rejected') {
+        messageBody = `Your offer to help with "${row.title}" has been declined.`;
+      }
+      if (messageBody) {
+        await pool.query(
+          `INSERT INTO notification (user_id, body, link) VALUES ($1, $2, $3)`,
+          [row.requester_id, messageBody, '/dashboard/my-requests']
+        );
+      }
+    } catch (notifErr) {
+      console.error('Error creating notification:', notifErr);
     }
 
     res.json({ msg: `Request ${status}`, request: result.rows[0] });
@@ -374,7 +412,7 @@ exports.replyToRequest = async (req, res) => {
     }
 
     const timestamp = new Date().toISOString();
-    conversation.push({ sender: senderName, timestamp, text: reply_message });
+    conversation.push({ sender: senderName, timestamp, text: reply_message, read: false, sender_id: user_id });
 
     const updatedConversation = JSON.stringify(conversation);
 
@@ -461,6 +499,53 @@ exports.toggleTaskStatus = async (req, res) => {
     );
 
     res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+};
+
+exports.markMessagesAsRead = async (req, res) => {
+  const user_id = req.user.id;
+  const { request_id } = req.params;
+  
+  try {
+    const check = await pool.query('SELECT reply_message FROM requests WHERE id = $1', [request_id]);
+    if (check.rows.length === 0) return res.status(404).json({ msg: 'Request not found' });
+    
+    let conversation = [];
+    if (check.rows[0].reply_message) {
+      try { conversation = JSON.parse(check.rows[0].reply_message); } catch(e) {}
+    }
+    
+    let updated = false;
+    conversation.forEach(msg => {
+      if (msg.sender_id !== user_id && msg.read === false) {
+        msg.read = true;
+        updated = true;
+      }
+    });
+    
+    if (updated) {
+      await pool.query('UPDATE requests SET reply_message = $1 WHERE id = $2', [JSON.stringify(conversation), request_id]);
+    }
+    res.json({ msg: 'Messages marked as read' });
+  } catch(err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+};
+
+exports.deleteRequest = async (req, res) => {
+  const user_id = req.user.id;
+  const { request_id } = req.params;
+
+  try {
+    const isOwner = await pool.query('SELECT * FROM requests WHERE id = $1 AND requester_id = $2', [request_id, user_id]);
+    if (isOwner.rows.length === 0) return res.status(403).json({ msg: 'Not authorized to delete this request' });
+
+    await pool.query('DELETE FROM requests WHERE id = $1', [request_id]);
+    res.json({ msg: 'Request deleted successfully' });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');

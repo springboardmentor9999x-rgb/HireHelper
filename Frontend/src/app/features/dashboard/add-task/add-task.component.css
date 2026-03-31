@@ -191,3 +191,39 @@ textarea.form-control {
     padding: 1.5rem 1rem 2rem;
   }
 }
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.edit-btn {
+  background-color: var(--white, #fff);
+  color: var(--text-color, #374151);
+  border: 1px solid var(--border-color, #e5e7eb);
+}
+
+.edit-btn:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.remove-btn {
+  background-color: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+}
+
+.remove-btn:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
+}

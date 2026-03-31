@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TaskService } from '../../../core/services/task.service';
 import { LanguageService } from '../../../core/services/language.service';
 import { environment } from '../../../../environments/environment';
+import { ModalService } from '../../../core/services/modal.service';
 
 @Component({
   selector: 'app-requests',
@@ -12,32 +13,61 @@ import { environment } from '../../../../environments/environment';
   templateUrl: './requests.component.html',
   styleUrls: ['./requests.component.css']
 })
-export class RequestsComponent implements OnInit {
+export class RequestsComponent implements OnInit, OnDestroy {
   requests: any[] = [];
   isLoading = true;
   errorMsg = '';
   apiUrl = environment.apiUrl;
-  labels: any = {};
-  replyingRequestId: string | null = null;
   replyMessage: string = '';
+
+  taskGroups: any[] = [];
+  selectedTaskGroup: any = null;
+  labels: any = {};
+  selectedChat: any = null;
+  sidePanelOpen: boolean = false;
+  chatReplyMessage: string = '';
+  currentUserId: string = '';
+  private pollingInterval: any;
 
   constructor(
     private taskService: TaskService,
-    private langService: LanguageService
+    private langService: LanguageService,
+    private modalService: ModalService
   ) {}
 
   ngOnInit(): void {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        this.currentUserId = JSON.parse(userStr).id;
+      } catch (e) {}
+    }
+
     this.langService.lang$.subscribe(() => {
       this.labels = this.langService.getLabels();
     });
-    this.fetchRequests();
+    this.fetchRequests(true);
+
+    this.pollingInterval = setInterval(() => {
+      this.fetchRequests(false);
+    }, 5000);
   }
 
-  fetchRequests(): void {
-    this.isLoading = true;
+  ngOnDestroy() {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+    }
+  }
+
+  fetchRequests(showLoading = false): void {
+    if (showLoading) {
+      this.isLoading = true;
+    }
     this.taskService.getIncomingRequests().subscribe({
       next: (data) => {
-        this.requests = data.map((req: any) => {
+        const groupsMap = new Map();
+        
+        data.forEach((req: any) => {
           let conversation = [];
           if (req.reply_message) {
             try {
@@ -46,9 +76,49 @@ export class RequestsComponent implements OnInit {
               conversation = [{ sender: 'System', text: req.reply_message }];
             }
           }
-          return { ...req, conversation };
+          const requestObj = { ...req, conversation };
+          
+          if (!groupsMap.has(req.task_id)) {
+            groupsMap.set(req.task_id, {
+              task_id: req.task_id,
+              title: req.title,
+              description: req.description,
+              location: req.location,
+              pay: req.pay,
+              task_image: req.picture,
+              requests: [],
+              hasAccepted: false
+            });
+          }
+          const group = groupsMap.get(req.task_id);
+          group.requests.push(requestObj);
+          if (req.request_status === 'accepted') {
+            group.hasAccepted = true;
+          }
         });
-        this.isLoading = false;
+
+        this.taskGroups = Array.from(groupsMap.values());
+        this.requests = data; // Keep raw data if needed
+
+        // If a panel is currently open, refresh its data
+        if (this.selectedTaskGroup) {
+          const updatedGroup = this.taskGroups.find(g => g.task_id === this.selectedTaskGroup.task_id);
+          this.selectedTaskGroup = updatedGroup || null;
+          if (!this.selectedTaskGroup) {
+            this.sidePanelOpen = false;
+            this.selectedChat = null;
+          } else if (this.selectedChat) {
+             const updatedChat = this.selectedTaskGroup.requests.find((r: any) => r.request_id === this.selectedChat.request_id);
+             this.selectedChat = updatedChat || null;
+             if (this.selectedChat) {
+                this.taskService.markMessagesAsRead(this.selectedChat.request_id).subscribe();
+             }
+          }
+        }
+
+        if (showLoading) {
+          this.isLoading = false;
+        }
       },
       error: (err) => {
         this.errorMsg = 'Failed to load help offers.';
@@ -60,40 +130,52 @@ export class RequestsComponent implements OnInit {
   acceptRequest(requestId: string): void {
     this.taskService.updateRequestStatus(requestId, 'accepted').subscribe({
       next: () => this.fetchRequests(),
-      error: (err) => alert(err?.error?.msg || 'Failed to accept request.')
+      error: (err) => this.modalService.show('Error', err?.error?.msg || 'Failed to accept request.', 'error')
     });
   }
 
   rejectRequest(requestId: string): void {
     this.taskService.updateRequestStatus(requestId, 'rejected').subscribe({
       next: () => this.fetchRequests(),
-      error: (err) => alert(err?.error?.msg || 'Failed to reject request.')
+      error: (err) => this.modalService.show('Error', err?.error?.msg || 'Failed to reject request.', 'error')
     });
   }
 
-  openReplyModal(requestId: string): void {
-    this.replyingRequestId = requestId;
-    this.replyMessage = '';
-  }
+  sendChatReply(requestId: string): void {
+    if (!this.chatReplyMessage.trim()) return;
 
-  cancelReply(): void {
-    this.replyingRequestId = null;
-    this.replyMessage = '';
-  }
-
-  sendReply(): void {
-    if (!this.replyingRequestId || !this.replyMessage.trim()) return;
-
-    this.taskService.replyToRequest(this.replyingRequestId, this.replyMessage).subscribe({
+    this.taskService.replyToRequest(requestId, this.chatReplyMessage).subscribe({
       next: () => {
-        alert('Reply sent successfully!');
-        this.replyingRequestId = null;
-        this.replyMessage = '';
+        this.chatReplyMessage = '';
         this.fetchRequests(); // Automatically load the new conversation thread
       },
       error: (err: any) => {
-        alert(err?.error?.msg || 'Failed to send reply');
+        this.modalService.show('Error', err?.error?.msg || 'Failed to send reply', 'error');
       }
     });
+  }
+
+  openSidePanel(group: any): void {
+    this.selectedTaskGroup = group;
+    this.selectedChat = null;
+    this.sidePanelOpen = true;
+  }
+
+  openChat(req: any): void {
+    this.selectedChat = req;
+    this.chatReplyMessage = '';
+    this.taskService.markMessagesAsRead(req.request_id).subscribe();
+  }
+
+  closeChat(): void {
+    this.selectedChat = null;
+  }
+
+  closeSidePanel(): void {
+    this.sidePanelOpen = false;
+    setTimeout(() => {
+      this.selectedTaskGroup = null;
+      this.selectedChat = null;
+    }, 300);
   }
 }

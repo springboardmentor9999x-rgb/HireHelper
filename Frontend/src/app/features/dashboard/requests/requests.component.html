@@ -16,104 +16,123 @@
     <p>{{ labels.noHelpOffersDesc || 'When someone offers to help with your tasks, they will appear here.' }}</p>
   </div>
 
-  <div class="request-list" *ngIf="!isLoading && requests.length > 0">
-    <div class="request-card" *ngFor="let req of requests">
-      <div class="request-card-header">
-        <div class="requester-info">
-          <div class="requester-avatar" *ngIf="!req.requester_picture">
-            {{ req.first_name ? req.first_name.charAt(0).toUpperCase() : '?' }}
-          </div>
-          <img *ngIf="req.requester_picture" [src]="apiUrl + req.requester_picture" alt="Avatar" class="requester-avatar-img" />
-          <div class="requester-details">
-            <span class="requester-name">{{ req.first_name }} {{ req.last_name }}</span>
-            <span class="requester-email">{{ req.email_id }}</span>
-          </div>
+  <div class="request-grid" *ngIf="!isLoading && taskGroups.length > 0">
+    <div class="task-card" *ngFor="let group of taskGroups" (click)="openSidePanel(group)" style="cursor: pointer; position: relative;">
+      <div *ngIf="group.hasAccepted" class="status-badge status-accepted" style="position: absolute; top: 1rem; right: 1rem;">Accepted</div>
+      <div class="task-card-body" style="display: flex; flex-direction: column; height: 100%;">
+        <h4 class="task-title">{{ group.title }}</h4>
+        <p class="task-desc" *ngIf="group.description" style="flex-grow: 1;">{{ group.description | slice:0:100 }}{{ group.description.length > 100 ? '...' : '' }}</p>
+        <div class="task-meta" *ngIf="group.location">
+          <span>{{ group.location }}</span>
         </div>
-        <span class="status-badge"
-          [ngClass]="{
-            'status-pending': req.request_status === 'pending',
-            'status-accepted': req.request_status === 'accepted',
-            'status-rejected': req.request_status === 'rejected'
-          }">
-          {{ req.request_status | uppercase }}
-        </span>
-      </div>
-
-      <div class="request-card-body">
-        <h4 class="task-title">{{ labels.forTask || 'For task:' }} {{ req.title }}</h4>
-        <p class="task-desc" *ngIf="req.description">{{ req.description }}</p>
-        <div class="task-meta" *ngIf="req.location">
-          <span>{{ req.location }}</span>
-        </div>
-        <div class="task-meta" *ngIf="req.pay">
-          <span>Pay Offered: {{ req.pay }}</span>
-        </div>
-        <p class="requested-at">{{ labels.requested || 'Requested' }} {{ req.requested_at | date:'medium' }}</p>
-      </div>
-
-      <!-- Preview of Last Message -->
-      <div class="request-card-body conversation-preview" *ngIf="!req.isExpanded" (click)="req.isExpanded = true">
-        <h4 class="conversation-preview-title">
-          {{ req.conversation?.length > 0 ? ('Last message from ' + req.conversation[req.conversation.length-1].sender + ':') : ('Message from ' + req.first_name + ':') }}
-        </h4>
-        <p class="conversation-preview-text">
-          "{{ req.conversation?.length > 0 ? req.conversation[req.conversation.length-1].text : req.message }}"
-        </p>
-        <div class="conversation-preview-hint">Click to view full conversation</div>
-      </div>
-
-      <!-- Full Conversation (Expanded) -->
-      <div class="request-card-body conversation-expanded" *ngIf="req.isExpanded">
-        <div class="conversation-header">
-          <h4>Conversation History</h4>
-          <span (click)="req.isExpanded = false" class="conversation-close">Close &times;</span>
+        <div class="task-meta" *ngIf="group.pay">
+          <span>Pay: {{ group.pay }}</span>
         </div>
         
-        <!-- Original message -->
-        <div style="margin-bottom: 1rem;">
-          <div class="conversation-msg-meta">{{ req.first_name }} ({{ req.requested_at | date:'short' }})</div>
-          <div class="conversation-msg-bubble-original">
-            {{ req.message }}
-          </div>
+        <div class="req-count-badge" style="margin-top: auto;">
+          {{ group.requests.length }} Help Offer{{ group.requests.length > 1 ? 's' : '' }}
         </div>
-
-        <!-- Replies array -->
-        <div *ngFor="let msg of req.conversation" style="margin-bottom: 1rem;">
-          <div class="conversation-msg-meta">
-            {{ msg.sender }} <span *ngIf="msg.timestamp">({{ msg.timestamp | date:'short' }})</span>
-          </div>
-          <div class="conversation-msg-bubble-reply">
-            {{ msg.text }}
-          </div>
-        </div>
-      </div>
-
-      <div class="request-card-footer" style="display: flex; justify-content: space-between; align-items: center;">
-        <div *ngIf="req.request_status === 'pending'" style="display: flex; gap: 0.5rem;">
-          <button class="btn btn-accept" (click)="acceptRequest(req.request_id)">{{ labels.accept || 'Accept Offer' }}</button>
-          <button class="btn btn-reject" (click)="rejectRequest(req.request_id)">{{ labels.reject || 'Reject' }}</button>
-        </div>
-        <div *ngIf="req.request_status !== 'pending'" style="color: #6b7280; font-size: 0.9rem;">
-          Request is {{ req.request_status | uppercase }}
-        </div>
-        <button class="btn btn-outline" (click)="openReplyModal(req.request_id)">{{ labels.reply || 'Reply' }}</button>
       </div>
     </div>
   </div>
 
-  <!-- Reply Modal -->
-  <div class="modal-overlay" *ngIf="replyingRequestId">
-    <div class="modal-content">
-      <h3>{{ labels.replyToUser || 'Reply to Help Offer' }}</h3>
-      <p style="margin-bottom: 1rem; color: #6b7280; font-size: 0.95rem;">
-        {{ labels.replyHelpDesc || 'Write a message to reply to this offer. This will be sent to the user via email.' }}
-      </p>
-      <textarea [(ngModel)]="replyMessage" class="form-control" rows="4" placeholder="Your reply..."></textarea>
-      
-      <div class="modal-actions" style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end;">
-        <button class="btn btn-outline" style="margin: 0;" (click)="cancelReply()">{{ labels.cancel || 'Cancel' }}</button>
-        <button class="btn btn-primary" (click)="sendReply()" [disabled]="!replyMessage.trim()">{{ labels.send || 'Send Reply' }}</button>
+  <!-- Side Panel -->
+  <div class="side-panel-overlay" *ngIf="sidePanelOpen" (click)="closeSidePanel()"></div>
+  <div class="side-panel" [ngClass]="{'open': sidePanelOpen}">
+    
+    <!-- STATE 1: Chat List -->
+    <ng-container *ngIf="!selectedChat">
+      <div class="side-panel-header">
+        <h3 style="margin: 0; font-size: 1.25rem;">{{ selectedTaskGroup?.title }}</h3>
+        <button class="btn-close" (click)="closeSidePanel()">&times;</button>
       </div>
-    </div>
+      <div class="side-panel-body" style="padding: 0;">
+        <p style="padding: 1rem 1.5rem; color: #6b7280; font-size: 0.9rem; margin: 0; border-bottom: 1px solid #f3f4f6; background: #fafafa;">
+          Showing {{ selectedTaskGroup?.requests?.length || 0 }} offer(s) for this task.
+        </p>
+        <div class="chat-list">
+          <div class="chat-list-item" *ngFor="let req of selectedTaskGroup?.requests" (click)="openChat(req)">
+            <div class="chat-avatar" *ngIf="!req.requester_picture">
+              {{ req.first_name ? req.first_name.charAt(0).toUpperCase() : '?' }}
+            </div>
+            <img *ngIf="req.requester_picture" [src]="apiUrl + req.requester_picture" alt="Avatar" class="chat-avatar-img" />
+            
+            <div class="chat-info">
+              <div class="chat-info-top">
+                 <span class="chat-name">{{ req.first_name }} {{ req.last_name }}</span>
+                 <span class="chat-time">{{ req.requested_at | date:'shortTime' }}</span>
+              </div>
+              <div class="chat-info-bottom">
+                 <span class="chat-preview">{{ req.conversation[req.conversation.length-1]?.text || 'Started a conversation' | slice:0:30 }}...</span>
+                 <span class="status-badge status-{{req.request_status}}">{{ req.request_status | uppercase }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- STATE 2: Individual Chat View -->
+    <ng-container *ngIf="selectedChat">
+       <div class="side-panel-header" style="justify-content: flex-start; gap: 1rem; padding: 1rem 1.5rem; background: #f0f2f5;">
+          <button class="btn-icon" (click)="closeChat()" style="background:none; border:none; font-size: 1.2rem; cursor: pointer; color: #6b7280; display:flex; align-items:center;">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          </button>
+          
+          <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1;">
+            <div class="chat-avatar" *ngIf="!selectedChat.requester_picture" style="width: 36px; height: 36px; font-size: 1rem;">
+              {{ selectedChat.first_name ? selectedChat.first_name.charAt(0).toUpperCase() : '?' }}
+            </div>
+            <img *ngIf="selectedChat.requester_picture" [src]="apiUrl + selectedChat.requester_picture" class="chat-avatar-img" style="width: 36px; height: 36px;" />
+            <div style="display:flex; flex-direction:column;">
+                <span style="font-weight: 600; font-size: 1rem; color: #111827;">{{ selectedChat.first_name }} {{ selectedChat.last_name }}</span>
+                <span style="font-size: 0.75rem; color: #6b7280;">{{ selectedChat.email_id }}</span>
+            </div>
+          </div>
+          <button class="btn-close" (click)="closeSidePanel()">&times;</button>
+       </div>
+       
+       <div style="padding: 10px 1.5rem; background: #fff; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.02); z-index: 10;">
+          <span class="status-badge status-{{selectedChat.request_status}}">{{ selectedChat.request_status | uppercase }}</span>
+          
+          <div *ngIf="selectedChat.request_status === 'pending'" style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-accept" (click)="acceptRequest(selectedChat.request_id)" *ngIf="!selectedTaskGroup?.hasAccepted">{{ labels.accept || 'Accept' }}</button>
+            <button class="btn btn-reject" (click)="rejectRequest(selectedChat.request_id)" *ngIf="!selectedTaskGroup?.hasAccepted">{{ labels.reject || 'Reject' }}</button>
+          </div>
+          <div *ngIf="selectedChat.request_status === 'pending' && selectedTaskGroup?.hasAccepted">
+             <span style="color: #6b7280; font-size: 0.85rem; font-weight: 500;">Task Already Assigned</span>
+          </div>
+       </div>
+
+       <div class="side-panel-body chat-bubbles-container" style="background: #efeae2; display: flex; flex-direction: column; gap: 1rem; padding: 1.5rem; overflow-y: auto;">
+          <!-- Original message is just the first bubble -->
+          <div class="chat-bubble chat-bubble-them">
+             <div class="bubble-text">{{ selectedChat.message }}</div>
+             <div class="bubble-meta">
+                {{ selectedChat.requested_at | date:'shortTime' }}
+             </div>
+          </div>
+          <!-- Real conversation -->
+          <div *ngFor="let msg of selectedChat.conversation" class="chat-bubble" [ngClass]="msg.sender_id === currentUserId ? 'chat-bubble-me' : 'chat-bubble-them'">
+             <div class="bubble-text">{{ msg.text }}</div>
+             <div class="bubble-meta">
+                {{ msg.timestamp | date:'shortTime' }}
+                <span *ngIf="msg.sender_id === currentUserId" style="margin-left: 4px; display: inline-flex; align-items: center;">
+                    <svg *ngIf="msg.read" style="width: 15px; height: 15px; color: #3b82f6;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline><polyline points="24 6 13 17 8 12"></polyline></svg>
+                    <svg *ngIf="!msg.read" style="width: 15px; height: 15px; color: #9ca3af;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </span>
+             </div>
+          </div>
+       </div>
+
+       <div class="chat-input-area" style="padding: 1rem; background: #f0f2f5; display: flex; gap: 0.5rem; align-items: center;">
+          <input type="text" [(ngModel)]="chatReplyMessage" placeholder="Type a message..." (keyup.enter)="sendChatReply(selectedChat.request_id)" 
+                 style="flex: 1; padding: 0.75rem 1.25rem; border-radius: 9999px; border: 1px solid #d1d5db; outline: none; font-size: 0.95rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05);" />
+          <button class="btn-send" (click)="sendChatReply(selectedChat.request_id)" [disabled]="!chatReplyMessage.trim()"
+                  style="width: 44px; height: 44px; border-radius: 50%; background: #25d366; color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
+             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          </button>
+       </div>
+    </ng-container>
   </div>
 </div>

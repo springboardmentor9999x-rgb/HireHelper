@@ -11,6 +11,12 @@
                 <li><a routerLink="/dashboard/my-tasks" routerLinkActive="active">{{ labels.myTasks || 'My Tasks' }}</a></li>
                 <li><a routerLink="/dashboard/requests" routerLinkActive="active">{{ labels.helpOffers || 'Help Offers' }}</a></li>
                 <li><a routerLink="/dashboard/my-requests" routerLinkActive="active">{{ labels.myAppliedTasks || 'My Applied Tasks' }}</a></li>
+                <li>
+                    <a routerLink="/dashboard/notifications" routerLinkActive="active" style="display: flex; justify-content: space-between; align-items: center;">
+                        {{ labels.notificationsTitle || 'Notifications' }}
+                        <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+                    </a>
+                </li>
                 <li style="margin-top: 15px;"><a routerLink="/dashboard/add-task" routerLinkActive="active" class="add-task-btn">{{ labels.postTask || '+ Post a Task' }}</a></li>
             </ul>
         </nav>
@@ -35,6 +41,10 @@
                     <span *ngIf="isDarkMode">☀️</span>
                     <span *ngIf="!isDarkMode">🌙</span>
                 </button>
+                <div class="notification-bell-container" style="position: relative; cursor: pointer;" routerLink="/dashboard/notifications">
+                    <span style="font-size: 1.2rem; color: var(--text-color);">🔔</span>
+                    <span class="badge" *ngIf="unreadCount > 0" style="position: absolute; top: -5px; right: -8px; background: red; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: bold;">{{ unreadCount }}</span>
+                </div>
                 <div class="user-profile">
                     <div class="avatar" (click)="toggleProfileMenu()">
                         <img *ngIf="profilePic" [src]="apiUrl + profilePic" alt="Avatar" class="avatar-img-small" />

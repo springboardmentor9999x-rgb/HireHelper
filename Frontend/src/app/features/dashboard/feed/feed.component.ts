@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { TaskService, Task } from '../../../core/services/task.service';
 import { LanguageService } from '../../../core/services/language.service';
 import { environment } from '../../../../environments/environment';
+import { ModalService } from '../../../core/services/modal.service';
 
 export interface FeedTask extends Task {
   first_name?: string;
@@ -30,7 +31,8 @@ export class FeedComponent implements OnInit {
 
   constructor(
     private taskService: TaskService,
-    private langService: LanguageService
+    private langService: LanguageService,
+    private modalService: ModalService
   ) {}
 
   ngOnInit(): void {
@@ -56,6 +58,20 @@ export class FeedComponent implements OnInit {
     });
   }
 
+  getTaskImage(task: any): string {
+    return this.taskService.resolveTaskImage(task);
+  }
+
+  onImageError(event: any, task: any) {
+    if (!event.target.dataset.fallbackApplied) {
+      event.target.dataset.fallbackApplied = 'true';
+      event.target.src = this.taskService.getTaskImageFallback(task?.title, task?.id);
+    } else if (event.target.dataset.fallbackApplied === 'true') {
+      event.target.dataset.fallbackApplied = 'final';
+      event.target.src = 'https://placehold.co/800x500/eeeeee/999999?text=Task+Image';
+    }
+  }
+
   onRequestTask(task: FeedTask): void {
     if (!task.id) return;
     this.selectedTaskForRequest = task;
@@ -66,12 +82,12 @@ export class FeedComponent implements OnInit {
     if (!this.selectedTaskForRequest?.id) return;
     this.taskService.requestTask(this.selectedTaskForRequest.id, this.requestMessage).subscribe({
       next: () => {
-        alert('Your request to help has been sent!');
+        this.modalService.show('Success', 'Your request to help has been sent!', 'success');
         this.selectedTaskForRequest = null;
         this.requestMessage = '';
       },
       error: (err) => {
-        alert(err?.error?.msg || 'Failed to send request.');
+        this.modalService.show('Error', err?.error?.msg || 'Failed to send request.', 'error');
         this.selectedTaskForRequest = null;
       }
     });

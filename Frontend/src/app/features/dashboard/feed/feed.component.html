@@ -18,6 +18,9 @@
 
   <div class="feed-grid" *ngIf="!isLoading && tasks.length > 0">
     <div class="feed-card" *ngFor="let task of tasks">
+      <div class="card-hero-image">
+        <img [src]="getTaskImage(task)" (error)="onImageError($event, task)" alt="Task Image" />
+      </div>
       <div class="feed-card-header">
         <div class="user-info">
           <div class="user-avatar" *ngIf="!task.user_picture">
@@ -48,10 +51,6 @@
           <div class="meta-item" *ngIf="task.pay">
             <span>Pay Offered: {{ task.pay }}</span>
           </div>
-        </div>
-
-        <div class="task-image-container" *ngIf="task.picture">
-            <img [src]="task.picture" alt="Task Image" class="task-image" />
         </div>
       </div>
 

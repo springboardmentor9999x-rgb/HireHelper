@@ -1,12 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middlewares/auth.middleware');
-const { createTask, getMyTasks, getFeedTasks, requestTask, getIncomingRequests, getMyAppliedTasks, updateRequestStatus, updateTask, deleteTask, toggleTaskStatus, replyToRequest } = require('../controllers/tasks.controller');
+const { createTask, getMyTasks, getFeedTasks, requestTask, getIncomingRequests, getMyAppliedTasks, updateRequestStatus, updateTask, deleteTask, toggleTaskStatus, replyToRequest, markMessagesAsRead, deleteRequest } = require('../controllers/tasks.controller');
+const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+        cb(null, 'task-' + req.user.id + '-' + Date.now() + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage: storage });
 
 // @route   POST /api/tasks
 // @desc    Create a new task
 // @access  Private
-router.post('/', auth, createTask);
+router.post('/', auth, upload.single('picture'), createTask);
 
 // @route   GET /api/tasks/my
 // @desc    Get user's tasks
@@ -37,6 +49,16 @@ router.put('/request/:request_id', auth, updateRequestStatus);
 // @desc    Reply to a received request via email
 // @access  Private
 router.post('/request/:request_id/reply', auth, replyToRequest);
+
+// @route   PUT /api/tasks/request/:request_id/read-messages
+// @desc    Mark all unread conversation messages as read
+// @access  Private
+router.put('/request/:request_id/read-messages', auth, markMessagesAsRead);
+
+// @route   DELETE /api/tasks/request/:request_id
+// @desc    Delete a sent request
+// @access  Private
+router.delete('/request/:request_id', auth, deleteRequest);
 
 // @route   PUT /api/tasks/:id/status
 // @desc    Toggle task status (open/closed)

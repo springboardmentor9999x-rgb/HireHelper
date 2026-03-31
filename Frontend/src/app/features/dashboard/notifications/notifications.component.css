@@ -1,0 +1,101 @@
+.notifications-container {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header-section h2 {
+  font-size: 1.5rem;
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.notif-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.notif-card {
+  background: var(--card-bg, #ffffff);
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 1.25rem;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid var(--border-color, #f3f4f6);
+}
+
+.notif-card:hover {
+  background: var(--hover-bg, #f9fafb);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.notif-card.unread {
+  background: var(--card-bg, #ffffff);
+  border-left: 4px solid var(--primary-color, #3b82f6);
+}
+
+.notif-icon-wrapper {
+  background: var(--bg-secondary, #f3f4f6);
+  color: var(--text-light, #6b7280);
+  padding: 0.75rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notif-icon-wrapper.unread-icon {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--primary-color, #3b82f6);
+}
+
+.notif-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.notif-body {
+  font-size: 1.05rem;
+  color: var(--text-color, #111827);
+  line-height: 1.4;
+}
+
+.notif-card.unread .notif-body {
+  font-weight: 600;
+}
+
+.notif-meta {
+  font-size: 0.85rem;
+  color: var(--text-muted, #9ca3af);
+  display: flex;
+  align-items: center;
+}
+
+.new-badge {
+  background: #fee2e2;
+  color: #ef4444;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  margin-left: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

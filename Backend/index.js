@@ -32,11 +32,13 @@ pool.connect((err, client, release) => {
 
 const usersRoutes = require('./routes/users.routes');
 const tasksRoutes = require('./routes/tasks.routes');
+const notificationsRoutes = require('./routes/notifications.routes');
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/tasks', tasksRoutes);
+app.use('/api/notifications', notificationsRoutes);
 
 app.get('/', (req, res) => {
   res.send('HireHelper API is running...');

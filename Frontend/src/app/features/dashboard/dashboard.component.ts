@@ -1,29 +1,35 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { LanguageService } from '../../core/services/language.service';
+import { NotificationService } from '../../core/services/notification.service';
 import { environment } from '../../../environments/environment';
+import { GlobalModalComponent } from '../../shared/components/global-modal/global-modal.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, GlobalModalComponent, HttpClientModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnDestroy {
   userName = '';
   profilePic: string | null = null;
   apiUrl = environment.apiUrl;
   isProfileMenuOpen = false;
   isDarkMode = false;
   labels: any = {};
+  unreadCount = 0;
+  private notificationInterval: any;
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private langService: LanguageService
+    private langService: LanguageService,
+    private notificationService: NotificationService
   ) {
     const userStr = localStorage.getItem('user');
     if (userStr) {
@@ -49,6 +55,27 @@ export class DashboardComponent {
 
     this.langService.lang$.subscribe(() => {
       this.labels = this.langService.getLabels();
+    });
+
+    this.fetchUnreadCount();
+    // Poll for live notifications every 5 seconds
+    this.notificationInterval = setInterval(() => {
+      this.fetchUnreadCount();
+    }, 5000);
+  }
+
+  ngOnDestroy() {
+    if (this.notificationInterval) {
+      clearInterval(this.notificationInterval);
+    }
+  }
+
+  fetchUnreadCount() {
+    this.notificationService.getNotifications().subscribe({
+      next: (notifs) => {
+        this.unreadCount = notifs.filter(n => !n.read).length;
+      },
+      error: (err) => console.error('Error fetching notifications', err)
     });
   }
 

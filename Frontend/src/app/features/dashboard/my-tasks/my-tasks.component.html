@@ -21,6 +21,9 @@
     <div class="task-card" *ngFor="let task of tasks">
       <!-- View Mode -->
       <ng-container *ngIf="editingTaskId !== task.id">
+        <div class="card-hero-image">
+           <img [src]="getTaskImage(task)" (error)="onImageError($event, task)" alt="Task Image" />
+        </div>
         <div class="task-header">
           <h3 class="task-title">{{ task.title }}</h3>
           <span class="status-badge" [ngClass]="'status-' + (task.status?.toLowerCase() || 'open')">
@@ -106,4 +109,22 @@
       </ng-container>
     </div>
   </div>
+
+  <!-- Custom Confirm Modal -->
+  <div class="modal-overlay" *ngIf="isConfirmModalOpen">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>{{ confirmModalTitle }}</h3>
+        <button class="btn-close" (click)="closeConfirmModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>{{ confirmModalMessage }}</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" (click)="closeConfirmModal()">Cancel</button>
+        <button class="btn" [ngClass]="confirmModalButtonClass" (click)="executeConfirmModal()">{{ confirmModalButtonText }}</button>
+      </div>
+    </div>
+  </div>
+
 </div>
