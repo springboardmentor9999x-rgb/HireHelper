@@ -14,7 +14,6 @@ import { inject } from '@angular/core';
 export class RequestsComponent implements OnInit {
   requests: RequestItem[] = [];
   loading = true;
-  errorMessage = '';
   private toastService = inject(ToastService);
 
   constructor(
@@ -36,7 +35,7 @@ export class RequestsComponent implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.errorMessage = 'Failed to load received requests. Please try again.';
+        this.toastService.showError('Failed to load received requests. Please try again.');
         console.error('Error fetching received requests:', err);
         this.cdr.detectChanges();
       }
@@ -52,7 +51,6 @@ export class RequestsComponent implements OnInit {
       },
       error: (err) => {
         this.toastService.showError(err.error?.message || `Failed to ${status.toLowerCase()} request. Please try again.`);
-        this.errorMessage = `Failed to ${status.toLowerCase()} request. Please try again.`;
         console.error(`Error updating request to ${status}:`, err);
         this.cdr.detectChanges();
       }

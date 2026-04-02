@@ -1,66 +1,55 @@
-<div class="space-y-6">
+<div class="space-y-5">
     <!-- Header Section -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
-            <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Task Feed</h2>
-            <p class="text-slate-500 text-sm mt-1">Browse and help others with their tasks.</p>
+            <h2 class="text-2xl font-bold text-brand-primary tracking-tight">Task Feed</h2>
+            <p class="text-brand-muted text-sm mt-0.5">Browse and help others with their tasks.</p>
         </div>
         <button (click)="fetchFeedTasks()"
-            class="flex items-center space-x-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors shadow-sm">
-            <svg class="w-4 h-4" [class.animate-spin]="loading" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            class="flex items-center gap-2 px-4 py-2 bg-surface border border-border rounded-xl text-sm font-semibold text-brand-muted hover:text-accent hover:border-accent/40 transition-all shadow-sm group">
+            <svg class="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" [class.animate-spin]="loading"
+                fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
                 </path>
             </svg>
-            <span>Refresh</span>
+            Refresh
         </button>
     </div>
 
     <!-- Search & Filter Bar -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col gap-4">
+    <div class="bg-surface border border-border rounded-2xl p-3 shadow-sm flex flex-col gap-3">
         <!-- Search Input -->
         <div class="relative">
             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-4 w-4 text-brand-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
             </span>
             <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()"
                 placeholder="Search tasks by title or description..."
-                class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-all" />
+                class="w-full pl-9 pr-4 py-2 border border-border rounded-xl text-sm bg-background text-brand-primary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all" />
         </div>
 
         <!-- Category Filter Pills -->
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-wrap gap-1.5">
             <button *ngFor="let cat of categories" (click)="onCategoryChange(cat)"
                 [class]="selectedCategory === cat
-                    ? 'px-4 py-1.5 rounded-full text-xs font-bold bg-accent text-white shadow-sm transition-all'
-                    : 'px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all'">
+                    ? 'px-3 py-1 rounded-full text-[11px] font-bold bg-accent text-white shadow-sm transition-all'
+                    : 'px-3 py-1 rounded-full text-[11px] font-bold bg-background border border-border text-brand-muted hover:border-accent/40 hover:text-accent transition-all'">
                 {{ cat }}
             </button>
         </div>
     </div>
 
     <!-- Loading State -->
-    <div *ngIf="loading" class="flex flex-col items-center justify-center py-20 animate-pulse">
-        <div class="w-12 h-12 border-4 border-accent/20 border-t-accent rounded-full animate-spin mb-4"></div>
-        <p class="text-slate-500 font-medium">Loading your feed...</p>
-    </div>
-
-    <!-- Error State -->
-    <div *ngIf="errorMessage && !loading"
-        class="bg-red-50 border border-red-200 rounded-xl p-6 flex items-center space-x-4">
-        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
+    <div *ngIf="loading" class="flex flex-col items-center justify-center py-16">
+        <div class="relative w-12 h-12">
+            <div class="absolute inset-0 border-4 border-accent/20 rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-accent rounded-full border-t-transparent animate-spin"></div>
         </div>
-        <div>
-            <h3 class="font-bold text-red-900">Something went wrong</h3>
-            <p class="text-red-700 text-sm">{{ errorMessage }}</p>
-        </div>
+        <p class="mt-3 text-brand-muted text-sm font-medium animate-pulse">Loading feed...</p>
     </div>
 
     <!-- Modals -->
@@ -69,99 +58,105 @@
     </app-request-modal>
 
     <!-- Empty State -->
-    <div *ngIf="!loading && tasks.length === 0 && !errorMessage"
-        class="bg-white border-2 border-dashed border-slate-200 rounded-2xl py-20 flex flex-col items-center justify-center text-center px-4">
-        <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-6">
-            <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div *ngIf="!loading && tasks.length === 0"
+        class="bg-surface border-2 border-dashed border-border rounded-2xl py-14 flex flex-col items-center text-center px-4">
+        <div class="w-16 h-16 bg-accent/5 rounded-full flex items-center justify-center mb-4">
+            <svg class="w-8 h-8 text-accent/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
                 </path>
             </svg>
         </div>
-        <h3 class="text-xl font-bold text-slate-900 mb-2">No tasks found</h3>
-        <p class="text-slate-500 max-w-sm mb-8">
-            {{ searchQuery || selectedCategory !== 'All' ? 'Try adjusting your search or category filter.' : 'No tasks
-            from other users yet. Check back later!' }}
+        <h3 class="text-lg font-bold text-brand-primary mb-1">No tasks found</h3>
+        <p class="text-brand-muted text-sm max-w-xs">
+            {{ searchQuery || selectedCategory !== 'All' ? 'Try adjusting your search or filters.' : 'No open tasks from other users yet. Check back soon!' }}
         </p>
-        <a routerLink="/dashboard/add-task"
-            class="px-6 py-3 bg-brand-primary text-white rounded-lg font-bold hover:bg-brand-primary/90 transition-all shadow-lg hover:shadow-brand-primary/20">
-            Create Your First Task
-        </a>
     </div>
 
-    <!-- Task Grid -->
+    <!-- Task Grid — compact 4-column on xl, 3 on lg, 2 on md -->
     <div *ngIf="!loading && tasks.length > 0"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
-        <div *ngFor="let task of tasks"
-            class="group bg-white rounded-2xl border border-slate-200 hover:border-accent/40 hover:shadow-xl hover:shadow-accent/5 transition-all duration-300 overflow-hidden flex flex-col">
-            <!-- Task Header/Image -->
-            <div class="h-2 w-full bg-accent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 feed-grid">
 
-            <!-- Task Image -->
-            <div class="h-44 bg-slate-100 relative overflow-hidden">
+        <div *ngFor="let task of tasks; let i = index"
+            class="feed-card group bg-surface border-2 border-border/30 rounded-2xl overflow-hidden flex flex-col hover:border-accent hover:border-4 hover:shadow-2xl hover:shadow-accent/20 transition-all duration-300 cursor-default"
+            [style.animation-delay]="(i * 60) + 'ms'">
+
+            <!-- Image Thumbnail -->
+            <div class="relative h-36 bg-gradient-to-br from-slate-100 to-slate-200 overflow-hidden shrink-0">
                 <img *ngIf="task.picture_url" [src]="task.picture_url" [alt]="task.title"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                <div *ngIf="!task.picture_url"
-                    class="w-full h-full flex items-center justify-center bg-brand-primary/5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-brand-primary/20" fill="none"
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
+
+                <!-- Gradient placeholder when no image -->
+                <div *ngIf="!task.picture_url" class="w-full h-full flex items-center justify-center"
+                    [style]="'background: linear-gradient(135deg, hsl(220 15% 95%) 0%, hsl(220 15% 88%) 100%)'">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 opacity-20" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                 </div>
-            </div>
 
-            <div class="p-6 flex-grow">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="flex flex-col gap-1.5">
-                        <span
-                            [class]="'px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ' + getStatusClass(task.status)">
-                            {{ task.status }}
-                        </span>
-                        <span
-                            class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border bg-accent/10 text-accent border-accent/20 self-start">
-                            {{ task.category || 'Other' }}
-                        </span>
-                    </div>
-                    <span class="text-slate-400 text-[10px] font-medium uppercase tracking-tight">
-                        {{ task.created_at | date:'MMM d' }}
+                <!-- Gradient overlay at the bottom of image -->
+                <div class="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/40 to-transparent"></div>
+
+                <!-- Category pill overlaid on the image -->
+                <div class="absolute bottom-2 left-2">
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-white/90 text-accent backdrop-blur-sm shadow-sm">
+                        {{ task.category || 'Other' }}
                     </span>
                 </div>
 
-                <h3
-                    class="text-lg font-bold text-slate-900 group-hover:text-brand-primary transition-colors mb-2 line-clamp-1">
-                    {{ task.title }}
-                </h3>
-                <p class="text-slate-600 text-sm line-clamp-3 mb-6 min-h-[4.5rem]">
+                <!-- Date overlaid on the image -->
+                <div class="absolute top-2 right-2">
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-black/40 text-white/90 backdrop-blur-sm">
+                        {{ task.created_at | date:'MMM d' }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-3 flex flex-col gap-2 flex-grow">
+                <!-- Title & Status -->
+                <div class="flex items-start justify-between gap-1">
+                    <h3 class="text-sm font-bold text-brand-primary line-clamp-1 leading-snug group-hover:text-accent transition-colors flex-1">
+                        {{ task.title }}
+                    </h3>
+                    <span [class]="'shrink-0 px-2 py-0.5 rounded-full text-[9px] font-black uppercase border ' + getStatusClass(task.status)">
+                        {{ task.status }}
+                    </span>
+                </div>
+
+                <!-- Description -->
+                <p class="text-[11px] text-brand-muted line-clamp-2 leading-relaxed">
                     {{ task.description || 'No description provided.' }}
                 </p>
 
-                <div class="space-y-3 pt-4 border-t border-slate-50">
-                    <div class="flex items-center text-slate-500">
-                        <svg class="w-4 h-4 mr-2 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <!-- Meta Info -->
+                <div class="flex flex-col gap-1 mt-auto pt-2 border-t border-border">
+                    <div class="flex items-center gap-1.5 text-brand-muted">
+                        <svg class="w-3 h-3 text-accent shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                            </path>
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
-                        <span class="text-xs font-medium">{{ task.location }}</span>
+                        <span class="text-[11px] font-medium truncate">{{ task.location }}</span>
                     </div>
-                    <div class="flex items-center text-slate-500">
-                        <svg class="w-4 h-4 mr-2 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex items-center gap-1.5 text-brand-muted">
+                        <svg class="w-3 h-3 text-accent shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        <span class="text-xs font-medium">{{ task.start_time | date:'MMM d, h:mm a' }}</span>
+                        <span class="text-[11px] font-medium">{{ task.start_time | date:'MMM d, h:mm a' }}</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Action Footer -->
-            <div class="p-4 bg-slate-50/50 border-t border-slate-100">
+            <!-- Action Button -->
+            <div class="px-3 pb-3">
                 <button (click)="requestTask(task)"
-                    class="w-full py-3 bg-white hover:bg-accent hover:text-white border border-slate-200 hover:border-accent text-brand-primary font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-sm active:scale-[0.98]">
-                    Request to Help
+                    class="w-full py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider bg-accent/10 text-accent border border-accent/20 hover:bg-accent hover:text-white transition-all duration-200 hover:shadow-md hover:shadow-accent/20 active:scale-[0.97]">
+                    ✦ Request to Help
                 </button>
             </div>
         </div>

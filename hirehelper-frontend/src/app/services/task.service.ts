@@ -17,6 +17,8 @@ export interface Task {
     category?: string;
     is_verified?: boolean;
     created_at?: string;
+    proof_note?: string;
+    proof_picture_url?: string;
 }
 
 export const TASK_CATEGORIES = ['All', 'Moving', 'Cleaning', 'IT Help', 'Delivery', 'Errands', 'Other'];
@@ -44,8 +46,8 @@ export class TaskService {
         return this.http.get<{ tasks: Task[] }>(this.apiUrl, { params });
     }
 
-    markAsCompleted(taskId: string): Observable<any> {
-        return this.http.put(`${this.apiUrl}/${taskId}/complete`, {});
+    markAsCompleted(taskId: string, proof: { proof_note?: string; proof_picture_url?: string }): Observable<any> {
+        return this.http.put(`${this.apiUrl}/${taskId}/complete`, proof);
     }
 
     updateTask(taskId: string, task: Partial<Task>): Observable<any> {
@@ -54,5 +56,13 @@ export class TaskService {
 
     verifyCompletion(taskId: string): Observable<any> {
         return this.http.put(`${this.apiUrl}/${taskId}/verify`, {});
+    }
+
+    cancelTask(taskId: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}/${taskId}/cancel`, {});
+    }
+
+    unassignTask(taskId: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}/${taskId}/unassign`, {});
     }
 }

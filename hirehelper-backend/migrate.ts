@@ -25,6 +25,22 @@ async function migrate() {
         `);
         console.log('Added is_verified column.');
 
+        // Add proof fields
+        await pool.query(`
+            ALTER TABLE tasks 
+            ADD COLUMN IF NOT EXISTS proof_note TEXT,
+            ADD COLUMN IF NOT EXISTS proof_picture_url TEXT;
+        `);
+        console.log('Added proof fields.');
+
+        // Fix proof columns type (in case they were created as VARCHAR(255))
+        await pool.query(`
+            ALTER TABLE tasks
+            ALTER COLUMN proof_note TYPE TEXT,
+            ALTER COLUMN proof_picture_url TYPE TEXT;
+        `);
+        console.log('Ensured proof fields are TEXT type.');
+
         console.log('Migration completed successfully.');
         process.exit(0);
     } catch (error) {

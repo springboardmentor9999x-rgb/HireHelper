@@ -1,13 +1,13 @@
-<div class="animate-fade-in space-y-8">
+<div class="animate-fade-in space-y-6">
     <!-- Header Section -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-brand-primary tracking-tight">My Tasks</h1>
-            <p class="text-brand-muted mt-1">Manage and track all the tasks you've posted.</p>
+            <h1 class="text-2xl font-bold text-brand-primary tracking-tight">My Task Dashboard</h1>
+            <p class="text-brand-muted text-sm mt-0.5">Manage the tasks you've posted and the ones you're helping with.</p>
         </div>
         <a routerLink="/dashboard/add-task"
-            class="inline-flex items-center justify-center px-5 py-2.5 bg-accent hover:bg-accent-hover text-white font-bold rounded-lg transition-all shadow-lg hover:shadow-accent/20 gap-2 group">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:rotate-90 transition-transform"
+            class="inline-flex items-center justify-center px-5 py-2.5 bg-accent hover:bg-accent-hover text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-lg hover:shadow-accent/20 gap-2 group">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-hover:rotate-90 transition-transform"
                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
@@ -15,189 +15,282 @@
         </a>
     </div>
 
-    <!-- Loading State -->
-    <div *ngIf="loading" class="flex flex-col items-center justify-center py-20">
-        <div class="relative w-16 h-16">
-            <div class="absolute inset-0 border-4 border-accent/20 rounded-full"></div>
-            <div class="absolute inset-0 border-4 border-accent rounded-full border-t-transparent animate-spin"></div>
-        </div>
-        <p class="mt-4 text-brand-muted font-medium animate-pulse">Loading your tasks...</p>
-    </div>
-
-    <!-- Error State -->
-    <div *ngIf="!loading && errorMessage"
-        class="bg-red-50 border border-red-100 rounded-xl p-6 flex items-center gap-4 text-red-700 animate-shake">
-        <div class="bg-red-100 p-3 rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        </div>
-        <div>
-            <p class="font-bold">Something went wrong</p>
-            <p class="text-sm opacity-90">{{ errorMessage }}</p>
-        </div>
-        <button (click)="fetchTasks()"
-            class="ml-auto px-4 py-2 bg-white border border-red-200 rounded-lg text-sm font-bold hover:bg-red-50 transition-colors">
-            Retry
+    <!-- Tab Switcher (Segmented Control) -->
+    <div *ngIf="!loading" 
+        class="flex p-1 bg-brand-primary/5 rounded-2xl w-full max-w-sm mx-auto mb-2 border border-brand-primary/10 shadow-inner">
+        <button (click)="setActiveTab('posted')"
+            [class]="'flex-1 py-2.5 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ' + 
+            (activeTab === 'posted' ? 'bg-white text-accent shadow-md border border-border' : 'text-brand-muted hover:text-brand-primary')">
+            My Posts
+        </button>
+        <button (click)="setActiveTab('helping')"
+            [class]="'flex-1 py-2.5 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ' + 
+            (activeTab === 'helping' ? 'bg-white text-accent shadow-md border border-border' : 'text-brand-muted hover:text-brand-primary')">
+            Helping With
         </button>
     </div>
 
-    <!-- Empty State -->
-    <div *ngIf="!loading && !errorMessage && tasks.length === 0"
-        class="bg-surface border-2 border-dashed border-border rounded-2xl p-16 flex flex-col items-center text-center">
-        <div class="w-24 h-24 bg-accent/5 rounded-full flex items-center justify-center mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-accent/40" fill="none" viewBox="0 0 24 24"
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex flex-col items-center justify-center py-20">
+        <div class="relative w-12 h-12">
+            <div class="absolute inset-0 border-4 border-accent/20 rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-accent rounded-full border-t-transparent animate-spin"></div>
+        </div>
+        <p class="mt-4 text-brand-muted text-sm font-medium animate-pulse">Loading your tasks...</p>
+    </div>
+
+    <!-- Empty State: My Posts -->
+    <div *ngIf="!loading && activeTab === 'posted' && postedTasks.length === 0"
+        class="bg-surface border-2 border-dashed border-border rounded-2xl py-20 flex flex-col items-center text-center px-4">
+        <div class="w-20 h-20 bg-accent/5 rounded-full flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-accent/30" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
         </div>
-        <h3 class="text-xl font-bold text-brand-primary">No tasks found</h3>
-        <p class="text-brand-muted mt-2 max-w-sm mx-auto">You haven't posted any tasks yet. Get started by creating your
-            first task!</p>
+        <h3 class="text-xl font-bold text-brand-primary">No posts yet</h3>
+        <p class="text-brand-muted text-sm mt-2 max-w-sm mx-auto">You haven't posted any tasks. Start by creating one to find help!</p>
         <a routerLink="/dashboard/add-task"
-            class="mt-8 px-8 py-3 bg-brand-primary text-white font-bold rounded-lg hover:bg-brand-primary-hover transition-all">
-            Create Your First Task
+            class="mt-8 px-8 py-3 bg-brand-primary text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-brand-primary-hover transition-all shadow-lg hover:shadow-brand-primary/20">
+            Post Your First Task
+        </a>
+    </div>
+
+    <!-- Empty State: Helping With -->
+    <div *ngIf="!loading && activeTab === 'helping' && helpingTasks.length === 0"
+        class="bg-surface border-2 border-dashed border-border rounded-2xl py-20 flex flex-col items-center text-center px-4">
+        <div class="w-20 h-20 bg-blue-500/5 rounded-full flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-500/30" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+        </div>
+        <h3 class="text-xl font-bold text-brand-primary">Nothing to do yet</h3>
+        <p class="text-brand-muted text-sm mt-2 max-w-sm mx-auto">You haven't been assigned to any tasks. Check the Task Feed to find ways to help!</p>
+        <a routerLink="/dashboard/feed"
+            class="mt-8 px-8 py-3 bg-blue-600 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition-all shadow-lg hover:shadow-blue-500/20">
+            Browse Task Feed
         </a>
     </div>
 
     <!-- Tasks Grid -->
-    <div *ngIf="!loading && !errorMessage && tasks.length > 0"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div *ngFor="let task of tasks"
-            class="bg-surface border border-border rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col">
-            <!-- Task Image/Placeholder -->
-            <div class="h-48 bg-slate-100 relative overflow-hidden">
+    <div *ngIf="!loading && (activeTab === 'posted' ? postedTasks.length > 0 : helpingTasks.length > 0)"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 tasks-grid">
+        
+        <div *ngFor="let task of (activeTab === 'posted' ? postedTasks : helpingTasks); let i = index"
+            class="task-card group bg-surface border-2 border-border/30 rounded-2xl overflow-hidden flex flex-col hover:border-accent hover:border-4 hover:shadow-2xl hover:shadow-accent/20 transition-all duration-300"
+            [style.animation-delay]="(i * 60) + 'ms'">
+            
+            <!-- Compact Image Section -->
+            <div class="relative h-36 bg-slate-100 overflow-hidden shrink-0">
                 <img *ngIf="task.picture_url" [src]="task.picture_url" [alt]="task.title"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                <div *ngIf="!task.picture_url"
-                    class="w-full h-full flex items-center justify-center bg-brand-primary/5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-brand-primary/20" fill="none"
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out">
+                
+                <div *ngIf="!task.picture_url" class="w-full h-full flex items-center justify-center bg-brand-primary/5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-brand-primary/10" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                 </div>
-                <div class="absolute top-4 right-4">
-                    <span
-                        [class]="'px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ' + getStatusClass(task.status)">
+
+                <!-- Gradient overlay -->
+                <div class="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black/40 to-transparent"></div>
+
+                <!-- Floating Status Badge -->
+                <div class="absolute top-2 right-2">
+                    <span [class]="'px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider border backdrop-blur-md shadow-sm ' + getStatusClass(task.status)">
                         {{ task.status }}
+                    </span>
+                </div>
+
+                <!-- Floating Category Badge -->
+                <div class="absolute bottom-2 left-2">
+                    <span class="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider bg-white/90 text-accent border border-white/50 backdrop-blur-sm">
+                        {{ task.category || 'Other' }}
                     </span>
                 </div>
             </div>
 
-            <!-- Task Details -->
-            <div class="p-6 flex-grow flex flex-col">
-                <div class="flex items-center gap-2 mb-2">
-                    <h3 class="text-lg font-bold text-brand-primary line-clamp-1">{{ task.title }}</h3>
+            <!-- Content Section -->
+            <div class="p-3 flex flex-col flex-grow">
+                <h3 class="text-sm font-bold text-brand-primary line-clamp-1 mb-1 group-hover:text-accent transition-colors leading-tight">
+                    {{ task.title }}
+                </h3>
+                
+                <!-- Lifecycle Stepper -->
+                <div class="mb-4 mt-2">
+                    <div class="flex items-center justify-between relative px-2">
+                        <!-- Progress Line -->
+                        <div class="absolute top-[6px] left-0 w-full h-[2px] bg-border z-0"></div>
+                        <div class="absolute top-[6px] left-0 h-[2px] bg-accent z-0 transition-all duration-700"
+                            [style.width.%]="(getTaskProgress(task.status) / 3) * 100"></div>
+                        
+                        <!-- Steps -->
+                        <div *ngFor="let step of [0,1,2,3]; let i = index" class="relative z-10 flex flex-col items-center">
+                            <div [class]="'w-3 h-3 rounded-full border-2 transition-all duration-500 ' + 
+                                (getTaskProgress(task.status) >= i ? 'bg-accent border-accent scale-110 shadow-[0_0_8px_rgba(255,51,102,0.4)]' : 'bg-surface border-border')">
+                            </div>
+                            <span class="text-[7px] font-black uppercase tracking-tighter mt-1"
+                                [class.text-accent]="getTaskProgress(task.status) >= i"
+                                [class.text-brand-muted]="getTaskProgress(task.status) < i">
+                                {{ ['Open', 'Assigned', 'Done', 'Verified'][i] }}
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex items-center gap-2 mb-3">
-                    <span
-                        class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-accent/10 text-accent border border-accent/20 uppercase tracking-wide">
-                        {{ task.category || 'Other' }}
-                    </span>
-                </div>
-                <p class="text-brand-muted text-sm line-clamp-2 mb-4 flex-grow">{{ task.description || 'No description
-                    provided.' }}</p>
 
-                <div class="space-y-3 pt-4 border-t border-border">
-                    <div class="flex items-center text-xs text-brand-muted gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-accent" fill="none"
+                <p class="text-[11px] text-brand-muted line-clamp-2 leading-relaxed mb-3">
+                    {{ task.description || 'No description provided.' }}
+                </p>
+
+                <!-- Detailed Info -->
+                <div class="space-y-1.5 pt-2 border-t border-border mt-auto">
+                    <div class="flex items-center text-brand-muted gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-accent shrink-0" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        {{ task.location }}
+                        <span class="text-[10px] font-medium truncate">{{ task.location }}</span>
                     </div>
-                    <div class="flex items-center text-xs text-brand-muted gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-accent" fill="none"
+                    <div class="flex items-center text-brand-muted gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-accent shrink-0" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        {{ task.start_time | date:'medium' }}
+                        <span class="text-[10px] font-medium">{{ task.start_time | date:'MMM d, h:mm a' }}</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Actions -->
-            <div class="px-6 pb-6 mt-auto flex flex-col gap-2">
+            <!-- Contextual Actions -->
+            <div class="px-3 pb-3 mt-auto flex flex-col gap-1.5">
                 <!-- Owner: Edit Task (only when OPEN) -->
                 <button *ngIf="task.status === 'OPEN' && task.user_id?.toString() === currentUserId"
                     (click)="openEditModal(task)"
-                    class="w-full py-2.5 bg-accent hover:bg-accent-hover text-white text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    class="w-full py-1.5 bg-background hover:bg-accent/10 border border-border hover:border-accent/30 text-accent text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
-                    EDIT TASK
+                    Edit Task
                 </button>
 
-                <!-- Owner: Verify Completion (when task is COMPLETED) -->
+                <!-- Owner: Cancel Task (when OPEN or ASSIGNED) -->
+                <button *ngIf="(task.status === 'OPEN' || task.status === 'ASSIGNED') && task.user_id?.toString() === currentUserId"
+                    (click)="cancelTask(task.id!)"
+                    class="w-full py-1.5 bg-red-50 hover:bg-red-100 border border-red-100 hover:border-red-200 text-red-600 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Cancel Task
+                </button>
+
+                <!-- Owner: Verify Completion -->
                 <button *ngIf="task.status === 'COMPLETED' && task.user_id?.toString() === currentUserId"
                     (click)="verifyCompletion(task.id!)"
-                    class="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    class="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white text-[10px] font-black uppercase tracking-wider rounded-lg transition-all shadow-md hover:shadow-purple-500/20 flex items-center justify-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    VERIFY COMPLETION
+                    Verify Done
                 </button>
 
-                <!-- Assignee: Mark as Completed (when task is ASSIGNED) -->
+                <!-- Owner: Show Proof (when COMPLETED) -->
+                <div *ngIf="task.status === 'COMPLETED' && task.user_id?.toString() === currentUserId" 
+                    class="p-2 bg-indigo-50 border border-indigo-100 rounded-lg space-y-1">
+                    <p class="text-[9px] font-black text-indigo-700 uppercase tracking-widest flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Proof of Work
+                    </p>
+                    <p *ngIf="task.proof_note" class="text-[10px] text-indigo-900 italic line-clamp-2">"{{ task.proof_note }}"</p>
+                    <a *ngIf="task.proof_picture_url" [href]="task.proof_picture_url" target="_blank" 
+                        class="text-[9px] font-bold text-accent hover:underline flex items-center gap-1">
+                        View Photo
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- Assignee: Complete Task with Proof -->
                 <button *ngIf="task.status === 'ASSIGNED' && task.assignee_id?.toString() === currentUserId"
-                    (click)="markAsCompleted(task.id!)"
-                    class="w-full py-2.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
+                    (click)="openCompleteModal(task)"
+                    class="w-full py-2 bg-green-600 hover:bg-green-700 text-white text-[10px] font-black uppercase tracking-wider rounded-lg transition-all shadow-md hover:shadow-green-500/20 flex items-center justify-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
-                    MARK AS COMPLETED
+                    Mark as Completed
                 </button>
 
-                <!-- Verified badge -->
-                <div *ngIf="task.status === 'VERIFIED'"
-                    class="w-full py-2.5 bg-purple-100 text-purple-700 text-xs font-bold rounded-lg flex items-center justify-center gap-2 border border-purple-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                <!-- Assignee: Cancel Commitment/Unassign -->
+                <button *ngIf="task.status === 'ASSIGNED' && task.assignee_id?.toString() === currentUserId"
+                    (click)="unassignTask(task.id!)"
+                    class="w-full py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
-                    TASK VERIFIED ✓
+                    Unassign Me
+                </button>
+
+                <!-- Status Badge for Verified -->
+                <div *ngIf="task.status === 'VERIFIED'"
+                    class="w-full py-2 bg-purple-50 text-purple-700 text-[9px] font-black uppercase tracking-wider rounded-lg flex items-center justify-center gap-1.5 border border-purple-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    </svg>
+                    Verified ✓
                 </div>
+
+                <!-- Owner: Rate Assignee (when VERIFIED) -->
+                <button *ngIf="task.status === 'VERIFIED' && task.user_id?.toString() === currentUserId && !reviewedTaskIds.has(task.id!)"
+                    (click)="openReviewModal(task)"
+                    class="w-full py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-[10px] font-black uppercase tracking-wider rounded-lg transition-all shadow-md hover:shadow-yellow-500/20 flex items-center justify-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                    </svg>
+                    Rate Assignee
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- ==================== EDIT TASK MODAL ==================== -->
+<!-- ==================== PREMIUM EDIT TASK MODAL ==================== -->
 <div *ngIf="editingTask"
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-brand-primary/40 backdrop-blur-md animate-fade-in"
     (click)="closeEditModal()">
-    <div class="bg-surface w-full max-w-lg rounded-2xl shadow-2xl border border-border overflow-hidden"
+    <div class="bg-surface w-full max-w-lg rounded-3xl shadow-2xl border border-white/20 overflow-hidden relative"
         (click)="$event.stopPropagation()">
+        
+        <!-- Subtle accent light -->
+        <div class="absolute -top-24 -left-24 w-48 h-48 bg-accent/20 rounded-full blur-3xl pointer-events-none"></div>
 
         <!-- Modal Header -->
-        <div class="flex items-center justify-between px-6 py-4 border-b border-border bg-brand-primary/5">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24"
+        <div class="relative flex items-center justify-between px-8 py-6 border-b border-border bg-brand-primary/5">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center shadow-inner border border-accent/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                 </div>
-                <h2 class="text-lg font-bold text-brand-primary">Edit Task</h2>
+                <div>
+                    <h2 class="text-xl font-black text-brand-primary tracking-tight">Edit Task</h2>
+                    <p class="text-[10px] text-brand-muted uppercase font-bold tracking-[0.2em] mt-0.5">Revise your task details</p>
+                </div>
             </div>
             <button (click)="closeEditModal()"
-                class="p-2 rounded-lg hover:bg-border transition-colors text-brand-muted hover:text-brand-primary">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                class="w-10 h-10 rounded-full hover:bg-border transition-all flex items-center justify-center text-brand-muted hover:text-brand-primary border border-transparent hover:border-border group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -205,85 +298,264 @@
         </div>
 
         <!-- Modal Body -->
-        <div class="p-6 space-y-4 max-h-[65vh] overflow-y-auto">
+        <div class="relative p-8 space-y-5 max-h-[70vh] overflow-y-auto custom-scrollbar">
 
             <!-- Title -->
-            <div>
-                <label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-1">Title <span
-                        class="text-red-500">*</span></label>
-                <input type="text" [(ngModel)]="editForm.title" placeholder="Task title"
-                    class="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-brand-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition">
+            <div class="space-y-1.5 focus-within:translate-x-1 transition-transform">
+                <label class="flex items-center gap-2 text-[10px] font-black text-brand-muted uppercase tracking-widest px-1">
+                    <span class="w-1 h-1 bg-accent rounded-full"></span>
+                    Task Title <span class="text-red-500">*</span>
+                </label>
+                <input type="text" [(ngModel)]="editForm.title" placeholder="What needs to be done?"
+                    class="w-full px-5 py-3 rounded-2xl border border-border bg-background/50 text-brand-primary text-sm font-medium focus:outline-none focus:ring-4 focus:ring-accent/10 focus:border-accent transition-all shadow-sm">
             </div>
 
             <!-- Description -->
-            <div>
-                <label
-                    class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-1">Description</label>
-                <textarea [(ngModel)]="editForm.description" rows="3" placeholder="Describe the task..."
-                    class="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-brand-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition resize-none"></textarea>
+            <div class="space-y-1.5 focus-within:translate-x-1 transition-transform">
+                <label class="flex items-center gap-2 text-[10px] font-black text-brand-muted uppercase tracking-widest px-1">
+                    <span class="w-1 h-1 bg-accent rounded-full"></span>
+                    Detailed Description
+                </label>
+                <textarea [(ngModel)]="editForm.description" rows="3" placeholder="Provide extra details for helpers..."
+                    class="w-full px-5 py-3 rounded-2xl border border-border bg-background/50 text-brand-primary text-sm font-medium focus:outline-none focus:ring-4 focus:ring-accent/10 focus:border-accent transition-all shadow-sm resize-none"></textarea>
             </div>
 
-            <!-- Location -->
-            <div>
-                <label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-1">Location <span
-                        class="text-red-500">*</span></label>
-                <input type="text" [(ngModel)]="editForm.location" placeholder="Task location"
-                    class="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-brand-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition">
-            </div>
-
-            <!-- Category -->
-            <div>
-                <label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-1">Category</label>
-                <select [(ngModel)]="editForm.category"
-                    class="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-brand-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition">
-                    <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-                </select>
-            </div>
-
-            <!-- Start & End Time -->
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-1">Start Time
-                        <span class="text-red-500">*</span></label>
-                    <input type="datetime-local" [(ngModel)]="editForm.start_time"
-                        class="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-brand-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition">
+            <!-- Two Column Grid for Meta -->
+            <div class="grid grid-cols-2 gap-5">
+                <div class="space-y-1.5 focus-within:translate-x-1 transition-transform">
+                    <label class="flex items-center gap-2 text-[10px] font-black text-brand-muted uppercase tracking-widest px-1">
+                        <span class="w-1 h-1 bg-accent rounded-full"></span>
+                        Location <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" [(ngModel)]="editForm.location" placeholder="Where is it?"
+                        class="w-full px-5 py-3 rounded-2xl border border-border bg-background/50 text-brand-primary text-sm font-medium focus:outline-none focus:ring-4 focus:ring-accent/10 focus:border-accent transition-all shadow-sm">
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-1">End
-                        Time</label>
+                <div class="space-y-1.5 focus-within:translate-x-1 transition-transform">
+                    <label class="flex items-center gap-2 text-[10px] font-black text-brand-muted uppercase tracking-widest px-1">
+                        <span class="w-1 h-1 bg-accent rounded-full"></span>
+                        Category
+                    </label>
+                    <select [(ngModel)]="editForm.category"
+                        class="w-full px-5 py-3 rounded-2xl border border-border bg-background/50 text-brand-primary text-sm font-medium focus:outline-none focus:ring-4 focus:ring-accent/10 focus:border-accent transition-all shadow-sm appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2024%2024%22%20stroke%3D%22%2364748b%22%3E%3Cpath%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%222%22%20d%3D%22m19%209-7%207-7-7%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1rem] bg-[right_1.25rem_center] bg-no-repeat">
+                        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Time Grid -->
+            <div class="grid grid-cols-2 gap-5">
+                <div class="space-y-1.5 focus-within:translate-x-1 transition-transform">
+                    <label class="flex items-center gap-2 text-[10px] font-black text-brand-muted uppercase tracking-widest px-1">
+                        <span class="w-1 h-1 bg-accent rounded-full"></span>
+                        Start Time <span class="text-red-500">*</span>
+                    </label>
+                    <input type="datetime-local" [(ngModel)]="editForm.start_time"
+                        class="w-full px-5 py-3 rounded-2xl border border-border bg-background/50 text-brand-primary text-sm font-medium focus:outline-none focus:ring-4 focus:ring-accent/10 focus:border-accent transition-all shadow-sm">
+                </div>
+                <div class="space-y-1.5 focus-within:translate-x-1 transition-transform">
+                    <label class="flex items-center gap-2 text-[10px] font-black text-brand-muted uppercase tracking-widest px-1">
+                        <span class="w-1 h-1 bg-accent rounded-full"></span>
+                        End Time
+                    </label>
                     <input type="datetime-local" [(ngModel)]="editForm.end_time"
-                        class="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-brand-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition">
+                        class="w-full px-5 py-3 rounded-2xl border border-border bg-background/50 text-brand-primary text-sm font-medium focus:outline-none focus:ring-4 focus:ring-accent/10 focus:border-accent transition-all shadow-sm">
                 </div>
             </div>
 
             <!-- Picture URL -->
-            <div>
-                <label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-1">Picture
-                    URL</label>
-                <input type="url" [(ngModel)]="editForm.picture_url" placeholder="https://..."
-                    class="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-brand-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition">
+            <div class="space-y-1.5 focus-within:translate-x-1 transition-transform">
+                <label class="flex items-center gap-2 text-[10px] font-black text-brand-muted uppercase tracking-widest px-1">
+                    <span class="w-1 h-1 bg-accent rounded-full"></span>
+                    Task Image URL
+                </label>
+                <input type="url" [(ngModel)]="editForm.picture_url" placeholder="https://images.unsplash.com/..."
+                    class="w-full px-5 py-3 rounded-2xl border border-border bg-background/50 text-brand-primary text-sm font-medium focus:outline-none focus:ring-4 focus:ring-accent/10 focus:border-accent transition-all shadow-sm">
+                <p class="text-[9px] text-brand-muted italic mt-1 px-1">Provide a direct link to an image (optional)</p>
             </div>
         </div>
 
         <!-- Modal Footer -->
-        <div class="px-6 py-4 border-t border-border flex justify-end gap-3 bg-brand-primary/5">
+        <div class="relative px-8 py-6 border-t border-border flex justify-end gap-3 bg-brand-primary/5">
             <button (click)="closeEditModal()" [disabled]="isSaving"
-                class="px-5 py-2.5 text-sm font-bold text-brand-muted border border-border rounded-lg hover:bg-border transition-colors disabled:opacity-50">
-                Cancel
+                class="px-6 py-2.5 text-xs font-black uppercase tracking-widest text-brand-muted hover:text-brand-primary border border-border hover:bg-border rounded-xl transition-all disabled:opacity-50">
+                Discard
             </button>
             <button (click)="saveEdit()"
                 [disabled]="isSaving || !editForm.title || !editForm.location || !editForm.start_time"
-                class="px-5 py-2.5 text-sm font-bold text-white bg-accent hover:bg-accent-hover rounded-lg transition-all shadow-md hover:shadow-accent/20 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                <svg *ngIf="isSaving" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+                class="px-8 py-2.5 text-xs font-black uppercase tracking-widest text-white bg-accent hover:bg-accent-hover rounded-xl transition-all shadow-lg shadow-accent/20 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg *ngIf="isSaving" class="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 14.627 0 12 8z"></path>
                 </svg>
-                <svg *ngIf="!isSaving" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                <svg *ngIf="!isSaving" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                 </svg>
-                {{ isSaving ? 'Saving...' : 'Save Changes' }}
+                {{ isSaving ? 'Saving' : 'Save Changes' }}
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== COMPLETE TASK MODAL ==================== -->
+<div *ngIf="completingTask"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-brand-primary/40 backdrop-blur-md animate-fade-in"
+    (click)="closeCompleteModal()">
+    <div class="bg-surface w-full max-w-md rounded-3xl shadow-2xl border border-white/20 overflow-hidden relative"
+        (click)="$event.stopPropagation()">
+
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-green-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Header -->
+        <div class="relative flex items-center justify-between px-8 py-6 border-b border-border bg-green-500/5">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-green-500/10 flex items-center justify-center shadow-inner border border-green-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-xl font-black text-brand-primary tracking-tight">Mark as Completed</h2>
+                    <p class="text-[10px] text-brand-muted uppercase font-bold tracking-[0.2em] mt-0.5">Submit your proof of work</p>
+                </div>
+            </div>
+            <button (click)="closeCompleteModal()"
+                class="w-10 h-10 rounded-full hover:bg-border transition-all flex items-center justify-center text-brand-muted hover:text-brand-primary border border-transparent hover:border-border group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="relative p-8 space-y-5">
+            <p class="text-sm text-brand-muted">
+                You're marking <span class="font-bold text-brand-primary">{{ completingTask.title }}</span> as completed. Optionally add a note or photo as proof.
+            </p>
+
+            <!-- Proof Note -->
+            <div class="space-y-1.5">
+                <label class="flex items-center gap-2 text-[10px] font-black text-brand-muted uppercase tracking-widest px-1">
+                    <span class="w-1 h-1 bg-green-500 rounded-full"></span>
+                    Completion Note (Optional)
+                </label>
+                <textarea [(ngModel)]="proofForm.proof_note" rows="3"
+                    placeholder="Describe what you did to complete this task..."
+                    class="w-full px-5 py-3 rounded-2xl border border-border bg-background/50 text-brand-primary text-sm font-medium focus:outline-none focus:ring-4 focus:ring-green-500/10 focus:border-green-500 transition-all shadow-sm resize-none"></textarea>
+            </div>
+
+            <!-- Proof Picture URL -->
+            <div class="space-y-1.5">
+                <label class="flex items-center gap-2 text-[10px] font-black text-brand-muted uppercase tracking-widest px-1">
+                    <span class="w-1 h-1 bg-green-500 rounded-full"></span>
+                    Proof Photo URL (Optional)
+                </label>
+                <input type="url" [(ngModel)]="proofForm.proof_picture_url"
+                    placeholder="https://..."
+                    class="w-full px-5 py-3 rounded-2xl border border-border bg-background/50 text-brand-primary text-sm font-medium focus:outline-none focus:ring-4 focus:ring-green-500/10 focus:border-green-500 transition-all shadow-sm">
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="relative px-8 py-6 border-t border-border flex justify-end gap-3 bg-green-500/5">
+            <button (click)="closeCompleteModal()" [disabled]="isCompleting"
+                class="px-6 py-2.5 text-xs font-black uppercase tracking-widest text-brand-muted hover:text-brand-primary border border-border hover:bg-border rounded-xl transition-all disabled:opacity-50">
+                Cancel
+            </button>
+            <button (click)="submitCompletion()" [disabled]="isCompleting"
+                class="px-8 py-2.5 text-xs font-black uppercase tracking-widest text-white bg-green-600 hover:bg-green-700 rounded-xl transition-all shadow-lg shadow-green-500/20 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg *ngIf="isCompleting" class="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                <svg *ngIf="!isCompleting" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+                {{ isCompleting ? 'Submitting...' : 'Submit Completion' }}
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== REVIEW MODAL ==================== -->
+<div *ngIf="reviewingTask"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-brand-primary/40 backdrop-blur-md animate-fade-in"
+    (click)="closeReviewModal()">
+    <div class="bg-surface w-full max-w-md rounded-3xl shadow-2xl border border-white/20 overflow-hidden relative"
+        (click)="$event.stopPropagation()">
+
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Header -->
+        <div class="relative flex items-center justify-between px-8 py-6 border-b border-border bg-yellow-500/5">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-yellow-500/10 flex items-center justify-center shadow-inner border border-yellow-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-xl font-black text-brand-primary tracking-tight">Rate Assignee</h2>
+                    <p class="text-[10px] text-brand-muted uppercase font-bold tracking-[0.2em] mt-0.5">Share your experience</p>
+                </div>
+            </div>
+            <button (click)="closeReviewModal()"
+                class="w-10 h-10 rounded-full hover:bg-border transition-all flex items-center justify-center text-brand-muted hover:text-brand-primary border border-transparent hover:border-border group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="relative p-8 space-y-5">
+            <p class="text-sm text-brand-muted">
+                Rate the helper for <span class="font-bold text-brand-primary">{{ reviewingTask.title }}</span>.
+            </p>
+
+            <!-- Star Rating -->
+            <div class="space-y-1.5">
+                <label class="flex items-center gap-2 text-[10px] font-black text-brand-muted uppercase tracking-widest px-1">
+                    <span class="w-1 h-1 bg-yellow-500 rounded-full"></span>
+                    Rating <span class="text-red-500">*</span>
+                </label>
+                <div class="flex gap-2 px-1">
+                    <button *ngFor="let star of [1,2,3,4,5]" (click)="reviewForm.rating = star" type="button"
+                        [class]="'text-2xl transition-transform hover:scale-110 ' + (reviewForm.rating >= star ? 'text-yellow-400' : 'text-gray-300')">
+                        ★
+                    </button>
+                </div>
+            </div>
+
+            <!-- Comment -->
+            <div class="space-y-1.5">
+                <label class="flex items-center gap-2 text-[10px] font-black text-brand-muted uppercase tracking-widest px-1">
+                    <span class="w-1 h-1 bg-yellow-500 rounded-full"></span>
+                    Comment (Optional)
+                </label>
+                <textarea [(ngModel)]="reviewForm.comment" rows="3"
+                    placeholder="How was your experience with this helper?"
+                    class="w-full px-5 py-3 rounded-2xl border border-border bg-background/50 text-brand-primary text-sm font-medium focus:outline-none focus:ring-4 focus:ring-yellow-500/10 focus:border-yellow-500 transition-all shadow-sm resize-none"></textarea>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="relative px-8 py-6 border-t border-border flex justify-end gap-3 bg-yellow-500/5">
+            <button (click)="closeReviewModal()" [disabled]="isReviewing"
+                class="px-6 py-2.5 text-xs font-black uppercase tracking-widest text-brand-muted hover:text-brand-primary border border-border hover:bg-border rounded-xl transition-all disabled:opacity-50">
+                Cancel
+            </button>
+            <button (click)="submitReview()" [disabled]="isReviewing"
+                class="px-8 py-2.5 text-xs font-black uppercase tracking-widest text-white bg-yellow-500 hover:bg-yellow-600 rounded-xl transition-all shadow-lg shadow-yellow-500/20 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg *ngIf="isReviewing" class="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                <svg *ngIf="!isReviewing" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                </svg>
+                {{ isReviewing ? 'Submitting...' : 'Submit Review' }}
             </button>
         </div>
     </div>

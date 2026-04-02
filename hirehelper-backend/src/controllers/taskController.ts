@@ -51,7 +51,7 @@ export const getMyTasks = async (req: AuthRequest, res: Response) => {
     try {
         const query = `
             SELECT * FROM tasks 
-            WHERE user_id = $1::integer 
+            WHERE user_id = $1::integer OR assignee_id = $1::integer
             ORDER BY created_at DESC;
         `;
         const result = await pool.query(query, [userId]);
@@ -101,17 +101,20 @@ export const getFeedTasks = async (req: AuthRequest, res: Response) => {
 };
 
 export const markTaskAsCompleted = async (req: AuthRequest, res: Response) => {
-    const { id } = req.params;
+        const { id } = req.params;
+    const { proof_note, proof_picture_url } = req.body;
     const userId = req.user?.id;
 
     try {
         const query = `
             UPDATE tasks
-            SET status = 'COMPLETED'
-            WHERE id = $1 AND assignee_id = $2
+            SET status = 'COMPLETED',
+                proof_note = $1,
+                proof_picture_url = $2
+            WHERE id = $3 AND assignee_id = $4
             RETURNING *;
         `;
-        const result = await pool.query(query, [id, userId]);
+        const result = await pool.query(query, [proof_note || null, proof_picture_url || null, id, userId]);
 
         if (result.rows.length === 0) {
             return res.status(403).json({ message: 'Unauthorized: You are not the assignee for this task' });
@@ -187,5 +190,72 @@ export const updateTask = async (req: AuthRequest, res: Response) => {
     } catch (error) {
         console.error('Error updating task:', error);
         res.status(500).json({ message: 'Server error while updating task' });
+    }
+};
+
+export const cancelTask = async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const userId = req.user?.id;
+
+    try {
+        const query = `
+            UPDATE tasks
+            SET status = 'CANCELLED'
+            WHERE id = $1 AND user_id = $2 AND (status = 'OPEN' OR status = 'ASSIGNED')
+            RETURNING *;
+        `;
+        const result = await pool.query(query, [id, userId]);
+
+        if (result.rows.length === 0) {
+            return res.status(403).json({ message: 'Unauthorized or task cannot be cancelled in its current state.' });
+        }
+
+        const task = result.rows[0];
+
+        // Notify assignee if any
+        if (task.assignee_id) {
+            await pool.query(`
+                INSERT INTO notifications (user_id, body)
+                VALUES ($1, $2);
+            `, [task.assignee_id, `Task "${task.title}" has been cancelled by the owner.`]);
+        }
+
+        res.status(200).json({ message: 'Task cancelled successfully', task: result.rows[0] });
+    } catch (error) {
+        console.error('Error cancelling task:', error);
+        res.status(500).json({ message: 'Server error while cancelling task' });
+    }
+};
+
+export const unassignTask = async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const userId = req.user?.id;
+
+    try {
+        const query = `
+            UPDATE tasks
+            SET status = 'OPEN',
+                assignee_id = NULL
+            WHERE id = $1 AND assignee_id = $2 AND status = 'ASSIGNED'
+            RETURNING *;
+        `;
+        const result = await pool.query(query, [id, userId]);
+
+        if (result.rows.length === 0) {
+            return res.status(403).json({ message: 'Unauthorized or you are not the assignee for this assigned task.' });
+        }
+
+        const task = result.rows[0];
+
+        // Notify owner
+        await pool.query(`
+            INSERT INTO notifications (user_id, body)
+            VALUES ($1, $2);
+        `, [task.user_id, `Assignee has cancelled their request for "${task.title}". The task is now OPEN again.`]);
+
+        res.status(200).json({ message: 'Unassigned from task successfully', task: result.rows[0] });
+    } catch (error) {
+        console.error('Error unassigning from task:', error);
+        res.status(500).json({ message: 'Server error while unassigning from task' });
     }
 };

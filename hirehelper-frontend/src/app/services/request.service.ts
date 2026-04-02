@@ -14,6 +14,8 @@ export interface RequestItem {
     location?: string;
     first_name?: string;
     last_name?: string;
+    owner_id?: number;
+    task_status?: string;
 }
 
 @Injectable({
@@ -38,5 +40,9 @@ export class RequestService {
 
     updateRequestStatus(requestId: number, status: 'ACCEPTED' | 'REJECTED'): Observable<any> {
         return this.http.put(`${this.apiUrl}/${requestId}`, { status });
+    }
+
+    cancelRequest(requestId: number): Observable<any> {
+        return this.http.delete(`${this.apiUrl}/${requestId}`);
     }
 }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
+import { ReviewService, Review } from '../../../services/review.service';
 
 @Component({
     selector: 'app-profile',
@@ -19,7 +20,12 @@ export class Profile implements OnInit {
         professional_title: ''
     };
 
+    reviews: Review[] = [];
+    reviewsGiven: Review[] = [];
+    loadingReviews = true;
+
     private toastService = inject(ToastService);
+    private reviewService = inject(ReviewService);
 
     constructor(public authService: AuthService) { }
 
@@ -33,15 +39,31 @@ export class Profile implements OnInit {
                 bio: user.bio || '',
                 professional_title: user.professional_title || ''
             };
+            this.reviewService.getReviewsForUser(user.id).subscribe({
+                next: (res) => {
+                    this.reviews = res.reviews;
+                    this.loadingReviews = false;
+                },
+                error: () => this.loadingReviews = false
+            });
+            this.reviewService.getReviewsGivenByUser(user.id).subscribe({
+                next: (res) => this.reviewsGiven = res.reviews,
+                error: () => {}
+            });
         }
+    }
+
+    get averageRating(): number {
+        if (!this.reviews.length) return 0;
+        return this.reviews.reduce((sum, r) => sum + r.rating, 0) / this.reviews.length;
     }
 
     updateProfile() {
         this.authService.updateProfile(this.profileData).subscribe({
-            next: (res) => {
+            next: () => {
                 this.toastService.showSuccess('Profile updated successfully! Information saved.');
             },
-            error: (err) => {
+            error: () => {
                 this.toastService.showError('Failed to update profile. Please try again.');
             }
         });

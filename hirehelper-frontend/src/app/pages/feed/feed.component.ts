@@ -18,7 +18,6 @@ import { RequestModalComponent } from '../../components/request-modal/request-mo
 export class FeedComponent implements OnInit {
     tasks: Task[] = [];
     loading = true;
-    errorMessage = '';
     isModalOpen = false;
     selectedTask: Task | null = null;
 
@@ -49,7 +48,7 @@ export class FeedComponent implements OnInit {
             },
             error: (err) => {
                 this.loading = false;
-                this.errorMessage = 'Failed to load task feed. Please try again later.';
+                this.toastService.showError('Failed to load task feed. Please try again later.');
                 console.error('Error fetching feed tasks:', err);
                 this.cdr.detectChanges();
             }
@@ -96,10 +95,10 @@ export class FeedComponent implements OnInit {
 
     getStatusClass(status: string | undefined): string {
         switch (status?.toUpperCase()) {
-            case 'OPEN': return 'bg-green-100 text-green-800 border-green-200';
-            case 'ASSIGNED': return 'bg-blue-100 text-blue-800 border-blue-200';
-            case 'COMPLETED': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-            default: return 'bg-gray-100 text-gray-800 border-gray-200';
+            case 'OPEN': return 'bg-green-100/50 text-green-700 border-2 border-green-200';
+            case 'ASSIGNED': return 'bg-blue-100/50 text-blue-700 border-2 border-blue-200';
+            case 'COMPLETED': return 'bg-yellow-100/50 text-yellow-700 border-2 border-yellow-200';
+            default: return 'bg-gray-100/50 text-gray-700 border-2 border-gray-200';
         }
     }
 }

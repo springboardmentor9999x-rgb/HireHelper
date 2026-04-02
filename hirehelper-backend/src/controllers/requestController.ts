@@ -42,19 +42,22 @@ export const sendRequest = async (req: AuthRequest, res: Response) => {
         }
 
         // Insert request
-        const insertQuery = `
+        const insertResult = await pool.query(`
             INSERT INTO requests (task_id, requester_id, message)
             VALUES ($1, $2, $3)
             RETURNING *;
-        `;
-        const insertResult = await pool.query(insertQuery, [task_id, requesterId, message]);
+        `, [task_id, requesterId, message]);
+
+        // Get requester's name
+        const requesterResult = await pool.query('SELECT first_name, last_name FROM users WHERE id = $1', [requesterId]);
+        const requester = requesterResult.rows[0];
+        const requesterName = `${requester.first_name} ${requester.last_name}`;
 
         // Create notification for task owner
-        const notificationQuery = `
+        await pool.query(`
             INSERT INTO notifications (user_id, body)
             VALUES ($1, $2);
-        `;
-        await pool.query(notificationQuery, [task.user_id, 'Someone requested to help with your task.']);
+        `, [task.user_id, `${requesterName} requested to help with your task: "${task.title}".`]);
 
         res.status(201).json({
             message: 'Request sent successfully',
@@ -77,11 +80,13 @@ export const updateRequestStatus = async (req: AuthRequest, res: Response) => {
     }
 
     try {
-        // Verify task owner
+        // Verify task owner and get details for notification
         const checkQuery = `
-            SELECT r.*, t.user_id as owner_id 
+            SELECT r.*, t.title as task_title, t.user_id as owner_id,
+                   u.first_name as owner_first, u.last_name as owner_last
             FROM requests r
             JOIN tasks t ON r.task_id = t.id
+            JOIN users u ON t.user_id = u.id
             WHERE r.id = $1;
         `;
         const checkResult = await pool.query(checkQuery, [id]);
@@ -97,30 +102,28 @@ export const updateRequestStatus = async (req: AuthRequest, res: Response) => {
         }
 
         // Update request status
-        const updateRequestQuery = `
+        const updatedRequest = await pool.query(`
             UPDATE requests
             SET status = $1
             WHERE id = $2
             RETURNING *;
-        `;
-        const updatedRequest = await pool.query(updateRequestQuery, [status, id]);
+        `, [status, id]);
 
         if (status === 'ACCEPTED') {
             // Update task as Assigned
-            const updateTaskQuery = `
+            await pool.query(`
                 UPDATE tasks
                 SET status = 'ASSIGNED',
                     assignee_id = $1
                 WHERE id = $2;
-            `;
-            await pool.query(updateTaskQuery, [request.requester_id, request.task_id]);
+            `, [request.requester_id, request.task_id]);
 
             // Create notification for requester
-            const notificationQuery = `
+            const ownerName = `${request.owner_first} ${request.owner_last}`;
+            await pool.query(`
                 INSERT INTO notifications (user_id, body)
                 VALUES ($1, $2);
-            `;
-            await pool.query(notificationQuery, [request.requester_id, 'Your request has been accepted.']);
+            `, [request.requester_id, `Your request for "${request.task_title}" has been accepted by ${ownerName}.`]);
         }
 
         res.status(200).json({
@@ -143,7 +146,7 @@ export const getMyRequests = async (req: AuthRequest, res: Response) => {
 
     try {
         const query = `
-            SELECT r.*, t.title, t.location
+            SELECT r.*, t.title, t.location, t.user_id as owner_id, t.status as task_status
             FROM requests r
             JOIN tasks t ON r.task_id = t.id
             WHERE r.requester_id = $1
@@ -184,5 +187,28 @@ export const getReceivedRequests = async (req: AuthRequest, res: Response) => {
     } catch (error) {
         console.error('Error fetching received requests:', error);
         res.status(500).json({ message: 'Server error while fetching received requests' });
+    }
+};
+
+export const cancelRequest = async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const requesterId = req.user?.id;
+
+    try {
+        const query = `
+            DELETE FROM requests
+            WHERE id = $1 AND requester_id = $2 AND status = 'PENDING'
+            RETURNING *;
+        `;
+        const result = await pool.query(query, [id, requesterId]);
+
+        if (result.rows.length === 0) {
+            return res.status(403).json({ message: 'Unauthorized or request cannot be cancelled (maybe it was already accepted/rejected).' });
+        }
+
+        res.status(200).json({ message: 'Request cancelled successfully', request: result.rows[0] });
+    } catch (error) {
+        console.error('Error cancelling request:', error);
+        res.status(500).json({ message: 'Server error while cancelling request' });
     }
 };

@@ -15,7 +15,6 @@ import { Subscription } from 'rxjs';
 export class NotificationsComponent implements OnInit, OnDestroy {
   notifications: NotificationItem[] = [];
   loading = true;
-  errorMessage = '';
   private toastService = inject(ToastService);
   private refreshSubscription?: Subscription;
 
@@ -49,7 +48,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.loading = false;
-        this.errorMessage = 'Failed to load notifications. Please try again.';
+        this.toastService.showError('Failed to load notifications. Please try again.');
         console.error('Error fetching notifications:', err);
         this.cdr.detectChanges();
       }
