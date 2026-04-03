@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
@@ -20,9 +20,15 @@ export class Profile implements OnInit {
         professional_title: ''
     };
 
-    reviews: Review[] = [];
-    reviewsGiven: Review[] = [];
-    loadingReviews = true;
+    reviews = signal<Review[]>([]);
+    reviewsGiven = signal<Review[]>([]);
+    loadingReviews = signal<boolean>(true);
+
+    averageRating = computed(() => {
+        const revs = this.reviews();
+        if (!revs.length) return 0;
+        return revs.reduce((sum, r) => sum + r.rating, 0) / revs.length;
+    });
 
     private toastService = inject(ToastService);
     private reviewService = inject(ReviewService);
@@ -41,22 +47,25 @@ export class Profile implements OnInit {
             };
             this.reviewService.getReviewsForUser(user.id).subscribe({
                 next: (res) => {
-                    this.reviews = res.reviews;
-                    this.loadingReviews = false;
+                    this.reviews.set(res.reviews || []);
+                    this.loadingReviews.set(false);
                 },
-                error: () => this.loadingReviews = false
+                error: (err) => {
+                    console.error('Error fetching received reviews:', err);
+                    this.loadingReviews.set(false);
+                    this.toastService.showError('Could not load reviews received.');
+                }
             });
             this.reviewService.getReviewsGivenByUser(user.id).subscribe({
-                next: (res) => this.reviewsGiven = res.reviews,
-                error: () => {}
+                next: (res) => this.reviewsGiven.set(res.reviews || []),
+                error: (err) => {
+                    console.error('Error fetching given reviews:', err);
+                    this.toastService.showError('Could not load reviews given.');
+                }
             });
         }
     }
 
-    get averageRating(): number {
-        if (!this.reviews.length) return 0;
-        return this.reviews.reduce((sum, r) => sum + r.rating, 0) / this.reviews.length;
-    }
 
     updateProfile() {
         this.authService.updateProfile(this.profileData).subscribe({

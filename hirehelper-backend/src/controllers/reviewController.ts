@@ -54,7 +54,7 @@ export const getReviewsGivenByUser = async (req: AuthRequest, res: Response) => 
             FROM reviews r
             JOIN users u ON r.reviewee_id = u.id
             JOIN tasks t ON r.task_id = t.id
-            WHERE r.reviewer_id = $1
+            WHERE r.reviewer_id = $1::integer
             ORDER BY r.created_at DESC;
         `;
         const result = await pool.query(query, [userId]);
@@ -75,7 +75,7 @@ export const getReviewsForUser = async (req: AuthRequest, res: Response) => {
             FROM reviews r
             JOIN users u ON r.reviewer_id = u.id
             JOIN tasks t ON r.task_id = t.id
-            WHERE r.reviewee_id = $1
+            WHERE r.reviewee_id = $1::integer
             ORDER BY r.created_at DESC;
         `;
         const result = await pool.query(query, [userId]);

@@ -1,0 +1,23 @@
+{
+  "count": 3,
+  "rows": [
+    {
+      "id": 1,
+      "first_name": "Manchi",
+      "last_name": "Phanindra",
+      "email_id": "phani@gmail.com"
+    },
+    {
+      "id": 2,
+      "first_name": "Rama",
+      "last_name": "Raju",
+      "email_id": "rama@gmail.com"
+    },
+    {
+      "id": 3,
+      "first_name": "Phani",
+      "last_name": "Manchi",
+      "email_id": "manchi@gmail.com"
+    }
+  ]
+}

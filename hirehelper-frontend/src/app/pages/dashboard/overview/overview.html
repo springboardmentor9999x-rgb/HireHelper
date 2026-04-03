@@ -12,26 +12,25 @@
         class="bg-accent/5 p-6 rounded border border-accent/10 flex flex-col justify-between group hover:bg-accent/10 transition-colors">
         <div>
           <span class="text-[10px] font-bold text-accent uppercase tracking-[0.2em]">Account Status</span>
-          <h3 class="font-bold text-slate-800 mt-1">Verified Entity</h3>
+          <h3 class="font-bold text-slate-800 mt-1">{{ accountStatus() }}</h3>
         </div>
-        <p class="text-xs text-brand-muted mt-4">Your credentials have been securely validated across our
-          enterprise network.</p>
+        <p class="text-xs text-brand-muted mt-4">Your profile is active and verified within the HireHelper ecosystem.</p>
       </div>
 
-      <div class="bg-slate-50 p-6 rounded border border-border flex flex-col justify-between opacity-60">
+      <div class="bg-white p-6 rounded border border-border flex flex-col justify-between hover:border-accent/30 transition-colors">
         <div>
           <span class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Active Tasks</span>
-          <h3 class="font-bold text-slate-800 mt-1">Pending Sync</h3>
+          <h3 class="font-bold text-slate-800 mt-1">{{ activeTasksCount() }} Tasks</h3>
         </div>
-        <p class="text-xs text-brand-muted mt-4">Task aggregation modules will be deployed in the next update.</p>
+        <p class="text-xs text-brand-muted mt-4">Tasks you have either created or are currently working on.</p>
       </div>
 
-      <div class="bg-slate-50 p-6 rounded border border-border flex flex-col justify-between opacity-60">
+      <div class="bg-white p-6 rounded border border-border flex flex-col justify-between hover:border-accent/30 transition-colors">
         <div>
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Service Analytics</span>
-          <h3 class="font-bold text-slate-800 mt-1">Initializing...</h3>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Verified Tasks</span>
+          <h3 class="font-bold text-slate-800 mt-1">{{ completedTasksCount() }} Completed</h3>
         </div>
-        <p class="text-xs text-brand-muted mt-4">Corporate performance metrics are being calculated.</p>
+        <p class="text-xs text-brand-muted mt-4">Successfully verified and archived tasks from your history.</p>
       </div>
     </div>
   </div>
