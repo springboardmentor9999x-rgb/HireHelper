@@ -175,7 +175,14 @@ exports.loginUser = async (req, res) => {
       email_id: user.rows[0].email_id,
       phone_number: user.rows[0].phone_number,
       is_verified: user.rows[0].is_verified,
-      profile_picture: user.rows[0].profile_picture
+      profile_picture: user.rows[0].profile_picture,
+      profession: user.rows[0].profession,
+      interests: user.rows[0].interests,
+      experience_years: user.rows[0].experience_years,
+      skills: user.rows[0].skills,
+      bio: user.rows[0].bio,
+      city: user.rows[0].city,
+      availability: user.rows[0].availability
     };
 
     return res.json({

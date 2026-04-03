@@ -92,7 +92,15 @@ async function initDbSchema() {
   `);
 
   await pool.query(`
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_picture TEXT;
+    ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS profile_picture TEXT,
+      ADD COLUMN IF NOT EXISTS profession VARCHAR(120),
+      ADD COLUMN IF NOT EXISTS interests TEXT,
+      ADD COLUMN IF NOT EXISTS experience_years INTEGER,
+      ADD COLUMN IF NOT EXISTS skills TEXT,
+      ADD COLUMN IF NOT EXISTS bio TEXT,
+      ADD COLUMN IF NOT EXISTS city VARCHAR(120),
+      ADD COLUMN IF NOT EXISTS availability VARCHAR(120);
   `);
 
   await pool.query(`

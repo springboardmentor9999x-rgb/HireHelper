@@ -16,7 +16,7 @@ import { OfferItem } from '../offers/offers';
 })
 export class FeedComponent implements OnInit {
   tasks: TaskItem[] = [];
-  offers: OfferItem[] = [];
+  topOffersByUserId: Record<string, OfferItem | null> = {};
   loading = true;
   error = '';
   actionMessage = '';
@@ -31,7 +31,6 @@ export class FeedComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadOffers();
     this.loadTasks();
     this.loadRequestedTasks();
   }
@@ -79,6 +78,7 @@ export class FeedComponent implements OnInit {
       .subscribe({
       next: (tasks) => {
         this.tasks = tasks;
+        this.buildTopOffersByUserMap(tasks);
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -108,16 +108,31 @@ export class FeedComponent implements OnInit {
     return task.status !== 'OPEN' || this.requestedTaskIds.has(task.id);
   }
 
-  getTopOffer(): OfferItem | null {
-    if (this.offers.length === 0) {
+  getTopOfferForTask(task: TaskItem): OfferItem | null {
+    if (!task.user_id) {
       return null;
     }
 
-    return [...this.offers]
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+    return this.topOffersByUserId[task.user_id] || null;
   }
 
-  private loadOffers(): void {
-    this.offers = this.taskService.getStoredOffers<OfferItem>();
+  private buildTopOffersByUserMap(tasks: TaskItem[]): void {
+    const ownerIds = Array.from(new Set(tasks.map((task) => task.user_id).filter(Boolean)));
+    const topOffers: Record<string, OfferItem | null> = {};
+
+    ownerIds.forEach((ownerId) => {
+      const offers = this.taskService.getStoredOffersForUser<OfferItem>(ownerId);
+
+      if (!offers.length) {
+        topOffers[ownerId] = null;
+        return;
+      }
+
+      topOffers[ownerId] = [...offers].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )[0];
+    });
+
+    this.topOffersByUserId = topOffers;
   }
 }

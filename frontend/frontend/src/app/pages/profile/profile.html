@@ -5,77 +5,140 @@
   [panelValue]="user?.is_verified ? 'Verified' : 'Pending'">
 </app-workspace-header>
 
-<section class="content">
+<section class="content" *ngIf="user">
   <p class="error-banner" *ngIf="error">{{ error }}</p>
 
-  <div class="profile-grid" *ngIf="user">
-    <article class="detail-card">
-      <span>First name</span>
-      <strong>{{ user.first_name }}</strong>
-    </article>
-    <article class="detail-card">
-      <span>Last name</span>
-      <strong>{{ user.last_name }}</strong>
-    </article>
-    <article class="detail-card">
-      <span>Email</span>
-      <strong>{{ user.email_id }}</strong>
-    </article>
-    <article class="detail-card">
-      <span>Phone</span>
-      <strong>{{ user.phone_number }}</strong>
-    </article>
-    <article class="detail-card profile-photo-card">
-      <span>Photo</span>
-      <strong class="photo-preview">
-        <img *ngIf="user?.profile_picture" [src]="user.profile_picture" alt="Profile photo" />
-        <span *ngIf="!user?.profile_picture" class="photo-placeholder">{{ userInitial }}</span>
-        <input type="file" #photoInput accept="image/*" (change)="onPhotoSelected($event)" hidden />
-        <button class="change-btn" type="button" (click)="photoInput.click()" [disabled]="photoLoading">
-          {{ photoLoading ? 'Uploading...' : 'Change Photo' }}
-        </button>
-      </strong>
-    </article>
-    <article class="detail-card change-password-card">
-      <span>Password</span>
-      <strong class="change-pwd-preview">
-        <button class="change-pwd-btn" type="button" (click)="togglePasswordForm()">
-          🔒 Change Password
-        </button>
-      </strong>
-    </article>
-    <article class="detail-card">
-      <span>Status</span>
-      <strong>{{ user.is_verified ? 'Verified' : 'Pending verification' }}</strong>
-    </article>
-  </div>
-
-  <article class="detail-card password-section" *ngIf="showPasswordForm">
-    <div class="section-header">
-      <h3>Change Password</h3>
-      <button class="toggle-btn" type="button" (click)="togglePasswordForm()">✕</button>
+  <article class="profile-shell">
+    <div class="profile-top-actions">
+      <button class="edit-profile-btn" type="button" (click)="toggleEditForm()">
+        {{ showEditForm ? 'Close Editor' : 'Edit Profile' }}
+      </button>
     </div>
 
-    <div (ngSubmit)="onPasswordSubmit(); $event.preventDefault()" role="form">
+    <div class="profile-hero">
+      <div class="avatar-wrap">
+        <img *ngIf="user.profile_picture" [src]="user.profile_picture" alt="Profile photo" />
+        <span *ngIf="!user.profile_picture" class="photo-placeholder">{{ userInitial }}</span>
+      </div>
+      <h2>{{ userName }}</h2>
+      <p>{{ user.email_id }}</p>
+      <div class="hero-chips">
+        <span class="chip">{{ user.is_verified ? 'Verified Account' : 'Pending Verification' }}</span>
+        <span class="chip ghost">{{ displayValue(user.profession) }}</span>
+      </div>
+    </div>
+
+    <div class="details-grid">
+      <article class="detail-card"><span>First Name</span><strong>{{ displayValue(user.first_name) }}</strong></article>
+      <article class="detail-card"><span>Last Name</span><strong>{{ displayValue(user.last_name) }}</strong></article>
+      <article class="detail-card"><span>Email</span><strong>{{ displayValue(user.email_id) }}</strong></article>
+      <article class="detail-card"><span>Phone</span><strong>{{ displayValue(user.phone_number) }}</strong></article>
+      <article class="detail-card"><span>Profession</span><strong>{{ displayValue(user.profession) }}</strong></article>
+      <article class="detail-card"><span>Experience</span><strong>{{ user.experience_years !== null && user.experience_years !== undefined ? (user.experience_years + ' year(s)') : 'Not provided' }}</strong></article>
+      <article class="detail-card"><span>Interests</span><strong>{{ displayValue(user.interests) }}</strong></article>
+      <article class="detail-card"><span>Skills</span><strong>{{ displayValue(user.skills) }}</strong></article>
+      <article class="detail-card"><span>City</span><strong>{{ displayValue(user.city) }}</strong></article>
+      <article class="detail-card"><span>Availability</span><strong>{{ displayValue(user.availability) }}</strong></article>
+      <article class="detail-card detail-wide"><span>Bio</span><strong>{{ displayValue(user.bio) }}</strong></article>
+    </div>
+  </article>
+
+  <article class="editor-card" *ngIf="showEditForm">
+    <div class="section-header">
+      <h3>Edit Profile</h3>
+      <p>Update your helper information so others can trust and pick you quickly.</p>
+    </div>
+
+    <div class="profile-edit-layout" (ngSubmit)="onEditSubmit(); $event.preventDefault()" role="form">
       <label>
-        <span>Current Password</span>
-        <input type="password" autocomplete="current-password" [(ngModel)]="passwordForm.currentPassword" [ngModelOptions]="{standalone: true}" required />
+        <span>First Name</span>
+        <input type="text" [(ngModel)]="profileForm.first_name" [ngModelOptions]="{standalone: true}" required />
       </label>
       <label>
-        <span>New Password</span>
-        <input type="password" autocomplete="new-password" [(ngModel)]="passwordForm.newPassword" [ngModelOptions]="{standalone: true}" required minlength="6" />
+        <span>Last Name</span>
+        <input type="text" [(ngModel)]="profileForm.last_name" [ngModelOptions]="{standalone: true}" required />
       </label>
       <label class="full">
-        <span>Confirm New Password</span>
-        <input type="password" autocomplete="new-password" [(ngModel)]="passwordForm.confirmNewPassword" [ngModelOptions]="{standalone: true}" required />
+        <span>Email</span>
+        <input type="email" [(ngModel)]="profileForm.email_id" [ngModelOptions]="{standalone: true}" disabled />
+      </label>
+      <label>
+        <span>Phone</span>
+        <input type="text" [(ngModel)]="profileForm.phone_number" [ngModelOptions]="{standalone: true}" required />
+      </label>
+      <label>
+        <span>Profession</span>
+        <input type="text" [(ngModel)]="profileForm.profession" [ngModelOptions]="{standalone: true}" placeholder="Electrician, Carpenter, Tutor" />
+      </label>
+      <label>
+        <span>Experience (Years)</span>
+        <input type="number" min="0" [(ngModel)]="profileForm.experience_years" [ngModelOptions]="{standalone: true}" />
+      </label>
+      <label>
+        <span>City</span>
+        <input type="text" [(ngModel)]="profileForm.city" [ngModelOptions]="{standalone: true}" placeholder="Pune" />
+      </label>
+      <label>
+        <span>Availability</span>
+        <input type="text" [(ngModel)]="profileForm.availability" [ngModelOptions]="{standalone: true}" placeholder="Weekends, Evening shifts" />
+      </label>
+      <label class="full">
+        <span>Skills</span>
+        <input type="text" [(ngModel)]="profileForm.skills" [ngModelOptions]="{standalone: true}" placeholder="Wiring, plumbing, painting" />
+      </label>
+      <label class="full">
+        <span>Interests</span>
+        <input type="text" [(ngModel)]="profileForm.interests" [ngModelOptions]="{standalone: true}" placeholder="Home repairs, gardening" />
+      </label>
+      <label class="full">
+        <span>Bio</span>
+        <textarea rows="3" [(ngModel)]="profileForm.bio" [ngModelOptions]="{standalone: true}" placeholder="A quick intro about your helper experience."></textarea>
       </label>
 
-      <p class="pwd-error" *ngIf="pwdError">{{ pwdError }}</p>
-      <p class="pwd-success" *ngIf="pwdSuccess">{{ pwdSuccess }}</p>
+      <div class="edit-photo-row full">
+        <span>Profile Photo</span>
+        <div class="photo-preview">
+          <img *ngIf="user.profile_picture" [src]="user.profile_picture" alt="Profile photo" />
+          <span *ngIf="!user.profile_picture" class="photo-placeholder">{{ userInitial }}</span>
+        </div>
+        <input type="file" #photoInput accept="image/*" (change)="onPhotoSelected($event)" hidden />
+        <button class="inline-btn" type="button" (click)="photoInput.click()" [disabled]="photoLoading">
+          {{ photoLoading ? 'Uploading...' : 'Change Photo' }}
+        </button>
+      </div>
 
-      <div class="form-actions">
-        <button type="button" (click)="onPasswordSubmit()" [disabled]="loading">
-          {{ loading ? 'Updating...' : 'Update Password' }}
+      <div class="edit-inline-actions full">
+        <button class="inline-btn secondary" type="button" (click)="togglePasswordForm()">
+          {{ showPasswordForm ? 'Hide Password Form' : 'Change Password' }}
+        </button>
+      </div>
+
+      <div class="password-form full" *ngIf="showPasswordForm">
+        <label>
+          <span>Current Password</span>
+          <input type="password" autocomplete="current-password" [(ngModel)]="passwordForm.currentPassword" [ngModelOptions]="{standalone: true}" required />
+        </label>
+        <label>
+          <span>New Password</span>
+          <input type="password" autocomplete="new-password" [(ngModel)]="passwordForm.newPassword" [ngModelOptions]="{standalone: true}" required minlength="6" />
+        </label>
+        <label class="full">
+          <span>Confirm New Password</span>
+          <input type="password" autocomplete="new-password" [(ngModel)]="passwordForm.confirmNewPassword" [ngModelOptions]="{standalone: true}" required />
+        </label>
+
+        <p class="pwd-error" *ngIf="pwdError">{{ pwdError }}</p>
+
+        <div class="form-actions compact">
+          <button type="button" (click)="onPasswordSubmit()" [disabled]="loading">
+            {{ loading ? 'Updating...' : 'Update Password' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="form-actions full">
+        <button type="button" (click)="onEditSubmit()" [disabled]="editLoading">
+          {{ editLoading ? 'Saving...' : 'Save Changes' }}
         </button>
       </div>
     </div>

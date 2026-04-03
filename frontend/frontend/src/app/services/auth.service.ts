@@ -10,6 +10,27 @@ export interface AppUser {
   phone_number: string;
   is_verified: boolean;
   profile_picture?: string;
+  profession?: string;
+  interests?: string;
+  experience_years?: number | null;
+  skills?: string;
+  bio?: string;
+  city?: string;
+  availability?: string;
+}
+
+export interface UpdateProfilePayload {
+  first_name: string;
+  last_name: string;
+  phone_number: string;
+  profile_picture?: string;
+  profession?: string;
+  interests?: string;
+  experience_years?: number | null;
+  skills?: string;
+  bio?: string;
+  city?: string;
+  availability?: string;
 }
 
 @Injectable({
@@ -62,6 +83,12 @@ export class AuthService {
 
   getCurrentUser(): Observable<AppUser> {
     return this.http.get<AppUser>(`${this.userBaseUrl}/me`).pipe(
+      tap((user) => this.saveUser(user))
+    );
+  }
+
+  updateCurrentUser(data: UpdateProfilePayload): Observable<AppUser> {
+    return this.http.put<AppUser>(`${this.userBaseUrl}/me`, data).pipe(
       tap((user) => this.saveUser(user))
     );
   }

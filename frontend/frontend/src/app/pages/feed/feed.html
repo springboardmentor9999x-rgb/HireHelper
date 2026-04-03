@@ -29,7 +29,7 @@
       <div class="card-glow"></div>
       <div class="task-image-wrap">
         <img *ngIf="task.picture" class="task-image" [src]="task.picture" [alt]="task.title" />
-        <span class="offer-image-badge" *ngIf="getTopOffer() as topOffer">{{ topOffer.discount }}% OFF</span>
+        <span class="offer-image-badge" *ngIf="getTopOfferForTask(task) as topOffer">{{ topOffer.discount }}% OFF</span>
       </div>
       <div class="task-content-scroll">
         <div class="task-head">

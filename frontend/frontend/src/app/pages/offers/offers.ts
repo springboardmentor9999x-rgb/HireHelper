@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { WorkspaceHeaderComponent } from '../../components/workspace-header/workspace-header';
 import { TaskService } from '../../services/task.service';
+import { AuthService } from '../../services/auth.service';
 
 export interface OfferItem {
   id: string;
@@ -23,8 +24,6 @@ export interface OfferItem {
   styleUrls: ['./offers.css']
 })
 export class OffersComponent implements OnInit {
-  private readonly offersStorageKey = 'hirehelper_offers';
-
   offers: OfferItem[] = [];
   submitting = false;
 
@@ -32,7 +31,8 @@ export class OffersComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private taskService: TaskService
+    private taskService: TaskService,
+    private auth: AuthService
   ) {
     this.offerForm = this.fb.group({
       title: ['', [Validators.required, Validators.maxLength(100)]],
@@ -51,6 +51,12 @@ export class OffersComponent implements OnInit {
   }
 
   createOffer(): void {
+    const userId = this.getCurrentUserId();
+    if (!userId) {
+      this.errorAlert('Unable to identify logged in user. Please login again.');
+      return;
+    }
+
     if (this.offerForm.invalid) {
       this.offerForm.markAllAsTouched();
       return;
@@ -69,7 +75,7 @@ export class OffersComponent implements OnInit {
     };
 
     this.offers = [nextOffer, ...this.offers];
-    this.persistOffers();
+    this.persistOffers(userId);
     this.taskService.addLocalNotification(
       `Offer created: "${nextOffer.title}" with ${nextOffer.discount}% off.`
     );
@@ -86,35 +92,40 @@ export class OffersComponent implements OnInit {
   }
 
   removeOffer(offerId: string): void {
+    const userId = this.getCurrentUserId();
+    if (!userId) {
+      this.errorAlert('Unable to identify logged in user. Please login again.');
+      return;
+    }
+
     this.offers = this.offers.filter((offer) => offer.id !== offerId);
-    this.persistOffers();
+    this.persistOffers(userId);
   }
 
   private loadOffers(): void {
-    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
-      return;
-    }
-
-    const raw = localStorage.getItem(this.offersStorageKey);
-    if (!raw) {
+    const userId = this.getCurrentUserId();
+    if (!userId) {
       this.offers = [];
       return;
     }
 
-    try {
-      const parsed = JSON.parse(raw) as OfferItem[];
-      this.offers = Array.isArray(parsed) ? parsed : [];
-    } catch {
-      this.offers = [];
-      localStorage.removeItem(this.offersStorageKey);
-    }
+    this.offers = this.taskService.getStoredOffersForUser<OfferItem>(userId);
   }
 
-  private persistOffers(): void {
-    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
-      return;
-    }
+  private persistOffers(userId: string): void {
+    this.taskService.saveOffersForUser<OfferItem>(userId, this.offers);
+  }
 
-    localStorage.setItem(this.offersStorageKey, JSON.stringify(this.offers));
+  private getCurrentUserId(): string | null {
+    return this.auth.getStoredUser()?.id || null;
+  }
+
+  private errorAlert(message: string): void {
+    Swal.fire({
+      icon: 'error',
+      title: 'Action Failed',
+      text: message,
+      confirmButtonColor: '#dc2626'
+    });
   }
 }

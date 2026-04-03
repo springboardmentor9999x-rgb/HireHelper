@@ -85,7 +85,7 @@ export class TaskService {
   private readonly requestUrl = 'http://localhost:5000/api/requests';
   private readonly pendingTaskKey = 'pendingCreatedTask';
   private readonly localNotificationsKey = 'hirehelper_local_notifications';
-  private readonly offersStorageKey = 'hirehelper_offers';
+  private readonly offersStorageKeyPrefix = 'hirehelper_offers';
   private notificationSubject = new BehaviorSubject<number>(0);
   notifications$ = this.notificationSubject.asObservable();
 
@@ -245,12 +245,13 @@ export class TaskService {
     localStorage.removeItem(this.pendingTaskKey);
   }
 
-  getStoredOffers<T>(): T[] {
+  getStoredOffersForUser<T>(userId: string): T[] {
     if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
       return [];
     }
 
-    const raw = localStorage.getItem(this.offersStorageKey);
+    const storageKey = this.getOffersStorageKey(userId);
+    const raw = localStorage.getItem(storageKey);
     if (!raw) {
       return [];
     }
@@ -259,9 +260,22 @@ export class TaskService {
       const parsed = JSON.parse(raw) as T[];
       return Array.isArray(parsed) ? parsed : [];
     } catch {
-      localStorage.removeItem(this.offersStorageKey);
+      localStorage.removeItem(storageKey);
       return [];
     }
+  }
+
+  saveOffersForUser<T>(userId: string, offers: T[]): void {
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      return;
+    }
+
+    const storageKey = this.getOffersStorageKey(userId);
+    localStorage.setItem(storageKey, JSON.stringify(offers));
+  }
+
+  private getOffersStorageKey(userId: string): string {
+    return `${this.offersStorageKeyPrefix}_${userId}`;
   }
 
   private getLocalNotifications(): NotificationItem[] {

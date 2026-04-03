@@ -11,6 +11,7 @@
   display: flex;
   min-height: 100vh;
   font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  position: relative;
 }
 
 .sidebar {
@@ -30,6 +31,80 @@
   color: #f8fafc;
   border-right: 1px solid rgba(148, 163, 184, 0.22);
   backdrop-filter: blur(10px);
+  transition: width 0.25s ease, transform 0.25s ease, padding 0.25s ease, opacity 0.2s ease;
+}
+
+.sidebar-toggle {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(15, 23, 42, 0.8);
+  color: #e2e8f0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.toggle-tooltip {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 8px);
+  transform: translateY(-50%);
+  background: rgba(15, 23, 42, 0.95);
+  color: #e2e8f0;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 8px;
+  padding: 5px 8px;
+  font-size: 0.78rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease;
+  pointer-events: none;
+  z-index: 3000;
+}
+
+.sidebar-toggle:hover .toggle-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.sidebar-toggle.top {
+  align-self: flex-end;
+  margin-bottom: 8px;
+}
+
+.sidebar-toggle.top .toggle-tooltip {
+  left: auto;
+  right: calc(100% + 8px);
+}
+
+.sidebar-toggle.floating {
+  position: fixed;
+  top: 14px;
+  left: 8px;
+  z-index: 1200;
+  box-shadow: 0 12px 24px rgba(2, 6, 23, 0.45);
+}
+
+.sidebar-toggle.floating .toggle-tooltip {
+  left: calc(100% + 10px);
+}
+
+.layout.sidebar-collapsed .sidebar {
+  width: 0;
+  min-width: 0;
+  padding-left: 0;
+  padding-right: 0;
+  border-right: 0;
+  opacity: 0;
+  transform: translateX(-100%);
+  overflow: hidden;
 }
 
 .sidebar::-webkit-scrollbar {
@@ -157,6 +232,11 @@ nav a:hover {
 
   .main {
     padding: 22px 18px 28px;
+  }
+
+  .sidebar-toggle.top,
+  .sidebar-toggle.floating {
+    display: none;
   }
 }
 

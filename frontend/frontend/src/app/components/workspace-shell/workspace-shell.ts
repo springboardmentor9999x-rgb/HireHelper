@@ -1,10 +1,7 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { TaskService, NotificationItem } from '../../services/task.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 
 @Component({
   selector: 'app-workspace-shell',
@@ -16,6 +13,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 export class WorkspaceShellComponent {
   private auth = inject(AuthService);
   private router = inject(Router);
+  isSidebarCollapsed = false;
+
+  toggleSidebar(): void {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+  }
 
   logout(): void {
     this.auth.logout();

@@ -1,5 +1,10 @@
-<div class="layout">
+<div class="layout" [class.sidebar-collapsed]="isSidebarCollapsed">
   <aside class="sidebar">
+    <button class="sidebar-toggle top" type="button" (click)="toggleSidebar()" aria-label="Hide sidebar">
+      <span>&lt;</span>
+      <span class="toggle-tooltip">Hide sidebar</span>
+    </button>
+
     <div class="brand-block">
       <p class="brand-kicker">Operations desk</p>
       <h2 class="logo">HireHelper</h2>
@@ -22,6 +27,16 @@
       <button class="logout" (click)="logout()">Logout</button>
     </div>
   </aside>
+
+  <button
+    class="sidebar-toggle floating"
+    type="button"
+    *ngIf="isSidebarCollapsed"
+    (click)="toggleSidebar()"
+    aria-label="Show sidebar">
+    <span>&gt;</span>
+    <span class="toggle-tooltip">Show sidebar</span>
+  </button>
 
   <main class="main">
     <router-outlet></router-outlet>
