@@ -77,15 +77,14 @@
         <span class="text-sm font-semibold tracking-wide">Received Requests</span>
       </a>
 
-      <a routerLink="/dashboard/notifications" routerLinkActive="bg-white/10 border-r-4 border-accent"
-        class="flex items-center justify-between p-3.5 rounded-sm hover:bg-white/5 transition-all group">
-        <div class="flex items-center space-x-3">
-          <svg class="w-5 h-5 text-white/60 group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
-          <span class="text-sm font-semibold tracking-wide">Notifications</span>
-        </div>
-        <span *ngIf="unreadNotificationsCount > 0" class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">{{ unreadNotificationsCount }}</span>
+
+      <a routerLink="/dashboard/settings" routerLinkActive="bg-white/10 border-r-4 border-accent"
+        class="flex items-center space-x-3 p-3.5 rounded-sm hover:bg-white/5 transition-all group">
+        <svg class="w-5 h-5 text-white/60 group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span class="text-sm font-semibold tracking-wide">Settings</span>
       </a>
     </nav>
 
@@ -108,22 +107,38 @@
         <div class="w-1.5 h-6 bg-accent rounded-full"></div>
         <h1 class="text-xl font-bold text-slate-900 tracking-tight">Dashboard Overview</h1>
       </div>
-      <a routerLink="/dashboard/profile"
-        class="flex items-center space-x-4 cursor-pointer hover:opacity-80 transition-all">
+      <div class="flex items-center space-x-6">
+        <!-- Notification Bell -->
+        <a routerLink="/dashboard/notifications" routerLinkActive="text-accent"
+          class="relative p-2 text-slate-400 hover:text-accent transition-all duration-300 hover:scale-110 active:scale-95 group">
+          <svg class="w-6 h-6 group-hover:drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+          <span *ngIf="unreadNotificationsCount > 0"
+            class="absolute top-1.5 right-1.5 inline-flex items-center justify-center w-4 h-4 text-[9px] font-bold leading-none text-white bg-red-500 rounded-full border-2 border-white shadow-sm transform translate-x-1 -translate-y-1 animate-pulse">
+            {{ unreadNotificationsCount }}
+          </span>
+        </a>
+
+        <a routerLink="/dashboard/profile"
+          class="flex items-center space-x-4 cursor-pointer hover:opacity-80 transition-all">
         <div class="text-right sm:block">
           <p class="text-xl font-bold text-slate-900 tracking-tight">{{
             authService.currentUser()?.first_name }} {{ authService.currentUser()?.last_name }}</p>
           <p class="text-[10px] text-brand-muted uppercase tracking-wider">Enterprise Member</p>
         </div>
         <div
-          class="w-11 h-11 rounded-md bg-accent/10 flex items-center justify-center border border-accent/20 shadow-sm relative cursor-pointer">
-          <span class="relative z-10 text-slate-900 font-black text-base uppercase leading-none">
+          class="w-11 h-11 rounded-md bg-accent/10 flex items-center justify-center border border-accent/20 shadow-sm relative cursor-pointer overflow-hidden">
+          <img *ngIf="authService.currentUser()?.picture_url" [src]="authService.currentUser()?.picture_url" class="w-full h-full object-cover relative z-10">
+          <span class="relative z-10 text-slate-900 font-black text-base uppercase leading-none" *ngIf="!authService.currentUser()?.picture_url">
             {{ (authService.currentUser()?.first_name?.charAt(0) || '') }}{{
             (authService.currentUser()?.last_name?.charAt(0) || '') || '??' }}
           </span>
         </div>
       </a>
-    </header>
+    </div>
+  </header>
 
     <div class="flex-grow p-6 lg:p-10 overflow-auto space-y-8 animate-fade-in">
       <router-outlet></router-outlet>

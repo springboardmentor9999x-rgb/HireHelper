@@ -10,6 +10,11 @@ export const createReview = async (req: AuthRequest, res: Response) => {
         return res.status(400).json({ message: 'Task ID, Reviewee ID, and Rating are required.' });
     }
 
+    // Validate: A user cannot review themselves
+    if (parseInt(reviewee_id) === reviewerId) {
+        return res.status(400).json({ message: 'You cannot review yourself.' });
+    }
+
     try {
         // Validate: Task must be VERIFIED
         const taskQuery = 'SELECT status FROM tasks WHERE id = $1';

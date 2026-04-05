@@ -33,4 +33,8 @@ export class NotificationService {
     markAsRead(id: number): Observable<any> {
         return this.http.patch(`${this.apiUrl}/${id}/read`, {});
     }
+
+    markAllAsRead(): Observable<any> {
+        return this.http.patch(`${this.apiUrl}/read-all`, {});
+    }
 }

@@ -56,3 +56,29 @@ export const markAsRead = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ message: 'Server error while updating notification' });
     }
 };
+
+export const markAllAsRead = async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.id;
+
+    if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    try {
+        const query = `
+            UPDATE notifications
+            SET is_read = true
+            WHERE user_id = $1 AND is_read = false
+            RETURNING *;
+        `;
+        const result = await pool.query(query, [userId]);
+
+        res.status(200).json({
+            message: 'All notifications marked as read',
+            count: result.rowCount
+        });
+    } catch (error) {
+        console.error('Error marking all notifications as read:', error);
+        res.status(500).json({ message: 'Server error while updating notifications' });
+    }
+};

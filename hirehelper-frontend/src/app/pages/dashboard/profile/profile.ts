@@ -17,8 +17,11 @@ export class Profile implements OnInit {
         last_name: '',
         phone_number: '',
         bio: '',
-        professional_title: ''
+        professional_title: '',
+        picture_url: ''
     };
+
+    isUploading = signal(false);
 
     reviews = signal<Review[]>([]);
     reviewsGiven = signal<Review[]>([]);
@@ -43,7 +46,8 @@ export class Profile implements OnInit {
                 last_name: user.last_name || '',
                 phone_number: user.phone_number || '',
                 bio: user.bio || '',
-                professional_title: user.professional_title || ''
+                professional_title: user.professional_title || '',
+                picture_url: user.picture_url || ''
             };
             this.reviewService.getReviewsForUser(user.id).subscribe({
                 next: (res) => {
@@ -76,5 +80,24 @@ export class Profile implements OnInit {
                 this.toastService.showError('Failed to update profile. Please try again.');
             }
         });
+    }
+
+    onFileSelected(event: any) {
+        const file: File = event.target.files[0];
+        if (file) {
+            this.isUploading.set(true);
+            this.authService.uploadProfilePicture(file).subscribe({
+                next: (res) => {
+                    this.isUploading.set(true);
+                    this.profileData.picture_url = res.picture_url;
+                    this.toastService.showSuccess('Profile picture updated successfully.');
+                    this.isUploading.set(false);
+                },
+                error: () => {
+                    this.isUploading.set(false);
+                    this.toastService.showError('Failed to upload picture.');
+                }
+            });
+        }
     }
 }

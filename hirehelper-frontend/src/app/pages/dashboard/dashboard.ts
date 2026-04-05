@@ -18,6 +18,7 @@ export class Dashboard implements OnInit, OnDestroy {
   unreadNotificationsCount = 0;
   private lastNotificationIds: Set<number> = new Set();
   private pollingSubscription?: Subscription;
+  private refreshSubscription?: Subscription;
 
   constructor(
     public authService: AuthService, 
@@ -33,11 +34,19 @@ export class Dashboard implements OnInit, OnDestroy {
     this.pollingSubscription = interval(30000).subscribe(() => {
       this.fetchUnreadNotificationsCount();
     });
+
+    // Listen for manual refreshes
+    this.refreshSubscription = this.notificationService.refresh$.subscribe(() => {
+      this.fetchUnreadNotificationsCount(true); // Refresh count without showing new toasts
+    });
   }
 
   ngOnDestroy(): void {
     if (this.pollingSubscription) {
       this.pollingSubscription.unsubscribe();
+    }
+    if (this.refreshSubscription) {
+      this.refreshSubscription.unsubscribe();
     }
   }
 

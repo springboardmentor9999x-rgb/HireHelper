@@ -1,0 +1,13 @@
+﻿[dotenv@17.3.1] injecting env (10) from .env -- tip: ≡ƒöÉ encrypt with Dotenvx: https://dotenvx.com
+Database Connected Successfully
+id (integer)
+first_name (character varying)
+last_name (character varying)
+phone_number (character varying)
+email_id (character varying)
+password (character varying)
+role (character varying)
+otp (character varying)
+otp_expiry (timestamp without time zone)
+is_verified (boolean)
+created_at (timestamp without time zone)

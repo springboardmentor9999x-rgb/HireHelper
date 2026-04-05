@@ -1,0 +1,110 @@
+<div class="space-y-8 animate-fade-in">
+  <div class="bg-white p-8 lg:p-12 rounded-lg shadow-xl shadow-slate-200/50 border border-border">
+    <div class="mb-10">
+      <h2 class="text-3xl font-bold text-slate-900 tracking-tight">System Preferences</h2>
+      <p class="text-brand-muted mt-2">Customize your organizational dashboard and notification environment.</p>
+    </div>
+
+    <div class="space-y-12 max-w-2xl">
+      <!-- Notification Settings -->
+      <section class="space-y-6">
+        <div class="flex items-center space-x-3">
+          <div class="w-1 h-6 bg-accent rounded-full"></div>
+          <h3 class="text-sm font-black uppercase tracking-[0.2em] text-slate-400">Notification Protocol</h3>
+        </div>
+        
+        <div class="bg-slate-50 p-6 rounded-xl border border-border flex items-center justify-between hover:bg-white transition-all group">
+          <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center text-accent group-hover:scale-110 transition-transform">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-900">Push Notifications</h4>
+              <p class="text-xs text-brand-muted mt-0.5">Real-time alerts for task updates and requests.</p>
+            </div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" [(ngModel)]="settings.notifications_enabled" class="sr-only peer">
+            <div class="w-14 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+          </label>
+        </div>
+
+        <button (click)="saveSettings()" [disabled]="isLoading()"
+          class="bg-brand-primary text-white px-10 py-4 rounded font-bold text-sm uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg active:scale-[0.98] disabled:opacity-60 flex items-center gap-3">
+          @if (isLoading()) {
+            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+          }
+          Synchronize Preferences
+        </button>
+      </section>
+
+      <!-- Password Management -->
+      <section class="mt-8 pt-10 border-t border-slate-100">
+        <div class="flex items-center space-x-3 mb-6">
+          <div class="w-1 h-6 bg-accent rounded-full"></div>
+          <h3 class="text-sm font-black uppercase tracking-[0.2em] text-slate-400">Security Credentials</h3>
+        </div>
+
+        <form (ngSubmit)="changePassword()" class="space-y-6">
+          <div class="space-y-2">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Current Password</label>
+            <input type="password" [(ngModel)]="passwordData.old_password" name="old_password" required
+                class="w-full bg-slate-50 border border-border p-3.5 rounded focus:outline-none focus:border-accent transition-colors text-sm" placeholder="••••••••">
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">New Password</label>
+                <input type="password" [(ngModel)]="passwordData.new_password" name="new_password" required
+                    class="w-full bg-slate-50 border border-border p-3.5 rounded focus:outline-none focus:border-accent transition-colors text-sm" placeholder="••••••••">
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Confirm New Password</label>
+                <input type="password" [(ngModel)]="passwordData.confirm_password" name="confirm_password" required
+                    class="w-full bg-slate-50 border border-border p-3.5 rounded focus:outline-none focus:border-accent transition-colors text-sm" placeholder="••••••••">
+            </div>
+          </div>
+
+          <button type="submit" [disabled]="isChangingPassword() || !passwordData.old_password || !passwordData.new_password"
+              class="bg-brand-secondary text-white px-10 py-4 rounded font-bold text-sm uppercase tracking-widest hover:bg-slate-700 transition-all shadow-lg active:scale-[0.98] disabled:opacity-60 flex items-center gap-2">
+              @if (isChangingPassword()) {
+                  <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Updating...
+              } @else {
+                  Update Security
+              }
+          </button>
+        </form>
+      </section>
+
+      <!-- Danger Zone -->
+      <section class="mt-8 pt-10 border-t border-slate-100">
+        <div class="bg-red-50 p-8 rounded-lg border border-red-100">
+          <div class="mb-6">
+            <h2 class="text-2xl font-bold text-red-900 tracking-tight">Privacy & Deletion</h2>
+            <p class="text-red-700/60 mt-2">Permanently remove your account and all associated data.</p>
+          </div>
+
+          <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="text-sm text-red-800/80 leading-relaxed max-w-md">
+                Deleting your account is permanent. All professional data and transaction history will be purged.
+            </div>
+            <button (click)="deleteAccount()" [disabled]="isDeletingAccount()"
+                class="bg-red-600 text-white px-8 py-3 rounded font-bold text-sm uppercase tracking-widest hover:bg-red-700 transition-all shadow-lg active:scale-[0.98] disabled:opacity-60 shrink-0">
+                @if (isDeletingAccount()) {
+                    Deleting Account...
+                } @else {
+                    Delete My Account
+                }
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

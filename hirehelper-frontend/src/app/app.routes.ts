@@ -12,12 +12,17 @@ import { FeedComponent } from './pages/feed/feed.component';
 import { MyRequestsComponent } from './pages/my-requests/my-requests.component';
 import { RequestsComponent } from './pages/requests/requests.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
+import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
+import { SettingsComponent } from './pages/dashboard/settings/settings.component';
 
 
 export const routes: Routes = [
     { path: 'login', component: Login },
     { path: 'register', component: Register },
     { path: 'verify-otp', component: VerifyOtp },
+    { path: 'forgot-password', component: ForgotPasswordComponent },
+    { path: 'reset-password', component: ResetPasswordComponent },
     {
         path: 'dashboard',
         component: Dashboard,
@@ -31,6 +36,7 @@ export const routes: Routes = [
             { path: 'my-requests', component: MyRequestsComponent },
             { path: 'requests', component: RequestsComponent },
             { path: 'notifications', component: NotificationsComponent },
+            { path: 'settings', component: SettingsComponent },
 
             { path: '', redirectTo: 'overview', pathMatch: 'full' }
         ]

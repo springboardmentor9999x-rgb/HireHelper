@@ -59,7 +59,47 @@ export class AuthService {
     }
 
     updateSettings(data: any): Observable<any> {
-        return this.http.put(`${this.apiUrl}/users/settings`, data);
+        return this.http.put(`${this.apiUrl}/users/settings`, data).pipe(
+            tap((response: any) => {
+                if (response.settings && isPlatformBrowser(this.platformId)) {
+                    const updatedUser = { ...this.currentUser(), ...response.settings };
+                    localStorage.setItem('user', JSON.stringify(updatedUser));
+                    this.currentUser.set(updatedUser);
+                }
+            })
+        );
+    }
+
+    forgotPassword(email: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}/auth/forgot-password`, { email });
+    }
+
+    resetPassword(data: any): Observable<any> {
+        return this.http.post(`${this.apiUrl}/auth/reset-password`, data);
+    }
+
+    changePassword(data: any): Observable<any> {
+        return this.http.put(`${this.apiUrl}/users/change-password`, data);
+    }
+
+    deleteAccount(): Observable<any> {
+        return this.http.delete(`${this.apiUrl}/users/me`).pipe(
+            tap(() => this.logout())
+        );
+    }
+
+    uploadProfilePicture(file: File): Observable<any> {
+        const formData = new FormData();
+        formData.append('picture', file);
+        return this.http.post(`${this.apiUrl}/users/profile-picture`, formData).pipe(
+            tap((response: any) => {
+                if (response.picture_url && isPlatformBrowser(this.platformId)) {
+                    const updatedUser = { ...this.currentUser(), picture_url: response.picture_url };
+                    localStorage.setItem('user', JSON.stringify(updatedUser));
+                    this.currentUser.set(updatedUser);
+                }
+            })
+        );
     }
 
     logout() {

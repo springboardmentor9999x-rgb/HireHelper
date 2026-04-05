@@ -1,47 +1,76 @@
 <div class="bg-white p-8 lg:p-12 rounded-lg shadow-xl shadow-slate-200/50 border border-border animate-slide-up">
-    <div class="mb-8">
-        <h2 class="text-3xl font-bold text-slate-900 tracking-tight">Professional Profile</h2>
-        <p class="text-brand-muted mt-2">Update your personal information and professional details.</p>
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-6">
+        <div>
+            <h2 class="text-3xl font-bold text-slate-900 tracking-tight">Professional Profile</h2>
+            <p class="text-brand-muted mt-2">Update your personal information and professional details.</p>
+        </div>
+        
+        <!-- Profile Picture Upload -->
+        <div class="relative group">
+            <div class="w-32 h-32 rounded-2xl bg-slate-100 border-2 border-dashed border-border flex items-center justify-center overflow-hidden relative transition-all group-hover:border-accent">
+                <img *ngIf="profileData.picture_url" [src]="profileData.picture_url" class="w-full h-full object-cover">
+                <div *ngIf="!profileData.picture_url" class="text-slate-300">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                </div>
+                
+                <!-- Upload Overlay -->
+                <label class="absolute inset-0 bg-slate-900/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                    <svg class="w-8 h-8 text-white mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span class="text-white text-[10px] font-black uppercase tracking-widest">Update</span>
+                    <input type="file" class="hidden" (change)="onFileSelected($event)" accept="image/*">
+                </label>
+                
+                <!-- Loading State -->
+                <div *ngIf="isUploading()" class="absolute inset-0 bg-white/80 flex items-center justify-center z-20">
+                    <div class="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <form (ngSubmit)="updateProfile()" class="space-y-6 max-w-2xl">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-2">
-                <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">First Name</label>
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">First Name</label>
                 <input type="text" [(ngModel)]="profileData.first_name" name="first_name"
-                    class="w-full bg-slate-50 border border-border p-3 rounded focus:outline-none focus:border-accent transition-colors">
+                    class="w-full bg-slate-50 border border-border p-3.5 rounded focus:outline-none focus:border-accent transition-colors text-sm">
             </div>
             <div class="space-y-2">
-                <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Last Name</label>
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Last Name</label>
                 <input type="text" [(ngModel)]="profileData.last_name" name="last_name"
-                    class="w-full bg-slate-50 border border-border p-3 rounded focus:outline-none focus:border-accent transition-colors">
+                    class="w-full bg-slate-50 border border-border p-3.5 rounded focus:outline-none focus:border-accent transition-colors text-sm">
             </div>
         </div>
         <div class="space-y-2">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Phone Number</label>
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Phone Number</label>
             <input type="text" [(ngModel)]="profileData.phone_number" name="phone_number"
                 placeholder="e.g. +1 234 567 890"
-                class="w-full bg-slate-50 border border-border p-3 rounded focus:outline-none focus:border-accent transition-colors">
+                class="w-full bg-slate-50 border border-border p-3.5 rounded focus:outline-none focus:border-accent transition-colors text-sm">
         </div>
 
         <div class="space-y-2">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Professional Title</label>
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Professional Title</label>
             <input type="text" [(ngModel)]="profileData.professional_title" name="professional_title"
                 placeholder="e.g. Senior Software Architect"
-                class="w-full bg-slate-50 border border-border p-3 rounded focus:outline-none focus:border-accent transition-colors">
+                class="w-full bg-slate-50 border border-border p-3.5 rounded focus:outline-none focus:border-accent transition-colors text-sm">
         </div>
 
         <div class="space-y-2">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Professional Summary</label>
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Professional Summary</label>
             <textarea [(ngModel)]="profileData.bio" name="bio" rows="4"
                 placeholder="Tell us about your professional background..."
-                class="w-full bg-slate-50 border border-border p-3 rounded focus:outline-none focus:border-accent transition-colors resize-none"></textarea>
+                class="w-full bg-slate-50 border border-border p-3.5 rounded focus:outline-none focus:border-accent transition-colors resize-none text-sm"></textarea>
         </div>
 
 
         <button type="submit"
-            class="bg-brand-primary text-white px-8 py-3 rounded font-bold text-sm uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl active:scale-[0.98]">
-            Update Credentials
+            class="bg-brand-primary text-white px-10 py-4 rounded font-bold text-sm uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl active:scale-[0.98]">
+            Synchronize Profile
         </button>
     </form>
 </div>

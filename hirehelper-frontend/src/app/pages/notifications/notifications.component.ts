@@ -44,6 +44,12 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.notifications = res.notifications || [];
         this.loading = false;
+        
+        // After fetching, if there are unread notifications, mark them all as read
+        if (this.notifications.some(n => !n.is_read)) {
+          this.markNotificationsAsRead();
+        }
+        
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -61,12 +67,24 @@ export class NotificationsComponent implements OnInit, OnDestroy {
         const notification = this.notifications.find(n => n.id === id);
         if (notification) {
           notification.is_read = true;
+          this.notificationService.triggerRefresh(); // Notify other components (like Dashboard)
           this.cdr.detectChanges();
         }
       },
       error: (err) => {
         this.toastService.showError(err.error?.message || 'Failed to mark notification as read.');
         console.error('Error marking notification as read:', err);
+      }
+    });
+  }
+
+  private markNotificationsAsRead(): void {
+    this.notificationService.markAllAsRead().subscribe({
+      next: () => {
+        this.notificationService.triggerRefresh(); // Notify other components (like Dashboard)
+      },
+      error: (err) => {
+        console.error('Error marking all notifications as read:', err);
       }
     });
   }

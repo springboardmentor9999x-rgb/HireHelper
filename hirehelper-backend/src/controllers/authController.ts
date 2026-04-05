@@ -2,7 +2,8 @@ import type { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import pool from '../config/db';
-import { sendVerificationOTP } from '../services/emailService';
+import { sendVerificationOTP, sendPasswordResetLink } from '../services/emailService';
+import crypto from 'crypto';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key';
 
@@ -120,7 +121,13 @@ export const register = async (req: Request<{}, {}, RegisterBody>, res: Response
                 first_name: newUser.rows[0].first_name,
                 last_name: newUser.rows[0].last_name,
                 email: newUser.rows[0].email_id,
-                role: newUser.rows[0].role
+                role: newUser.rows[0].role,
+                phone_number: newUser.rows[0].phone_number,
+                bio: newUser.rows[0].bio,
+                professional_title: newUser.rows[0].professional_title,
+                picture_url: newUser.rows[0].picture_url,
+                theme: newUser.rows[0].theme,
+                notifications_enabled: newUser.rows[0].notifications_enabled
             }
         });
     } catch (error) {
@@ -211,7 +218,13 @@ export const login = async (req: Request<{}, {}, LoginBody>, res: Response, next
                 first_name: user.first_name,
                 last_name: user.last_name,
                 email: user.email_id,
-                role: user.role
+                role: user.role,
+                phone_number: user.phone_number,
+                bio: user.bio,
+                professional_title: user.professional_title,
+                picture_url: user.picture_url,
+                theme: user.theme,
+                notifications_enabled: user.notifications_enabled
             }
         });
     } catch (error) {
@@ -256,3 +269,73 @@ export const resendOTP = async (req: Request<{}, {}, { email: string }>, res: Re
     }
 };
 
+export const forgotPassword = async (req: Request<{}, {}, { email: string }>, res: Response, next: NextFunction) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ message: 'Email is required' });
+    }
+
+    try {
+        const result = await pool.query('SELECT * FROM users WHERE email_id = $1', [email]);
+        const user = result.rows[0];
+
+        if (!user) {
+            // To prevent email enumeration, we could return success anyway.
+            // But for this app, we'll return an error or a generic success.
+            return res.status(404).json({ message: 'User with this email does not exist.' });
+        }
+
+        // Generate reset token
+        const token = crypto.randomBytes(32).toString('hex');
+        const expiry = new Date(Date.now() + 3600000); // 1 hour
+
+        await pool.query(
+            'UPDATE users SET reset_password_token = $1, reset_password_expires = $2 WHERE email_id = $3',
+            [token, expiry, email]
+        );
+
+        await sendPasswordResetLink(email, token);
+
+        res.json({ message: 'Password reset link has been sent to your email.' });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const resetPassword = async (req: Request<{}, {}, { token: string; password: string }>, res: Response, next: NextFunction) => {
+    const { token, password } = req.body;
+
+    if (!token || !password) {
+        return res.status(400).json({ message: 'Token and new password are required' });
+    }
+
+    // Password strength validation (same as register)
+    if (password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+        return res.status(400).json({ message: 'Password does not meet strength requirements.' });
+    }
+
+    try {
+        const result = await pool.query(
+            'SELECT * FROM users WHERE reset_password_token = $1 AND reset_password_expires > NOW()',
+            [token]
+        );
+        const user = result.rows[0];
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired reset token.' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        await pool.query(
+            'UPDATE users SET password = $1, reset_password_token = NULL, reset_password_expires = NULL WHERE id = $2',
+            [hashedPassword, user.id]
+        );
+
+        res.json({ message: 'Password reset successful. You can now login with your new password.' });
+    } catch (error) {
+        next(error);
+    }
+};
