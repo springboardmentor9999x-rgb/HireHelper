@@ -17,8 +17,6 @@ export class ProfileComponent implements OnInit {
   editing = false;
   successMessage = '';
   errorMessage = '';
-  profilePicturePreview: string | null = null;
-  uploadingPicture = false;
 
   constructor(
     private profileService: ProfileService,
@@ -47,7 +45,6 @@ export class ProfileComponent implements OnInit {
         this.loading = false;
         if (response.success) {
           this.profile = response.data;
-          this.profilePicturePreview = response.data.profile_picture || null;
           this.profileForm.patchValue({
             first_name: response.data.first_name,
             last_name: response.data.last_name,
@@ -117,66 +114,6 @@ export class ProfileComponent implements OnInit {
         this.loading = false;
         console.error('Error updating profile:', error);
         this.errorMessage = error.error?.message || 'Failed to update profile';
-      },
-    });
-  }
-
-  /**
-   * Handle file selection for profile picture
-   */
-  onFileSelected(event: any) {
-    const file: File = event.target.files[0];
-
-    if (file) {
-      // Validate file type
-      if (!['image/jpeg', 'image/png'].includes(file.type)) {
-        this.errorMessage = 'Only JPG and PNG files are allowed';
-        return;
-      }
-
-      // Validate file size (2MB max)
-      if (file.size > 2 * 1024 * 1024) {
-        this.errorMessage = 'File size must be less than 2MB';
-        return;
-      }
-
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.profilePicturePreview = reader.result as string;
-      };
-      reader.readAsDataURL(file);
-
-      // Upload file
-      this.uploadProfilePicture(file);
-    }
-  }
-
-  /**
-   * Upload profile picture
-   */
-  uploadProfilePicture(file: File) {
-    this.uploadingPicture = true;
-    this.errorMessage = '';
-    this.successMessage = '';
-
-    this.profileService.uploadProfilePicture(file).subscribe({
-      next: (response) => {
-        this.uploadingPicture = false;
-        if (response.success) {
-          this.profile = response.data;
-          this.successMessage = 'Profile picture uploaded successfully';
-          setTimeout(() => {
-            this.successMessage = '';
-          }, 3000);
-        } else {
-          this.errorMessage = response.message || 'Failed to upload picture';
-        }
-      },
-      error: (error) => {
-        this.uploadingPicture = false;
-        console.error('Error uploading picture:', error);
-        this.errorMessage = error.error?.message || 'Failed to upload picture';
       },
     });
   }

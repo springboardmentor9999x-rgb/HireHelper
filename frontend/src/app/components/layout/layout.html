@@ -1,8 +1,30 @@
 <div class="app-shell">
   <aside class="sidebar">
+    <!-- Sidebar Header -->
     <div class="sidebar-header">
       <div class="sidebar-brand">HireHelper</div>
     </div>
+
+    <!-- User Profile Section -->
+    <div class="user-profile-section" *ngIf="currentUser">
+      <div class="user-avatar">
+        <img 
+          *ngIf="currentUser.profile_picture" 
+          [src]="currentUser.profile_picture" 
+          alt="Profile"
+          class="avatar-image"
+        />
+        <div *ngIf="!currentUser.profile_picture" class="avatar-placeholder">
+          {{ getInitials() }}
+        </div>
+      </div>
+      <div class="user-info">
+        <div class="user-name">{{ getFullName() }}</div>
+        <div class="user-email">{{ currentUser.email }}</div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
     <nav class="sidebar-nav">
       <a routerLink="/dashboard/feed" routerLinkActive="active" class="nav-link">
         <span class="nav-icon">📰</span> Feed
@@ -27,6 +49,8 @@
         <span class="nav-icon">⚙️</span> Settings
       </a>
     </nav>
+
+    <!-- Sidebar Footer -->
     <div class="sidebar-footer">
       <button class="logout-btn" (click)="logout()" title="Logout">
         <span class="logout-icon">🚪</span> Logout
@@ -53,9 +77,10 @@
       (closeEvent)="closeNotificationSidebar()"
     ></app-notification-sidebar>
 
+    <!-- Page Content -->
     <section class="page-content">
-      <div *ngIf="currentUser?.firstName" class="welcome-header">
-        <h1>Welcome, {{ firstNameDisplay }} 👋</h1>
+      <div *ngIf="currentUser?.first_name" class="welcome-header">
+        <h1>Welcome, {{ getFirstName() }} 👋</h1>
       </div>
       <router-outlet></router-outlet>
     </section>

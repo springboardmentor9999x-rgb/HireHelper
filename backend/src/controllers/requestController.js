@@ -38,8 +38,8 @@ const requestController = {
 
       const task = taskCheck.rows[0];
 
-      // 2. Check if task status is OPEN
-      if (task.status !== 'open') {
+      // 2. Check if task status is OPEN (case-insensitive)
+      if (task.status.toLowerCase() !== 'open') {
         return res.status(400).json({
           success: false,
           message: 'Task is not available for requests'

@@ -26,6 +26,25 @@ export class AddTaskComponent implements OnInit {
   successMessage = '';
   selectedImage: File | null = null;
 
+  // Task categories
+  taskCategories = [
+    'Cleaning',
+    'Electrical',
+    'Plumbing',
+    'Carpentry',
+    'Painting',
+    'Appliance Repair',
+    'HVAC & AC Service',
+    'Home Maintenance',
+    'Gardening',
+    'Moving & Relocation',
+    'Pest Control',
+    'Personal Assistance',
+    'IT & Tech Support',
+    'Delivery Services',
+    'Other'
+  ];
+
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
@@ -53,6 +72,22 @@ export class AddTaskComponent implements OnInit {
   isFieldInvalid(fieldName: string): boolean {
     const field = this.taskForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched || this.submitted));
+  }
+
+  getFieldError(fieldName: string): string {
+    const field = this.taskForm.get(fieldName);
+    if (!field || !field.errors) return '';
+
+    if (field.errors['required']) return `${fieldName} is required`;
+    if (field.errors['minlength']) return `${fieldName} must be at least ${field.errors['minlength'].requiredLength} characters`;
+    
+    return 'Invalid input';
+  }
+
+  onCancel() {
+    if (confirm('Are you sure you want to cancel? All changes will be lost.')) {
+      this.router.navigate(['/dashboard/my-tasks']);
+    }
   }
 
   onSubmit() {
@@ -138,14 +173,21 @@ export class AddTaskComponent implements OnInit {
         console.error('❌ Error creating task:', error);
         console.error('Status:', error.status);
         console.error('Error body:', error.error);
+        console.error('Full error object:', JSON.stringify(error, null, 2));
+        
         if (error.status === 401) {
           this.errorMessage = 'Your session has expired. Please login again.';
         } else if (error.status === 400) {
           this.errorMessage = error.error?.message || 'Invalid task data. Please check your input.';
         } else if (error.status === 0) {
           this.errorMessage = 'Connection error. Please check your internet and try again.';
+        } else if (error.status === 500) {
+          const dbError = error.error?.error || error.error?.message || 'Server error';
+          const code = error.error?.code ? ` (${error.error.code})` : '';
+          this.errorMessage = `Failed to create task: ${dbError}${code}`;
+          console.error('🔍 Server error details:', error.error);
         } else {
-          this.errorMessage = error.error?.message || 'Failed to create task. Please try again.';
+          this.errorMessage = error.error?.message || `Failed to create task (Status: ${error.status}). Please try again.`;
         }
       },
     });

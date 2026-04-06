@@ -980,3 +980,252 @@ box-shadow:0 6px 16px rgba(0,0,0,0.4);
 .add-task svg{
 color:#ffffff;
 }
+
+/* ============================================
+   DARK MODE THEME
+   ============================================ */
+
+body.dark-mode {
+  background: linear-gradient(
+    135deg,
+    #0f1419 0%,
+    #1a1f2e 40%,
+    #0d2818 70%,
+    #1a3a2a 100%
+  ) !important;
+  color: #e0e0e0;
+}
+
+body.dark-mode .sidebar {
+  background: linear-gradient(
+    180deg,
+    #0f1419 0%,
+    #1a1f2e 40%,
+    #0d2818 70%,
+    #1a3a2a 100%
+  ) !important;
+  color: #e0e0e0;
+}
+
+body.dark-mode .topbar {
+  background: #1a1f2e !important;
+  border-bottom-color: #333 !important;
+  color: #e0e0e0;
+}
+
+body.dark-mode .page-content {
+  background: #0f1419 !important;
+  color: #e0e0e0;
+}
+
+body.dark-mode .settings-container {
+  background: #0f1419 !important;
+  color: #e0e0e0;
+}
+
+body.dark-mode .settings-header {
+  border-bottom-color: #333 !important;
+}
+
+body.dark-mode .settings-header h1 {
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .settings-header p {
+  color: #b0b0b0 !important;
+}
+
+body.dark-mode .settings-card {
+  background: #1a1f2e !important;
+  color: #e0e0e0;
+}
+
+body.dark-mode .tab-btn {
+  background: transparent;
+  color: #b0b0b0;
+  border-bottom: 2px solid transparent;
+}
+
+body.dark-mode .tab-btn:hover {
+  color: #e0e0e0;
+}
+
+body.dark-mode .tab-btn.active {
+  color: #2bb673;
+  border-bottom-color: #2bb673;
+}
+
+body.dark-mode .form-input,
+body.dark-mode .form-select,
+body.dark-mode .form-textarea,
+body.dark-mode .form-control {
+  background-color: #252b3d !important;
+  border-color: #3a3f50 !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .form-input:focus,
+body.dark-mode .form-select:focus,
+body.dark-mode .form-textarea:focus,
+body.dark-mode .form-control:focus {
+  border-color: #2bb673 !important;
+  box-shadow: 0 0 0 3px rgba(43, 182, 115, 0.2) !important;
+}
+
+body.dark-mode .form-input.error,
+body.dark-mode .form-select.error,
+body.dark-mode .form-textarea.error,
+body.dark-mode .form-control.error {
+  border-color: #ef4444 !important;
+}
+
+body.dark-mode .btn {
+  background-color: #2bb673;
+  color: white;
+  border: none;
+}
+
+body.dark-mode .btn:hover {
+  background-color: #22a35f;
+}
+
+body.dark-mode .btn-secondary {
+  background-color: #3a3f50;
+  color: #e0e0e0;
+}
+
+body.dark-mode .btn-secondary:hover {
+  background-color: #4a5060;
+}
+
+body.dark-mode .btn-danger {
+  background-color: #dc2626;
+  color: white;
+}
+
+body.dark-mode .btn-danger:hover {
+  background-color: #b91c1c;
+}
+
+body.dark-mode .toast {
+  background: #1a1f2e;
+  border: 1px solid #3a3f50;
+  color: #e0e0e0;
+}
+
+body.dark-mode .toast.success {
+  background: #0f452c;
+  border-color: #2bb673;
+  color: #7ee8c3;
+}
+
+body.dark-mode .toast.error {
+  background: #4a1b1b;
+  border-color: #ef4444;
+  color: #ff9999;
+}
+
+body.dark-mode .toast.warning {
+  background: #4a3d0a;
+  border-color: #eab308;
+  color: #fdd835;
+}
+
+body.dark-mode .card {
+  background: #1a1f2e;
+  border: 1px solid #3a3f50;
+}
+
+body.dark-mode .card:hover {
+  box-shadow: 0 4px 20px rgba(43, 182, 115, 0.1);
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode p,
+body.dark-mode label,
+body.dark-mode span {
+  color: #b0b0b0;
+}
+
+body.dark-mode .modal {
+  background: #1a1f2e;
+  color: #e0e0e0;
+}
+
+body.dark-mode .modal-backdrop {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+body.dark-mode .toggle-item {
+  background: #252b3d;
+  border: 1px solid #3a3f50;
+}
+
+body.dark-mode .toggle-info h3 {
+  color: #e0e0e0;
+}
+
+body.dark-mode .toggle-info p {
+  color: #b0b0b0;
+}
+
+body.dark-mode .toggle-label {
+  background: #3a3f50;
+}
+
+body.dark-mode .toggle-checkbox:checked + .toggle-label {
+  background: #2bb673;
+}
+
+body.dark-mode .auth-card {
+  background: #1a1f2e;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .auth-card h2 {
+  color: #e0e0e0;
+}
+
+body.dark-mode .dashboard-card {
+  background: #1a1f2e;
+  border: 1px solid #3a3f50;
+}
+
+body.dark-mode .dashboard-card h3 {
+  color: #e0e0e0;
+}
+
+body.dark-mode .dashboard-card p {
+  color: #b0b0b0;
+}
+
+body.dark-mode .error-text {
+  color: #ff9999;
+}
+
+body.dark-mode .help-text {
+  color: #7a7a7a;
+}
+
+body.dark-mode .security-value {
+  color: #b0b0b0;
+}
+
+body.dark-mode .theme-preview {
+  background: #252b3d;
+}
+
+body.dark-mode .preview-light,
+body.dark-mode .preview-dark {
+  background: #1a1f2e;
+  border: 1px solid #3a3f50;
+  color: #e0e0e0;
+}

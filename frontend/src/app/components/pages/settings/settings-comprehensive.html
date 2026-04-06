@@ -1,0 +1,413 @@
+<div class="settings-container">
+  <!-- Header -->
+  <div class="settings-header">
+    <h1>Settings</h1>
+    <p class="subtitle">Manage your account preferences and settings</p>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" [ngClass]="{ success: toast.type === 'success', error: toast.type === 'error', warning: toast.type === 'warning', visible: toast.visible }" *ngIf="toast.visible">
+    <span class="toast-icon">
+      <span *ngIf="toast.type === 'success'">✓</span>
+      <span *ngIf="toast.type === 'error'">✕</span>
+      <span *ngIf="toast.type === 'warning'">!</span>
+    </span>
+    <span class="toast-message">{{ toast.message }}</span>
+    <button class="toast-close" (click)="toast.visible = false">×</button>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-overlay" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading settings...</p>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tabs-navigation">
+    <button class="tab-btn" [class.active]="activeTab === 'profile'" (click)="activeTab = 'profile'">
+      <span class="tab-icon">👤</span> Profile
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'privacy'" (click)="activeTab = 'privacy'">
+      <span class="tab-icon">🔒</span> Privacy
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'appearance'" (click)="activeTab = 'appearance'">
+      <span class="tab-icon">🎨</span> Appearance
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'notifications'" (click)="activeTab = 'notifications'">
+      <span class="tab-icon">🔔</span> Notifications
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'security'" (click)="activeTab = 'security'">
+      <span class="tab-icon">🛡️</span> Security
+    </button>
+    <button class="tab-btn dangerous" [class.active]="activeTab === 'danger'" (click)="activeTab = 'danger'">
+      <span class="tab-icon">⚠️</span> Delete Account
+    </button>
+  </div>
+
+  <!-- Settings Content -->
+  <div class="settings-content" *ngIf="!loading">
+
+    <!-- 1. PROFILE SETTINGS -->
+    <div class="tab-content" [class.active]="activeTab === 'profile'">
+      <div class="settings-card">
+        <div class="card-header">
+          <h2>Profile Information</h2>
+          <p>Update your personal information</p>
+        </div>
+
+        <form [formGroup]="profileForm" class="settings-form">
+          <div class="form-group">
+            <label for="profile_picture">Profile Picture</label>
+            <div class="picture-upload-section">
+              <div class="picture-preview" *ngIf="profileForm.value.profile_picture">
+                <img [src]="profileForm.value.profile_picture" alt="Profile preview">
+                <button type="button" class="remove-btn" (click)="clearProfilePicture()">×</button>
+              </div>
+              <div class="picture-placeholder" *ngIf="!profileForm.value.profile_picture">
+                <span class="icon">📸</span>
+                <p>No picture selected</p>
+              </div>
+              <input type="file" id="profile_picture" accept="image/*" (change)="onProfilePictureSelected($event)" class="file-input">
+              <label for="profile_picture" class="file-label">Choose File</label>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="first_name">First Name *</label>
+              <input type="text" id="first_name" formControlName="first_name" class="form-control"
+                [class.error]="hasError(profileForm, 'first_name')">
+              <small class="error-text" *ngIf="hasError(profileForm, 'first_name')">
+                {{ getErrorMessage(profileForm, 'first_name') }}
+              </small>
+            </div>
+            <div class="form-group">
+              <label for="last_name">Last Name *</label>
+              <input type="text" id="last_name" formControlName="last_name" class="form-control"
+                [class.error]="hasError(profileForm, 'last_name')">
+              <small class="error-text" *ngIf="hasError(profileForm, 'last_name')">
+                {{ getErrorMessage(profileForm, 'last_name') }}
+              </small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="phone_number">Phone Number</label>
+            <input type="tel" id="phone_number" formControlName="phone_number" class="form-control"
+              [class.error]="hasError(profileForm, 'phone_number')">
+            <small class="error-text" *ngIf="hasError(profileForm, 'phone_number')">
+              {{ getErrorMessage(profileForm, 'phone_number') }}
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="bio">Bio</label>
+            <textarea id="bio" formControlName="bio" class="form-control" rows="4" placeholder="Tell us about yourself"></textarea>
+            <small class="help-text">{{ profileForm.value.bio?.length || 0 }}/500 characters</small>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-primary" (click)="saveProfile()" [disabled]="profileForm.invalid || savingProfile">
+              <span *ngIf="!savingProfile">💾 Save Profile</span>
+              <span *ngIf="savingProfile">Saving...</span>
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="profileForm.reset()">Clear</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 2. PRIVACY SETTINGS -->
+    <div class="tab-content" [class.active]="activeTab === 'privacy'">
+      <div class="settings-card">
+        <div class="card-header">
+          <h2>Privacy Settings</h2>
+          <p>Control your privacy preferences</p>
+        </div>
+
+        <form [formGroup]="privacyForm" class="settings-form">
+          <div class="toggle-group">
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <h3>Show Profile in Feed</h3>
+                <p>Allow your profile to appear in the public feed</p>
+              </div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="show_profile" formControlName="show_profile_in_feed" class="toggle-checkbox">
+                <label for="show_profile" class="toggle-label"></label>
+              </div>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <h3>Allow Direct Messages</h3>
+                <p>Let others send you direct messages</p>
+              </div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="allow_messages" formControlName="allow_messages" class="toggle-checkbox">
+                <label for="allow_messages" class="toggle-label"></label>
+              </div>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <h3>Email Notifications</h3>
+                <p>Receive important updates via email</p>
+              </div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="email_notif" formControlName="email_notifications" class="toggle-checkbox">
+                <label for="email_notif" class="toggle-label"></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-primary" (click)="savePrivacy()">
+              🔒 Save Privacy Settings
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 3. APPEARANCE SETTINGS -->
+    <div class="tab-content" [class.active]="activeTab === 'appearance'">
+      <div class="settings-card">
+        <div class="card-header">
+          <h2>Appearance</h2>
+          <p>Customize your interface appearance</p>
+        </div>
+
+        <form [formGroup]="appearanceForm" class="settings-form">
+          <div class="toggle-group">
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <h3>Dark Mode</h3>
+                <p>Use a dark theme for reduced eye strain</p>
+              </div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="dark_mode" formControlName="dark_mode" 
+                  (change)="saveDarkMode()" class="toggle-checkbox">
+                <label for="dark_mode" class="toggle-label"></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="theme-preview">
+            <div class="preview-light">
+              <p>Light Mode Preview</p>
+            </div>
+            <div class="preview-dark">
+              <p>Dark Mode Preview</p>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 4. NOTIFICATIONS SETTINGS -->
+    <div class="tab-content" [class.active]="activeTab === 'notifications'">
+      <div class="settings-card">
+        <div class="card-header">
+          <h2>Notifications</h2>
+          <p>Manage your notification preferences</p>
+        </div>
+
+        <form [formGroup]="notificationsForm" class="settings-form">
+          <div class="toggle-group">
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <h3>Task Requests</h3>
+                <p>Get notified when someone requests your tasks</p>
+              </div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="task_req" formControlName="task_requests" class="toggle-checkbox">
+                <label for="task_req" class="toggle-label"></label>
+              </div>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <h3>Task Updates</h3>
+                <p>Get notified when your tasks are updated</p>
+              </div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="task_upd" formControlName="task_updates" class="toggle-checkbox">
+                <label for="task_upd" class="toggle-label"></label>
+              </div>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <h3>Announcements</h3>
+                <p>Receive platform announcements and updates</p>
+              </div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="announ" formControlName="announcements" class="toggle-checkbox">
+                <label for="announ" class="toggle-label"></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-primary" (click)="saveNotifications()">
+              🔔 Save Preferences
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 5. SECURITY SETTINGS -->
+    <div class="tab-content" [class.active]="activeTab === 'security'">
+      <div class="settings-card">
+        <div class="card-header">
+          <h2>Security</h2>
+          <p>Protect your account security</p>
+        </div>
+
+        <div class="settings-form">
+          <div class="security-item">
+            <div class="security-info">
+              <h3>Change Password</h3>
+              <p>Update your account password</p>
+            </div>
+            <button type="button" class="btn btn-secondary" (click)="showPasswordModal = true">
+              🔐 Change Password
+            </button>
+          </div>
+
+          <div class="security-divider"></div>
+
+          <div class="security-item">
+            <div class="security-info">
+              <h3>Account Created</h3>
+              <p class="security-value" *ngIf="settings?.security?.created_at">
+                {{ settings?.security?.created_at | date:'medium' }}
+              </p>
+              <p class="security-value" *ngIf="!settings?.security?.created_at" style="color: #999;">
+                Loading...
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. DANGER ZONE - DELETE ACCOUNT -->
+    <div class="tab-content" [class.active]="activeTab === 'danger'">
+      <div class="settings-card danger-card">
+        <div class="card-header">
+          <h2>⚠️ Delete Account</h2>
+          <p>Permanently delete your account and all data</p>
+        </div>
+
+        <div class="danger-warning">
+          <strong>⚠️ This action cannot be undone</strong>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" (click)="showDeleteModal = true">
+            🗸️ Delete My Account
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PASSWORD CHANGE MODAL -->
+  <div class="modal-backdrop" *ngIf="showPasswordModal" (click)="showPasswordModal = false"></div>
+  <div class="modal" *ngIf="showPasswordModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Change Password</h2>
+        <button type="button" class="modal-close" (click)="showPasswordModal = false">×</button>
+      </div>
+
+      <form [formGroup]="passwordForm" class="modal-form">
+        <div class="form-group">
+          <label for="current_pwd">Current Password *</label>
+          <input type="password" id="current_pwd" formControlName="current_password" class="form-control"
+            [class.error]="hasError(passwordForm, 'current_password')">
+          <small class="error-text" *ngIf="hasError(passwordForm, 'current_password')">
+            {{ getErrorMessage(passwordForm, 'current_password') }}
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="new_pwd">New Password *</label>
+          <input type="password" id="new_pwd" formControlName="new_password" class="form-control"
+            [class.error]="hasError(passwordForm, 'new_password')">
+          <small class="error-text" *ngIf="hasError(passwordForm, 'new_password')">
+            {{ getErrorMessage(passwordForm, 'new_password') }}
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="confirm_pwd">Confirm Password *</label>
+          <input type="password" id="confirm_pwd" formControlName="confirm_password" class="form-control"
+            [class.error]="hasError(passwordForm, 'confirm_password') || (passwordForm.errors?.['passwordMismatch'] && passwordForm.touched)">
+          <small class="error-text" *ngIf="hasError(passwordForm, 'confirm_password')">
+            {{ getErrorMessage(passwordForm, 'confirm_password') }}
+          </small>
+          <small class="error-text" *ngIf="passwordForm.errors?.['passwordMismatch'] && passwordForm.touched">
+            Passwords do not match
+          </small>
+        </div>
+      </form>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="showPasswordModal = false">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="changePassword()" 
+          [disabled]="passwordForm.invalid || savingPassword">
+          <span *ngIf="!savingPassword">Change Password</span>
+          <span *ngIf="savingPassword">Saving...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE ACCOUNT CONFIRMATION MODAL -->
+  <div class="modal-backdrop" *ngIf="showDeleteModal" (click)="showDeleteModal = false"></div>
+  <div class="modal danger-modal" *ngIf="showDeleteModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🗑️ Delete Account</h2>
+        <button type="button" class="modal-close" (click)="showDeleteModal = false">×</button>
+      </div>
+
+      <div class="delete-confirmation">
+        <p><strong>Are you absolutely sure?</strong></p>
+        <p>This action is permanent and cannot be reversed.</p>
+        <ul class="delete-warning-list">
+          <li>✗ All your tasks will be deleted</li>
+          <li>✗ Your profile information will be removed</li>
+          <li>✗ All messages will be deleted</li>
+          <li>✗ There is no way to recover your data</li>
+        </ul>
+      </div>
+
+      <form [formGroup]="deleteAccountForm" class="modal-form">
+        <div class="form-group">
+          <label for="delete_pwd">Enter Your Password to Confirm *</label>
+          <input type="password" id="delete_pwd" formControlName="password" class="form-control"
+            [class.error]="hasError(deleteAccountForm, 'password')">
+          <small class="error-text" *ngIf="hasError(deleteAccountForm, 'password')">
+            {{ getErrorMessage(deleteAccountForm, 'password') }}
+          </small>
+        </div>
+      </form>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="showDeleteModal = false">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="deleteAccountConfirm()" 
+          [disabled]="deleteAccountForm.invalid || deletingAccount">
+          <span *ngIf="!deletingAccount">Permanently Delete Account</span>
+          <span *ngIf="deletingAccount">Deleting...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -21,36 +21,56 @@ const pool = require('../config/db');
 router.post('/', verifyToken, upload.single('image'), async (req, res) => {
   try {
     const userId = req.user.id;
-    const { title, description, location, start_time, end_time } = req.body;
+    const { title, description, category, location, start_time, end_time, budget, status, priority } = req.body;
     const imageFilename = req.file ? req.file.filename : null;
 
+    console.log('🔍 [Task] Create task request - USER:', userId);
+    console.log('📝 [Task] Body:', req.body);
+    console.log('🖼️ [Task] File:', imageFilename);
+    console.log('📋 [Task] File details:', req.file ? { name: req.file.originalname, size: req.file.size, mimetype: req.file.mimetype } : 'None');
+
     // Validate required fields
-    if (!title || !description) {
+    if (!title || !description || !category || !location || !start_time) {
+      console.warn('⚠️ [Task] Missing required field(s)');
       return res.status(400).json({
         success: false,
-        message: 'Title and description are required',
+        message: 'Title, description, category, location, and start time are required',
       });
     }
 
     // Insert task into database
     const query = `
-      INSERT INTO tasks (user_id, title, description, location, start_time, end_time, picture, created_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
-      RETURNING id, user_id, title, description, location, start_time, end_time, picture, created_at
+      INSERT INTO tasks (user_id, title, description, category, location, start_time, end_time, budget, picture, status, priority, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
+      RETURNING id, user_id, title, description, category, location, start_time, end_time, budget, picture, status, priority, created_at
     `;
 
     const values = [
       userId,
       title.trim(),
       description.trim(),
+      category ? category.trim() : null,
       location ? location.trim() : null,
       start_time || null,
       end_time || null,
+      budget ? parseFloat(budget) : null,
       imageFilename,
+      status || 'open',
+      priority || 'medium',
     ];
+
+    console.log('📤 [Task] Executing query with values:', {
+      userId,
+      title: title.substring(0, 50),
+      category,
+      location,
+      start_time,
+      imageFilename
+    });
 
     const result = await pool.query(query, values);
 
+    console.log('✅ [Task] Task created successfully:', result.rows[0].id);
     res.status(201).json({
       success: true,
       message: 'Task created successfully',
@@ -58,13 +78,38 @@ router.post('/', verifyToken, upload.single('image'), async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error creating task:', error);
+    console.error('❌ [Task] Error creating task:', {
+      message: error.message,
+      code: error.code,
+      detail: error.detail,
+      stack: error.stack
+    });
+    
+    // More specific error messages based on error type
+    let errorMessage = 'Failed to create task';
+    if (error.code === '23505') {
+      errorMessage = 'Task with this data already exists';
+    } else if (error.code === '23502') {
+      errorMessage = 'Missing required field';
+    } else if (error.code === '23503') {
+      errorMessage = 'Invalid reference to user';
+    }
+    
     res.status(500).json({
       success: false,
-      message: 'Failed to create task',
+      message: errorMessage,
       error: error.message,
+      code: error.code,
     });
   }
+}, (err, req, res, next) => {
+  // Multer error handler
+  console.error('❌ [Task] Multer error:', err);
+  res.status(400).json({
+    success: false,
+    message: err.message || 'File upload error',
+    error: err.message
+  });
 });
 
 /**
@@ -77,7 +122,19 @@ router.get('/my', verifyToken, async (req, res) => {
     console.log(`📥 Fetching tasks for user: ${userId}`);
 
     const query = `
-      SELECT id, user_id, title, description, location, start_time, end_time, created_at
+      SELECT 
+        id, 
+        user_id, 
+        title, 
+        description,
+        category,
+        location, 
+        start_time, 
+        end_time,
+        budget,
+        status,
+        picture,
+        created_at
       FROM tasks
       WHERE user_id = $1
       ORDER BY created_at DESC
@@ -154,7 +211,19 @@ router.get('/', verifyToken, async (req, res) => {
     const userId = req.user.id;
 
     const query = `
-      SELECT id, user_id, title, description, location, start_time, end_time, status, picture, created_at
+      SELECT 
+        id, 
+        user_id, 
+        title, 
+        description,
+        category,
+        location, 
+        start_time, 
+        end_time,
+        budget,
+        status, 
+        picture, 
+        created_at
       FROM tasks
       ORDER BY created_at DESC
     `;
@@ -186,7 +255,19 @@ router.get('/:id', verifyToken, async (req, res) => {
     const { id } = req.params;
 
     const query = `
-      SELECT id, user_id, title, description, location, start_time, end_time, created_at
+      SELECT 
+        id, 
+        user_id, 
+        title, 
+        description,
+        category,
+        location, 
+        start_time, 
+        end_time,
+        budget,
+        status,
+        picture,
+        created_at
       FROM tasks
       WHERE id = $1 AND user_id = $2
     `;

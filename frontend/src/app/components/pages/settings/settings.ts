@@ -1,246 +1,376 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { SettingsService, UserSettings } from '../../../services/settings.service';
-import { ProfileService } from '../../../services/profile.service';
+import { environment } from '../../../../environments/environment';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { LanguageService } from '../../../services/language.service';
+import { TranslateModule } from '@ngx-translate/core';
+
+interface Settings {
+  profile: any;
+  privacy: any;
+  language: any;
+  appearance: any;
+  notifications: any;
+  security: any;
+}
+
+interface Toast {
+  type: 'success' | 'error' | 'warning';
+  message: string;
+  visible: boolean;
+}
 
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.html',
   styleUrls: ['./settings.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule]
 })
-export class SettingsComponent implements OnInit {
-  // Settings data
-  settings: UserSettings | null = null;
+export class SettingsComponent implements OnInit, OnDestroy {
+  settings: Settings | null = null;
   loading = false;
-  saving = false;
-  successMessage = '';
-  errorMessage = '';
-
-  // UI State
-  activeSection = 'profile';
-  showPasswordModal = false;
-  showDeleteModal = false;
+  activeTab = 'profile';
+  private destroy$ = new Subject<void>();
 
   // Forms
   profileForm: FormGroup;
+  privacyForm: FormGroup;
+  languageForm: FormGroup;
+  appearanceForm: FormGroup;
+  notificationsForm: FormGroup;
   passwordForm: FormGroup;
-  deleteForm: FormGroup;
+  deleteAccountForm: FormGroup;
 
-  // Profile completion
-  profileCompletion = 0;
+  // UI State
+  toast: Toast = { type: 'success', message: '', visible: false };
+  showPasswordModal = false;
+  showDeleteModal = false;
+  savingProfile = false;
+  savingPassword = false;
+  deletingAccount = false;
 
-  // Available options
-  languages = ['English', 'Spanish', 'Hindi'];
+  // Languages
+  languages = ['English', 'Telugu', 'Hindi'];
 
   constructor(
-    private settingsService: SettingsService,
-    private profileService: ProfileService,
+    private http: HttpClient,
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private languageService: LanguageService
   ) {
+    // Initialize forms
     this.profileForm = this.fb.group({
       first_name: ['', [Validators.required, Validators.minLength(2)]],
       last_name: ['', [Validators.required, Validators.minLength(2)]],
-      phone_number: [''],
+      phone_number: ['', this.phoneValidator()],
+      bio: ['', Validators.maxLength(500)],
+      profile_picture: ['']
     });
 
-    this.passwordForm = this.fb.group(
-      {
-        current_password: ['', [Validators.required]],
-        new_password: ['', [Validators.required, Validators.minLength(6)]],
-        confirm_password: ['', [Validators.required]],
-      },
-      { validators: this.passwordMatchValidator }
-    );
+    this.privacyForm = this.fb.group({
+      show_profile_in_feed: [true],
+      allow_messages: [true],
+      email_notifications: [true]
+    });
 
-    this.deleteForm = this.fb.group({
-      password: ['', [Validators.required]],
+    this.languageForm = this.fb.group({
+      language: ['English']
+    });
+
+    this.appearanceForm = this.fb.group({
+      dark_mode: [false]
+    });
+
+    this.notificationsForm = this.fb.group({
+      task_requests: [true],
+      task_updates: [true],
+      announcements: [true]
+    });
+
+    this.passwordForm = this.fb.group({
+      current_password: ['', Validators.required],
+      new_password: ['', [Validators.required, Validators.minLength(6)]],
+      confirm_password: ['', Validators.required]
+    }, { validators: this.passwordMatchValidator() });
+
+    this.deleteAccountForm = this.fb.group({
+      password: ['', Validators.required]
     });
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
+    this.loadProfile();
     this.loadSettings();
+    this.loadSavedLanguage();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /**
-   * Load user settings
+   * Load saved language from localStorage and apply it
    */
-  loadSettings() {
-    this.loading = true;
-    this.errorMessage = '';
+  loadSavedLanguage(): void {
+    const currentLanguage = this.languageService.getCurrentLanguage();
+    this.languageForm.patchValue({ language: currentLanguage }, { emitEvent: false });
+  }
 
-    this.settingsService.getSettings().subscribe({
-      next: (response) => {
-        this.loading = false;
-        if (response.success) {
-          this.settings = response.data;
-          this.populateProfileForm();
-          this.calculateProfileCompletion();
-        } else {
-          this.errorMessage = response.message || 'Failed to load settings';
+  /**
+   * Load user profile from /api/users/me
+   */
+  loadProfile(): void {
+    const apiUrl = `${environment.apiUrl}/users/me`;
+    console.log('📥 [Settings] Loading profile from:', apiUrl);
+
+    this.http.get<any>(apiUrl)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          console.log('✅ [Settings] Profile loaded successfully:', response.data);
+          if (response.success && response.data) {
+            this.profileForm.patchValue({
+              first_name: response.data.first_name || '',
+              last_name: response.data.last_name || '',
+              phone_number: response.data.phone_number || '',
+              bio: response.data.bio || '',
+              profile_picture: response.data.profile_picture || ''
+            });
+          }
+        },
+        error: (error) => {
+          console.error('❌ [Settings] Error loading profile:', error);
+          this.showToast('error', 'Failed to load profile');
         }
-      },
-      error: (error) => {
-        this.loading = false;
-        console.error('Error loading settings:', error);
-        this.errorMessage = error.error?.message || 'Failed to load settings';
-      },
-    });
-  }
-
-  /**
-   * Populate profile form with current data
-   */
-  populateProfileForm() {
-    if (this.settings) {
-      this.profileForm.patchValue({
-        first_name: this.settings.firstName,
-        last_name: this.settings.lastName,
-        phone_number: this.settings.phoneNumber || '',
       });
-    }
   }
 
   /**
-   * Calculate profile completion percentage
+   * Load all settings
    */
-  calculateProfileCompletion() {
+  loadSettings(): void {
+    this.loading = true;
+    const apiUrl = `${environment.apiUrl}/settings`;
+
+    this.http.get<any>(apiUrl)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.loading = false;
+          if (response.success && response.data) {
+            this.settings = response.data;
+            this.populateForms();
+          }
+        },
+        error: (error) => {
+          this.loading = false;
+          console.error('Error loading settings:', error);
+          this.showToast('error', 'Failed to load settings');
+        }
+      });
+  }
+
+  /**
+   * Populate all forms with current settings
+   */
+  populateForms(): void {
     if (!this.settings) return;
 
-    let completed = 0;
-    const total = 6; // 6 criteria
+    // Profile form
+    this.profileForm.patchValue(this.settings.profile);
 
-    if (this.settings.firstName) completed++;
-    if (this.settings.lastName) completed++;
-    if (this.settings.phoneNumber) completed++;
-    if (this.settings.profilePicture) completed++;
-    if (this.settings.email) completed++;
-    if (this.settings.lastLogin) completed++;
+    // Privacy form
+    this.privacyForm.patchValue(this.settings.privacy);
 
-    this.profileCompletion = Math.round((completed / total) * 100);
+    // Language form
+    this.languageForm.patchValue({
+      language: this.settings.language.current
+    });
+
+    // Appearance form
+    this.appearanceForm.patchValue({
+      dark_mode: this.settings.appearance.dark_mode
+    });
+
+    // Notifications form
+    this.notificationsForm.patchValue(this.settings.notifications);
   }
 
   /**
-   * Update profile information
+   * SECTION 1: Update Profile Settings via /api/users/me
    */
-  updateProfile() {
+  saveProfile(): void {
     if (this.profileForm.invalid) {
-      this.errorMessage = 'Please fill all required fields correctly';
+      console.log('❌ [Settings] Profile form is invalid');
+      this.showToast('error', 'Please fill all required fields correctly');
       return;
     }
 
-    this.saving = true;
-    this.errorMessage = '';
-    this.successMessage = '';
+    this.savingProfile = true;
+    const apiUrl = `${environment.apiUrl}/users/me`;
+    const payload = {
+      first_name: this.profileForm.value.first_name || '',
+      last_name: this.profileForm.value.last_name || '',
+      phone_number: this.profileForm.value.phone_number || '',
+      bio: this.profileForm.value.bio || '',
+      profile_picture: this.profileForm.value.profile_picture || ''
+    };
 
-    const formValue = this.profileForm.value;
-    this.profileService.updateProfile({
-      first_name: formValue.first_name,
-      last_name: formValue.last_name,
-      phone_number: formValue.phone_number
-    }).subscribe({
-      next: (response) => {
-        this.saving = false;
-        if (response.success) {
-          this.showSuccessMessage('Profile updated successfully');
-        } else {
-          this.errorMessage = response.message || 'Failed to update profile';
+    console.log('📤 [Settings] Updating profile to:', apiUrl, payload);
+
+    this.http.put<any>(apiUrl, payload)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.savingProfile = false;
+          console.log('✅ [Settings] Profile updated successfully:', response);
+          if (response.success && response.data) {
+            // Update form with returned data
+            this.profileForm.patchValue({
+              first_name: response.data.first_name || '',
+              last_name: response.data.last_name || '',
+              phone_number: response.data.phone_number || '',
+              bio: response.data.bio || '',
+              profile_picture: response.data.profile_picture || ''
+            }, { emitEvent: false });
+            
+            // Update settings object for consistency
+            if (this.settings && this.settings.profile) {
+              this.settings.profile = {
+                ...this.settings.profile,
+                first_name: response.data.first_name,
+                last_name: response.data.last_name,
+                phone_number: response.data.phone_number,
+                bio: response.data.bio,
+                profile_picture: response.data.profile_picture
+              };
+            }
+            
+            this.showToast('success', 'Profile updated successfully ✓');
+          }
+        },
+        error: (error) => {
+          this.savingProfile = false;
+          console.error('❌ [Settings] Error updating profile:', error);
+          const message = error.error?.message || 'Failed to update profile';
+          this.showToast('error', message);
         }
-      },
-      error: (error) => {
-        this.saving = false;
-        this.errorMessage = error.error?.message || 'Failed to update profile';
-      }
-    });
+      });
   }
 
   /**
-   * Toggle notification email
+   * SECTION 2: Update Privacy Settings
    */
-  toggleEmailNotifications() {
-    if (!this.settings) return;
+  savePrivacy(): void {
+    const apiUrl = `${environment.apiUrl}/settings/privacy`;
+    const payload = this.privacyForm.value;
 
-    this.saving = true;
-    this.settingsService.updateNotifications({
-      notification_email: !this.settings.notifications.email,
-    }).subscribe({
-      next: (response) => {
-        this.saving = false;
-        if (response.success && this.settings) {
-          this.settings.notifications.email = !this.settings.notifications.email;
-          this.showSuccessMessage('Email notifications updated');
-        } else {
-          this.errorMessage = response.message || 'Failed to update notifications';
+    console.log('📤 [Settings] Saving privacy settings:', payload);
+
+    this.http.put<any>(apiUrl, payload)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          console.log('✅ [Settings] Privacy settings saved:', response);
+          if (response.success) {
+            // Update settings object
+            if (this.settings && response.data && response.data.privacy) {
+              this.settings.privacy = response.data.privacy;
+              this.privacyForm.patchValue(response.data.privacy, { emitEvent: false });
+            }
+            this.showToast('success', 'Privacy settings saved ✓');
+          }
+        },
+        error: (error) => {
+          console.error('❌ [Settings] Error saving privacy:', error);
+          const message = error.error?.message || 'Failed to save privacy settings';
+          this.showToast('error', message);
         }
-      },
-      error: (error) => {
-        this.saving = false;
-        this.errorMessage = error.error?.message || 'Failed to update notifications';
-      },
-    });
+      });
   }
 
   /**
-   * Toggle notification push
+   * SECTION 3: Update Language
    */
-  togglePushNotifications() {
-    if (!this.settings) return;
+  saveLanguage(): void {
+    const apiUrl = `${environment.apiUrl}/settings/language`;
+    const language = this.languageForm.value.language;
 
-    this.saving = true;
-    this.settingsService.updateNotifications({
-      notification_push: !this.settings.notifications.push,
-    }).subscribe({
-      next: (response) => {
-        this.saving = false;
-        if (response.success && this.settings) {
-          this.settings.notifications.push = !this.settings.notifications.push;
-          this.showSuccessMessage('Push notifications updated');
-        } else {
-          this.errorMessage = response.message || 'Failed to update notifications';
+    console.log('📤 [Settings] Saving language preference:', language);
+
+    this.http.put<any>(apiUrl, { language })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          console.log('✅ [Settings] Language preference saved:', response);
+          if (response.success) {
+            // Update form with returned data
+            this.languageForm.patchValue({
+              language: response.data.language || language
+            }, { emitEvent: false });
+
+            // Use LanguageService to set language globally
+            this.languageService.setLanguage(response.data.language || language);
+
+            // Update settings object
+            if (this.settings) {
+              this.settings.language = { current: response.data.language || language };
+            }
+            this.showToast('success', `Language changed to ${language} ✓`);
+          }
+        },
+        error: (error) => {
+          console.error('❌ [Settings] Error changing language:', error);
+          const message = error.error?.message || 'Failed to change language';
+          this.showToast('error', message);
         }
-      },
-      error: (error) => {
-        this.saving = false;
-        this.errorMessage = error.error?.message || 'Failed to update notifications';
-      },
-    });
+      });
   }
 
   /**
-   * Toggle dark mode
+   * SECTION 4: Update Appearance (Dark Mode)
    */
-  toggleDarkMode() {
-    if (!this.settings) return;
+  saveDarkMode(): void {
+    const darkMode = this.appearanceForm.value.dark_mode;
+    const apiUrl = `${environment.apiUrl}/settings/appearance`;
 
-    this.saving = true;
-    this.settingsService.updateTheme({
-      dark_mode: !this.settings.theme.darkMode,
-    }).subscribe({
-      next: (response) => {
-        this.saving = false;
-        if (response.success && this.settings) {
-          this.settings.theme.darkMode = !this.settings.theme.darkMode;
-          this.applyDarkMode(this.settings.theme.darkMode);
-          this.showSuccessMessage('Dark mode updated');
-        } else {
-          this.errorMessage = response.message || 'Failed to update theme';
+    console.log('📤 [Settings] Saving appearance settings - Dark Mode:', darkMode);
+
+    this.http.put<any>(apiUrl, { dark_mode: darkMode })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          console.log('✅ [Settings] Appearance settings saved:', response);
+          if (response.success) {
+            this.applyDarkMode(darkMode);
+            // Update settings object
+            if (this.settings) {
+              this.settings.appearance = { dark_mode: darkMode };
+            }
+            const theme = darkMode ? 'Dark Mode' : 'Light Mode';
+            this.showToast('success', `${theme} enabled ✓`);
+          }
+        },
+        error: (error) => {
+          console.error('❌ [Settings] Error updating appearance:', error);
+          const message = error.error?.message || 'Failed to update appearance';
+          this.showToast('error', message);
+          // Revert the toggle on error
+          this.appearanceForm.patchValue({ dark_mode: !darkMode }, { emitEvent: false });
         }
-      },
-      error: (error) => {
-        this.saving = false;
-        this.errorMessage = error.error?.message || 'Failed to update theme';
-      },
-    });
+      });
   }
 
   /**
-   * Apply dark mode CSS class
+   * Apply dark mode to DOM
    */
-  applyDarkMode(enabled: boolean) {
+  applyDarkMode(enabled: boolean): void {
     if (enabled) {
       document.body.classList.add('dark-mode');
       localStorage.setItem('darkMode', 'true');
@@ -251,176 +381,180 @@ export class SettingsComponent implements OnInit {
   }
 
   /**
-   * Toggle profile visibility
+   * SECTION 5: Update Notifications
    */
-  toggleProfileVisibility() {
-    if (!this.settings) return;
+  saveNotifications(): void {
+    const apiUrl = `${environment.apiUrl}/settings/notifications`;
+    const payload = this.notificationsForm.value;
 
-    this.saving = true;
-    this.settingsService.updatePrivacy({
-      profile_visibility: !this.settings.privacy.profileVisibility,
-    }).subscribe({
-      next: (response) => {
-        this.saving = false;
-        if (response.success && this.settings) {
-          this.settings.privacy.profileVisibility = !this.settings.privacy.profileVisibility;
-          this.showSuccessMessage('Privacy settings updated');
-        } else {
-          this.errorMessage = response.message || 'Failed to update privacy';
+    console.log('📤 [Settings] Saving notification preferences:', payload);
+
+    this.http.put<any>(apiUrl, payload)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          console.log('✅ [Settings] Notifications saved:', response);
+          if (response.success) {
+            // Update settings object with response data
+            if (this.settings) {
+              if (response.data && response.data.notifications) {
+                this.settings.notifications = response.data.notifications;
+                this.notificationsForm.patchValue(response.data.notifications, { emitEvent: false });
+              } else if (response.data && response.data.data && response.data.data.notifications) {
+                this.settings.notifications = response.data.data.notifications;
+                this.notificationsForm.patchValue(response.data.data.notifications, { emitEvent: false });
+              }
+            }
+            this.showToast('success', 'Notification preferences updated ✓');
+          }
+        },
+        error: (error) => {
+          console.error('❌ [Settings] Error updating notifications:', error);
+          const message = error.error?.message || 'Failed to update notifications';
+          this.showToast('error', message);
         }
-      },
-      error: (error) => {
-        this.saving = false;
-        this.errorMessage = error.error?.message || 'Failed to update privacy';
-      },
-    });
+      });
   }
 
   /**
-   * Update language
+   * SECTION 6: Change Password
    */
-  updateLanguage(language: string) {
-    if (!this.settings || this.settings.language === language) return;
-
-    this.saving = true;
-    this.settingsService.updateLanguage({ language }).subscribe({
-      next: (response) => {
-        this.saving = false;
-        if (response.success && this.settings) {
-          this.settings.language = language;
-          this.showSuccessMessage(`Language changed to ${language}`);
-        } else {
-          this.errorMessage = response.message || 'Failed to update language';
-        }
-      },
-      error: (error) => {
-        this.saving = false;
-        this.errorMessage = error.error?.message || 'Failed to update language';
-      },
-    });
-  }
-
-  /**
-   * Change password
-   */
-  changePassword() {
+  changePassword(): void {
     if (this.passwordForm.invalid) {
-      this.errorMessage = 'Please fill all password fields correctly';
+      this.showToast('error', 'Please fill all password fields correctly');
       return;
     }
 
-    const formValue = this.passwordForm.value;
-    this.saving = true;
-    this.errorMessage = '';
+    this.savingPassword = true;
+    const apiUrl = `${environment.apiUrl}/settings/password`;
 
-    console.log('📝 Sending password change request:', {
-      current_password: '***',
-      new_password: '***',
-      confirm_password: '***'
-    });
-
-    this.profileService.changePassword({
-      current_password: formValue.current_password,
-      new_password: formValue.new_password,
-      confirm_password: formValue.confirm_password
-    }).subscribe({
-      next: (response) => {
-        this.saving = false;
-        console.log('✅ Password change response:', response);
-        if (response.success) {
-          this.showSuccessMessage('Password changed successfully');
-          this.passwordForm.reset();
-          this.showPasswordModal = false;
-        } else {
-          this.errorMessage = response.message || 'Failed to change password';
+    this.http.put<any>(apiUrl, this.passwordForm.value)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.savingPassword = false;
+          if (response.success) {
+            this.showToast('success', 'Password changed successfully ✓');
+            this.passwordForm.reset();
+            this.showPasswordModal = false;
+          }
+        },
+        error: (error) => {
+          this.savingPassword = false;
+          const message = error.error?.message || 'Failed to change password';
+          this.showToast('error', message);
         }
-      },
-      error: (error) => {
-        this.saving = false;
-        console.error('❌ Password change error:', error);
-        const errorMsg = error.error?.message || error.message || 'Failed to change password';
-        this.errorMessage = errorMsg;
-      },
-    });
+      });
   }
 
   /**
-   * Delete account
+   * SECTION 7: Delete Account
    */
-  deleteAccount() {
-    if (this.deleteForm.invalid) {
-      this.errorMessage = 'Please enter your password';
+  deleteAccountConfirm(): void {
+    if (this.deleteAccountForm.invalid) {
+      this.showToast('error', 'Password is required');
       return;
     }
 
-    const password = this.deleteForm.get('password')?.value;
-    this.saving = true;
-    this.errorMessage = '';
+    this.deletingAccount = true;
+    const apiUrl = `${environment.apiUrl}/settings/delete-account`;
 
-    this.profileService.deleteAccount(password).subscribe({
-      next: (response) => {
-        this.saving = false;
-        if (response.success) {
-          // Clear auth and redirect to login
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('userId');
-          this.router.navigate(['/login']);
-        } else {
-          this.errorMessage = response.message || 'Failed to delete account';
+    this.http.delete<any>(apiUrl, {
+      body: this.deleteAccountForm.value
+    }).pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.deletingAccount = false;
+          if (response.success) {
+            this.showToast('success', 'Account deleted. Redirecting to login...');
+            setTimeout(() => {
+              localStorage.removeItem('authToken');
+              localStorage.removeItem('userId');
+              this.router.navigate(['/login']);
+            }, 2000);
+          }
+        },
+        error: (error) => {
+          this.deletingAccount = false;
+          const message = error.error?.message || 'Failed to delete account';
+          this.showToast('error', message);
         }
-      },
-      error: (error) => {
-        this.saving = false;
-        this.errorMessage = error.error?.message || 'Failed to delete account';
-      },
+      });
+  }
+
+  /**
+   * SECTION 8: File Upload for Profile Picture
+   */
+  onProfilePictureSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.profileForm.patchValue({
+          profile_picture: e.target.result
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  /**
+   * Clear profile picture
+   */
+  clearProfilePicture(): void {
+    this.profileForm.patchValue({
+      profile_picture: null
     });
   }
 
   /**
-   * Custom validator for password matching
+   * Show toast notification
    */
-  passwordMatchValidator(group: FormGroup): { [key: string]: any } | null {
-    const password = group.get('new_password')?.value;
-    const confirm = group.get('confirm_password')?.value;
-    return password === confirm ? null : { passwordMismatch: true };
-  }
-
-  /**
-   * Show success message and auto dismiss
-   */
-  showSuccessMessage(message: string) {
-    this.successMessage = message;
+  showToast(type: 'success' | 'error' | 'warning', message: string): void {
+    this.toast = { type, message, visible: true };
     setTimeout(() => {
-      this.successMessage = '';
+      this.toast.visible = false;
     }, 3000);
   }
 
   /**
-   * Format date for display
+   * Custom validators
    */
-  formatDate(date: Date): string {
-    if (!date) return '';
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  phoneValidator() {
+    return (control: any) => {
+      if (!control.value) return null;
+      const isValid = /^\d{10,}$/.test(control.value.replace(/\D/g, ''));
+      return isValid ? null : { invalidPhone: true };
+    };
+  }
+
+  passwordMatchValidator() {
+    return (group: FormGroup) => {
+      const password = group.get('new_password')?.value;
+      const confirm = group.get('confirm_password')?.value;
+      return password === confirm ? null : { passwordMismatch: true };
+    };
   }
 
   /**
-   * Get form controls
+   * Form validation helpers
    */
-  get pf() {
-    return this.profileForm.controls;
+  hasError(form: FormGroup, fieldName: string): boolean {
+    const field = form.get(fieldName);
+    return field ? field.invalid && (field.dirty || field.touched) : false;
   }
 
-  get pwf() {
-    return this.passwordForm.controls;
-  }
+  getErrorMessage(form: FormGroup, fieldName: string): string {
+    const field = form.get(fieldName);
+    if (!field || !field.errors) return '';
 
-  get df() {
-    return this.deleteForm.controls;
+    if (field.errors['required']) return `${fieldName} is required`;
+    if (field.errors['minlength']) return `${fieldName} must be at least ${field.errors['minlength'].requiredLength} characters`;
+    if (field.errors['maxlength']) return `${fieldName} cannot exceed ${field.errors['maxlength'].requiredLength} characters`;
+    if (field.errors['invalidPhone']) return 'Phone number must be at least 10 digits';
+    if (field.errors['pattern']) return `${fieldName} format is invalid`;
+
+    return 'Invalid field';
   }
 }
+

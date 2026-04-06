@@ -33,7 +33,7 @@ export const routes: Routes = [
       { path: 'my-tasks', loadComponent: () => import('./components/pages/my-tasks/my-tasks').then(m => m.MyTasksComponent) },
       { path: 'add-task', loadComponent: () => import('./components/pages/add-task/add-task').then(m => m.AddTaskComponent) },
       { path: 'profile', loadComponent: () => import('./components/pages/profile').then(m => m.ProfileComponent) },
-      { path: 'settings', loadComponent: () => import('./components/pages/settings').then(m => m.SettingsComponent) },
+      { path: 'settings', loadComponent: () => import('./components/pages/settings').then(m => m.SettingsComprehensiveComponent) },
       { path: 'activity', loadComponent: () => import('./components/pages/activity-dashboard').then(m => m.ActivityDashboardComponent) },
       { path: 'requests', loadComponent: () => import('./components/pages/requests').then(m => m.RequestsComponent) },
       { path: 'my-requests', loadComponent: () => import('./components/pages/my-requests').then(m => m.MyRequestsComponent) },

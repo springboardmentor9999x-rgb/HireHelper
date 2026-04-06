@@ -21,33 +21,15 @@
 
   <!-- Profile Content -->
   <div *ngIf="profile" class="profile-content">
-    <!-- Profile Picture Section -->
-    <div class="profile-picture-section">
+    <!-- Profile Picture Display -->
+    <div class="profile-picture-display">
       <div class="picture-container">
-        <img 
-          *ngIf="profilePicturePreview" 
-          [src]="profilePicturePreview" 
-          alt="Profile Picture"
-          class="profile-picture"
-        />
-        <div *ngIf="!profilePicturePreview" class="picture-placeholder">
-          <div class="placeholder-initials">{{ profile.first_name[0] }}{{ profile.last_name[0] }}</div>
+        <img *ngIf="profile.profile_picture" [src]="profile.profile_picture" alt="Profile Picture" class="profile-picture" />
+        <div *ngIf="!profile.profile_picture" class="picture-placeholder">
+          <div class="placeholder-initials">{{ (profile.first_name.charAt(0) || '') + (profile.last_name.charAt(0) || '') }}</div>
         </div>
       </div>
-
-      <label class="upload-button" [class.loading]="uploadingPicture">
-        <input 
-          type="file" 
-          (change)="onFileSelected($event)"
-          accept=".jpg,.jpeg,.png"
-          [disabled]="uploadingPicture"
-          hidden
-        />
-        <span *ngIf="!uploadingPicture">📸 Upload Picture</span>
-        <span *ngIf="uploadingPicture">Uploading...</span>
-      </label>
-
-      <p class="picture-hint">JPG or PNG, max 2MB</p>
+      <p class="picture-info" *ngIf="!profile.profile_picture">Upload a profile picture in Settings</p>
     </div>
 
     <!-- Profile Information Section (View Mode) -->
@@ -64,7 +46,7 @@
 
       <div class="info-group">
         <label>Email</label>
-        <p class="info-value">{{ profile.email }}</p>
+        <p class="info-value">{{ profile.email }} <span class="locked-badge">🔒 Fixed</span></p>
       </div>
 
       <div class="info-group">

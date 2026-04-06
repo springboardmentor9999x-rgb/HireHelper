@@ -72,7 +72,14 @@ exports.getTaskById = async (req, res) => {
 // CREATE new task
 exports.createTask = async (req, res) => {
   try {
-    console.log("USER:", req.user); // DEBUG
+    console.log("🔍 [Task] Create task request - USER:", req.user.id);
+    console.log("📝 [Task] Body:", req.body);
+    console.log("🖼️ [Task] File info:", req.file ? {
+      filename: req.file.filename,
+      size: req.file.size,
+      mimetype: req.file.mimetype,
+      path: req.file.path
+    } : 'No file');
 
     const userId = req.user.id;
 
@@ -83,7 +90,9 @@ exports.createTask = async (req, res) => {
       location,
       start_time,
       end_time,
-      budget
+      budget,
+      status,
+      priority
     } = req.body;
 
     // Validate required fields
@@ -94,24 +103,36 @@ exports.createTask = async (req, res) => {
       });
     }
 
+    // Get image path if file was uploaded
+    const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+    console.log("📸 [Task] Image path:", imagePath);
+
     const result = await pool.query(
       `INSERT INTO tasks 
-      (title, description, category, location, start_time, end_time, budget, user_id)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+      (title, description, category, location, start_time, end_time, budget, user_id, picture, status, priority)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
       RETURNING *`,
-      [title, description, category, location, start_time, end_time, budget, userId]
+      [title, description, category, location, start_time, end_time, budget, userId, imagePath, status || 'OPEN', priority || 'medium']
     );
 
+    console.log("✅ [Task] Task created successfully:", result.rows[0].id);
     res.status(201).json({
       success: true,
       data: result.rows[0]
     });
 
   } catch (error) {
-    console.error('Error creating task:', error);
+    console.error('❌ [Task] Error creating task:', error);
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      detail: error.detail
+    });
     res.status(500).json({
       success: false,
-      message: 'Error creating task'
+      message: 'Error creating task',
+      error: error.message,
+      code: error.code
     });
   }
 };
@@ -119,6 +140,10 @@ exports.createTask = async (req, res) => {
 // UPDATE task
 exports.updateTask = async (req, res) => {
   try {
+    console.log("🔍 [Task] Update task request - USER:", req.user.id, "TASK:", req.params.id);
+    console.log("📝 [Task] Body:", req.body);
+    console.log("🖼️ [Task] File:", req.file ? req.file.filename : 'None');
+
     const userId = req.user.id;
     const taskId = req.params.id;
 
@@ -134,7 +159,7 @@ exports.updateTask = async (req, res) => {
 
     // Check if task belongs to user
     const checkResult = await pool.query(
-      'SELECT id FROM tasks WHERE id = $1 AND user_id = $2',
+      'SELECT * FROM tasks WHERE id = $1 AND user_id = $2',
       [taskId, userId]
     );
 
@@ -145,31 +170,119 @@ exports.updateTask = async (req, res) => {
       });
     }
 
-    const result = await pool.query(
-      `UPDATE tasks 
-       SET title = COALESCE($1, title),
-           description = COALESCE($2, description),
-           category = COALESCE($3, category),
-           location = COALESCE($4, location),
-           start_time = COALESCE($5, start_time),
-           end_time = COALESCE($6, end_time),
-           budget = COALESCE($7, budget),
-           updated_at = CURRENT_TIMESTAMP
-       WHERE id = $8 AND user_id = $9
-       RETURNING *`,
-      [title, description, category, location, start_time, end_time, budget, taskId, userId]
-    );
+    const existingTask = checkResult.rows[0];
 
+    // Get image path if new file was uploaded, otherwise keep existing
+    let imagePath = existingTask.picture;
+    if (req.file) {
+      imagePath = `/uploads/${req.file.filename}`;
+      console.log("📸 [Task] New image uploaded:", {
+        filename: req.file.filename,
+        size: req.file.size,
+        mimetype: req.file.mimetype,
+        path: imagePath
+      });
+    } else {
+      console.log("📸 [Task] Keeping existing image:", imagePath);
+    }
+
+    // Build update query with only provided fields
+    const updateFields = [];
+    const params = [];
+    let paramIndex = 1;
+
+    if (title !== undefined && title !== '') {
+      updateFields.push(`title = $${paramIndex}`);
+      params.push(title);
+      paramIndex++;
+    }
+
+    if (description !== undefined && description !== '') {
+      updateFields.push(`description = $${paramIndex}`);
+      params.push(description);
+      paramIndex++;
+    }
+
+    if (category !== undefined && category !== '') {
+      updateFields.push(`category = $${paramIndex}`);
+      params.push(category);
+      paramIndex++;
+    }
+
+    if (location !== undefined && location !== '') {
+      updateFields.push(`location = $${paramIndex}`);
+      params.push(location);
+      paramIndex++;
+    }
+
+    if (start_time !== undefined && start_time !== '') {
+      updateFields.push(`start_time = $${paramIndex}`);
+      params.push(start_time);
+      paramIndex++;
+    }
+
+    if (end_time !== undefined && end_time !== '') {
+      updateFields.push(`end_time = $${paramIndex}`);
+      params.push(end_time);
+      paramIndex++;
+    }
+
+    if (budget !== undefined && budget !== '') {
+      updateFields.push(`budget = $${paramIndex}`);
+      params.push(parseFloat(budget));
+      paramIndex++;
+    }
+
+    // Always update image if provided (even if null)
+    updateFields.push(`picture = $${paramIndex}`);
+    params.push(imagePath);
+    paramIndex++;
+
+    // Always update timestamp
+    updateFields.push(`updated_at = CURRENT_TIMESTAMP`);
+
+    // Add taskId and userId to params for WHERE clause
+    params.push(taskId);
+    params.push(userId);
+
+    if (updateFields.length === 2) {
+      // Only timestamp was added, nothing to update
+      return res.status(400).json({
+        success: false,
+        message: 'No fields to update'
+      });
+    }
+
+    const query = `UPDATE tasks 
+                   SET ${updateFields.join(', ')}
+                   WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1}
+                   RETURNING *`;
+
+    console.log("🔧 Query:", query);
+    console.log("📌 Params:", params);
+
+    const result = await pool.query(query, params);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Task not found'
+      });
+    }
+
+    console.log("✅ [Task] Task updated successfully:", taskId);
     res.status(200).json({
       success: true,
+      message: 'Task updated successfully',
       data: result.rows[0]
     });
 
   } catch (error) {
-    console.error('Error updating task:', error);
+    console.error('❌ [Task] Error updating task:', error);
     res.status(500).json({
       success: false,
-      message: 'Error updating task'
+      message: 'Error updating task',
+      error: error.message
     });
   }
 };

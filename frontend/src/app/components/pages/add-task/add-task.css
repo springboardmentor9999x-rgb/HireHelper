@@ -95,20 +95,42 @@ label {
   font-size: var(--font-size-base);
   border: 2px solid var(--gray-300);
   border-radius: var(--radius-lg);
-  font-family: inherit;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 500;
   transition: all var(--transition-smooth);
   background-color: white;
   color: var(--gray-900);
+  line-height: 1.5;
+  letter-spacing: 0.3px;
+}
+
+input.form-control {
+  height: 52px;
+  box-sizing: border-box;
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 120px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.form-control::placeholder {
+  color: var(--gray-500);
+  font-weight: 400;
+  letter-spacing: 0.2px;
 }
 
 .form-control:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(237, 144, 58, 0.1);
+  background-color: #fafafa;
 }
 
 .form-control:hover:not(:focus) {
   border-color: var(--primary-light);
+  background-color: #fafafa;
 }
 
 .form-control.error {
@@ -118,12 +140,6 @@ label {
 
 .form-control.error:focus {
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-}
-
-textarea.form-control {
-  resize: vertical;
-  min-height: 120px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 select.form-control {
@@ -203,6 +219,26 @@ select.form-control {
 }
 
 .btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-cancel {
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.btn-cancel:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+.btn-cancel:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-cancel:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }

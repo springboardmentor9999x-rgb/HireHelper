@@ -10,8 +10,9 @@ import { interval, Subscription } from 'rxjs';
 interface User {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
+  profile_picture: string | null;
 }
 
 @Component({
@@ -36,10 +37,8 @@ export class LayoutComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Subscribe to current user
-    this.authService.currentUser$.subscribe((user) => {
-      this.currentUser = user;
-    });
+    // Load user profile from API
+    this.loadUserProfile();
 
     // Load notifications on init
     this.loadNotifications();
@@ -54,6 +53,36 @@ export class LayoutComponent implements OnInit, OnDestroy {
     if (this.notificationSubscription) {
       this.notificationSubscription.unsubscribe();
     }
+  }
+
+  /**
+   * Load user profile from /api/users/me
+   */
+  loadUserProfile(): void {
+    const apiUrl = `${environment.apiUrl}/users/me`;
+    this.http.get<any>(apiUrl).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.currentUser = {
+            id: response.data.id,
+            email: response.data.email || '',
+            first_name: response.data.first_name || '',
+            last_name: response.data.last_name || '',
+            profile_picture: response.data.profile_picture || null
+          };
+          console.log('✅ User profile loaded:', this.currentUser);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading user profile:', error);
+        // If profile loading fails, still try to use auth service data
+        this.authService.currentUser$.subscribe((user) => {
+          if (user) {
+            this.currentUser = user;
+          }
+        });
+      }
+    });
   }
 
   loadNotifications() {
@@ -88,11 +117,37 @@ export class LayoutComponent implements OnInit, OnDestroy {
     this.showNotificationDropdown = false;
   }
 
-  get firstNameDisplay(): string {
-    if (this.currentUser?.firstName) {
-      return this.currentUser.firstName.charAt(0).toUpperCase() + this.currentUser.firstName.slice(1);
+  /**
+   * Get user's full name
+   */
+  getFullName(): string {
+    if (this.currentUser) {
+      const fullName = `${this.currentUser.first_name} ${this.currentUser.last_name}`.trim();
+      return fullName || this.currentUser.email || 'User';
     }
-    return '';
+    return 'User';
+  }
+
+  /**
+   * Get first name for display
+   */
+  getFirstName(): string {
+    if (this.currentUser?.first_name) {
+      return this.currentUser.first_name.charAt(0).toUpperCase() + this.currentUser.first_name.slice(1);
+    }
+    return 'User';
+  }
+
+  /**
+   * Get initials for avatar
+   */
+  getInitials(): string {
+    if (this.currentUser) {
+      const first = this.currentUser.first_name?.charAt(0) || '';
+      const last = this.currentUser.last_name?.charAt(0) || '';
+      return (first + last).toUpperCase();
+    }
+    return 'U';
   }
 
   markAsRead(notificationId: number) {

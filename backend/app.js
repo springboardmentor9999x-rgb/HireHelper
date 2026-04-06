@@ -14,8 +14,15 @@ const requestRoutes = require('./src/routes/requestRoutes');
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin: 'http://localhost:4300',
+  credentials: true,
+  optionsSuccessStatus: 200
+}));
+
+// Order is critical: Apply JSON first, then specific routes with multer
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Setup upload directory
 const uploadDir = path.join(__dirname, 'uploads');
@@ -47,7 +54,7 @@ const upload = multer({
   }
 });
 
-app.use(upload.single('image'));
+// Serve uploaded files
 app.use('/uploads', express.static(uploadDir));
 
 // ROUTES
@@ -94,10 +101,13 @@ app.use((req, res) => {
       ],
       settings: [
         'GET /api/settings',
+        'PUT /api/settings/profile',
         'PUT /api/settings/notifications',
+        'PUT /api/settings/appearance',
         'PUT /api/settings/theme',
         'PUT /api/settings/language',
         'PUT /api/settings/privacy',
+        'PUT /api/settings/password',
         'PUT /api/settings/change-password',
         'DELETE /api/settings/delete-account'
       ],
@@ -127,6 +137,45 @@ app.use((req, res) => {
 // Error Handler
 app.use((err, req, res, next) => {
   console.error('❌ [Error]', err.message);
+  
+  // Handle multer file upload errors
+  if (err instanceof multer.MulterError) {
+    console.error('📸 [Multer Error]', err.code, err.message);
+    
+    if (err.code === 'FILE_TOO_LARGE' || err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(413).json({
+        success: false,
+        message: 'File size too large. Maximum 5MB allowed.',
+        error: err.message
+      });
+    }
+    
+    if (err.code === 'LIMIT_FILE_COUNT') {
+      return res.status(400).json({
+        success: false,
+        message: 'Too many files uploaded.',
+        error: err.message
+      });
+    }
+    
+    return res.status(400).json({
+      success: false,
+      message: 'File upload error',
+      error: err.message
+    });
+  }
+  
+  // Handle file validation errors from fileFilter
+  if (err.message && err.message.includes('Invalid file type')) {
+    console.error('📸 [File Filter Error]', err.message);
+    return res.status(415).json({
+      success: false,
+      message: 'Invalid file type. Only images (JPEG, PNG, GIF, WebP) are allowed.',
+      error: err.message
+    });
+  }
+  
+  // Generic server error
   res.status(500).json({
     success: false,
     message: 'Server error',

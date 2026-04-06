@@ -1,341 +1,443 @@
 <div class="settings-container">
   <!-- Header -->
   <div class="settings-header">
-    <h1>Settings</h1>
-    <p>Manage your HireHelper account and preferences</p>
+    <h1>{{ 'settings.title' | translate }}</h1>
+    <p class="subtitle">{{ 'settings.subtitle' | translate }}</p>
   </div>
 
-  <!-- Messages -->
-  <div *ngIf="successMessage" class="alert alert-success">
-    ✓ {{ successMessage }}
-  </div>
-  <div *ngIf="errorMessage" class="alert alert-error">
-    ✕ {{ errorMessage }}
+  <!-- Toast Notification -->
+  <div class="toast" [ngClass]="{ success: toast.type === 'success', error: toast.type === 'error', warning: toast.type === 'warning', visible: toast.visible }" *ngIf="toast.visible">
+    <span class="toast-icon">
+      <span *ngIf="toast.type === 'success'">✓</span>
+      <span *ngIf="toast.type === 'error'">✕</span>
+      <span *ngIf="toast.type === 'warning'">!</span>
+    </span>
+    <span class="toast-message">{{ toast.message }}</span>
+    <button class="toast-close" (click)="toast.visible = false">×</button>
   </div>
 
   <!-- Loading Spinner -->
-  <div *ngIf="loading" class="spinner-container">
+  <div class="loading-overlay" *ngIf="loading">
     <div class="spinner"></div>
-    <p>Loading settings...</p>
+    <p>{{ 'settings.loadingSettings' | translate }}</p>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tabs-navigation">
+    <button class="tab-btn" [class.active]="activeTab === 'profile'" (click)="activeTab = 'profile'">
+      <span class="tab-icon">👤</span> {{ 'settings.tabs.profile' | translate }}
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'privacy'" (click)="activeTab = 'privacy'">
+      <span class="tab-icon">🔒</span> {{ 'settings.tabs.privacy' | translate }}
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'language'" (click)="activeTab = 'language'">
+      <span class="tab-icon">🌐</span> {{ 'settings.tabs.language' | translate }}
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'appearance'" (click)="activeTab = 'appearance'">
+      <span class="tab-icon">🎨</span> {{ 'settings.tabs.appearance' | translate }}
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'notifications'" (click)="activeTab = 'notifications'">
+      <span class="tab-icon">🔔</span> {{ 'settings.tabs.notifications' | translate }}
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'security'" (click)="activeTab = 'security'">
+      <span class="tab-icon">🛡️</span> {{ 'settings.tabs.security' | translate }}
+    </button>
+    <button class="tab-btn dangerous" [class.active]="activeTab === 'danger'" (click)="activeTab = 'danger'">
+      <span class="tab-icon">⚠️</span> {{ 'settings.tabs.delete' | translate }}
+    </button>
   </div>
 
   <!-- Settings Content -->
-  <div *ngIf="!loading && settings" class="settings-content">
-    <!-- SECTION 1: Profile Settings -->
-    <div class="settings-section">
-      <div class="section-icon">👤</div>
-      <h3>Profile Settings</h3>
-      <p class="section-description">Manage your basic information</p>
+  <div class="settings-content" *ngIf="!loading">
 
-      <!-- Profile Completion Progress -->
-      <div class="progress-section">
-        <div class="progress-label">
-          <span>Profile Completion</span>
-          <span class="progress-percent">{{ profileCompletion }}%</span>
+    <!-- 1. PROFILE SETTINGS -->
+    <div class="tab-content" [class.active]="activeTab === 'profile'">
+      <div class="settings-card">
+        <div class="card-header">
+          <h2>{{ 'settings.profile.title' | translate }}</h2>
+          <p>{{ 'settings.profile.subtitle' | translate }}</p>
         </div>
-        <div class="progress-bar">
-          <div class="progress-fill" [style.width.%]="profileCompletion"></div>
-        </div>
-      </div>
 
-      <form [formGroup]="profileForm" class="settings-form">
-        <div class="form-row">
+        <form [formGroup]="profileForm" class="settings-form">
           <div class="form-group">
-            <label for="first_name">First Name</label>
-            <input
-              id="first_name"
-              type="text"
-              formControlName="first_name"
-              placeholder="Enter first name"
-              class="form-control"
-            />
+            <label for="profile_picture">{{ 'settings.profile.profilePicture' | translate }}</label>
+            <div class="picture-upload-section">
+              <div class="picture-preview" *ngIf="profileForm.value.profile_picture">
+                <img [src]="profileForm.value.profile_picture" alt="Profile preview">
+                <button type="button" class="remove-btn" (click)="clearProfilePicture()">×</button>
+              </div>
+              <div class="picture-placeholder" *ngIf="!profileForm.value.profile_picture">
+                <span class="icon">📸</span>
+                <p>{{ 'settings.profile.noPictureSelected' | translate }}</p>
+              </div>
+              <input type="file" id="profile_picture" accept="image/*" (change)="onProfilePictureSelected($event)" class="file-input">
+              <label for="profile_picture" class="file-label">{{ 'settings.profile.chooseFile' | translate }}</label>
+            </div>
           </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="first_name">{{ 'settings.profile.firstName' | translate }} *</label>
+              <input type="text" id="first_name" formControlName="first_name" class="form-control"
+                [class.error]="hasError(profileForm, 'first_name')">
+              <small class="error-text" *ngIf="hasError(profileForm, 'first_name')">
+                {{ getErrorMessage(profileForm, 'first_name') }}
+              </small>
+            </div>
+            <div class="form-group">
+              <label for="last_name">{{ 'settings.profile.lastName' | translate }} *</label>
+              <input type="text" id="last_name" formControlName="last_name" class="form-control"
+                [class.error]="hasError(profileForm, 'last_name')">
+              <small class="error-text" *ngIf="hasError(profileForm, 'last_name')">
+                {{ getErrorMessage(profileForm, 'last_name') }}
+              </small>
+            </div>
+          </div>
+
           <div class="form-group">
-            <label for="last_name">Last Name</label>
-            <input
-              id="last_name"
-              type="text"
-              formControlName="last_name"
-              placeholder="Enter last name"
-              class="form-control"
-            />
+            <label for="phone_number">{{ 'settings.profile.phoneNumber' | translate }}</label>
+            <input type="tel" id="phone_number" formControlName="phone_number" class="form-control"
+              [class.error]="hasError(profileForm, 'phone_number')">
+            <small class="error-text" *ngIf="hasError(profileForm, 'phone_number')">
+              {{ getErrorMessage(profileForm, 'phone_number') }}
+            </small>
           </div>
+
+          <div class="form-group">
+            <label for="bio">{{ 'settings.profile.bio' | translate }}</label>
+            <textarea id="bio" formControlName="bio" class="form-control" rows="4" [placeholder]="'settings.profile.bioPlaceholder' | translate"></textarea>
+            <small class="help-text">{{ profileForm.value.bio?.length || 0 }}/500 characters</small>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-primary" (click)="saveProfile()" [disabled]="profileForm.invalid || savingProfile">
+              <span *ngIf="!savingProfile">💾 {{ 'settings.profile.saveProfile' | translate }}</span>
+              <span *ngIf="savingProfile">{{ 'settings.profile.saving' | translate }}...</span>
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="profileForm.reset()">{{ 'common.clear' | translate }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 2. PRIVACY SETTINGS -->
+    <div class="tab-content" [class.active]="activeTab === 'privacy'">
+      <div class="settings-card">
+        <div class="card-header">
+          <h2>{{ 'settings.privacy.title' | translate }}</h2>
+          <p>{{ 'settings.privacy.subtitle' | translate }}</p>
+        </div>
+
+        <form [formGroup]="privacyForm" class="settings-form">
+          <div class="toggle-group">
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <h3>{{ 'settings.privacy.showProfileInFeed' | translate }}</h3>
+                <p>{{ 'settings.privacy.showProfileInFeedDesc' | translate }}</p>
+              </div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="show_profile" formControlName="show_profile_in_feed" (change)="savePrivacy()" class="toggle-checkbox">
+                <label for="show_profile" class="toggle-label"></label>
+              </div>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <h3>{{ 'settings.privacy.allowDirectMessages' | translate }}</h3>
+                <p>{{ 'settings.privacy.allowDirectMessagesDesc' | translate }}</p>
+              </div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="allow_messages" formControlName="allow_messages" (change)="savePrivacy()" class="toggle-checkbox">
+                <label for="allow_messages" class="toggle-label"></label>
+              </div>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <h3>{{ 'settings.privacy.emailNotifications' | translate }}</h3>
+                <p>{{ 'settings.privacy.emailNotificationsDesc' | translate }}</p>
+              </div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="email_notif" formControlName="email_notifications" (change)="savePrivacy()" class="toggle-checkbox">
+                <label for="email_notif" class="toggle-label"></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-primary" (click)="savePrivacy()">
+              🔒 {{ 'settings.privacy.savePrivacy' | translate }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 3. LANGUAGE SETTINGS -->
+    <div class="tab-content" [class.active]="activeTab === 'language'">
+      <div class="settings-card">
+        <div class="card-header">
+          <h2>{{ 'settings.language.title' | translate }}</h2>
+          <p>{{ 'settings.language.subtitle' | translate }}</p>
+        </div>
+
+        <form [formGroup]="languageForm" class="settings-form">
+          <div class="form-group">
+            <label for="language">{{ 'settings.language.language' | translate }}</label>
+            <select id="language" formControlName="language" class="form-control" (change)="saveLanguage()">
+              <option *ngFor="let lang of languages" [value]="lang">{{ lang }}</option>
+            </select>
+            <small class="help-text">{{ 'settings.language.helpText' | translate }}</small>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-primary" (click)="saveLanguage()">
+              🌐 {{ 'settings.language.saveLanguage' | translate }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 4. APPEARANCE SETTINGS -->
+    <div class="tab-content" [class.active]="activeTab === 'appearance'">
+      <div class="settings-card">
+        <div class="card-header">
+          <h2>{{ 'settings.appearance.title' | translate }}</h2>
+          <p>{{ 'settings.appearance.subtitle' | translate }}</p>
+        </div>
+
+        <form [formGroup]="appearanceForm" class="settings-form">
+          <div class="toggle-group">
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <h3>{{ 'settings.appearance.darkMode' | translate }}</h3>
+                <p>{{ 'settings.appearance.darkModeDesc' | translate }}</p>
+              </div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="dark_mode" formControlName="dark_mode" 
+                  (change)="saveDarkMode()" class="toggle-checkbox">
+                <label for="dark_mode" class="toggle-label"></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="theme-preview">
+            <div class="preview-light">
+              <p>{{ 'settings.appearance.lightModePreview' | translate }}</p>
+            </div>
+            <div class="preview-dark">
+              <p>{{ 'settings.appearance.darkModePreview' | translate }}</p>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 5. NOTIFICATIONS SETTINGS -->
+    <div class="tab-content" [class.active]="activeTab === 'notifications'">
+      <div class="settings-card">
+        <div class="card-header">
+          <h2>{{ 'settings.notifications.title' | translate }}</h2>
+          <p>{{ 'settings.notifications.subtitle' | translate }}</p>
+        </div>
+
+        <form [formGroup]="notificationsForm" class="settings-form">
+          <div class="toggle-group">
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <h3>{{ 'settings.notifications.taskRequests' | translate }}</h3>
+                <p>{{ 'settings.notifications.taskRequestsDesc' | translate }}</p>
+              </div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="task_req" formControlName="task_requests" (change)="saveNotifications()" class="toggle-checkbox">
+                <label for="task_req" class="toggle-label"></label>
+              </div>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <h3>{{ 'settings.notifications.taskUpdates' | translate }}</h3>
+                <p>{{ 'settings.notifications.taskUpdatesDesc' | translate }}</p>
+              </div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="task_upd" formControlName="task_updates" (change)="saveNotifications()" class="toggle-checkbox">
+                <label for="task_upd" class="toggle-label"></label>
+              </div>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <h3>{{ 'settings.notifications.announcements' | translate }}</h3>
+                <p>{{ 'settings.notifications.announcementsDesc' | translate }}</p>
+              </div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="announ" formControlName="announcements" (change)="saveNotifications()" class="toggle-checkbox">
+                <label for="announ" class="toggle-label"></label>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 6. SECURITY SETTINGS -->
+    <div class="tab-content" [class.active]="activeTab === 'security'">
+      <div class="settings-card">
+        <div class="card-header">
+          <h2>{{ 'settings.security.title' | translate }}</h2>
+          <p>{{ 'settings.security.subtitle' | translate }}</p>
+        </div>
+
+        <div class="settings-form">
+          <div class="security-item">
+            <div class="security-info">
+              <h3>{{ 'settings.security.changePassword' | translate }}</h3>
+              <p>{{ 'settings.security.changePasswordDesc' | translate }}</p>
+            </div>
+            <button type="button" class="btn btn-secondary" (click)="showPasswordModal = true">
+              🔐 {{ 'settings.security.changePasswordButton' | translate }}
+            </button>
+          </div>
+
+          <div class="security-divider"></div>
+
+          <div class="security-item">
+            <h3>{{ 'settings.security.lastLogin' | translate }}</h3>
+            <p class="security-value" *ngIf="settings?.security?.last_login">
+              {{ settings?.security?.last_login | date:'medium' }}
+            </p>
+          </div>
+
+          <div class="security-divider"></div>
+
+          <div class="security-item">
+            <div class="security-info">
+              <h3>{{ 'settings.security.accountCreated' | translate }}</h3>
+              <p class="security-value" *ngIf="settings?.security?.created_at">
+                {{ settings?.security?.created_at | date:'medium' }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. DANGER ZONE - DELETE ACCOUNT -->
+    <div class="tab-content" [class.active]="activeTab === 'danger'">
+      <div class="settings-card danger-card">
+        <div class="card-header">
+          <h2>⚠️ {{ 'settings.delete.title' | translate }}</h2>
+          <p>{{ 'settings.delete.subtitle' | translate }}</p>
+        </div>
+
+        <div class="danger-warning">
+          <strong>⚠️ {{ 'settings.delete.warning' | translate }}</strong>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" (click)="showDeleteModal = true">
+            🗸️ {{ 'settings.delete.deleteButton' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PASSWORD CHANGE MODAL -->
+  <div class="modal-backdrop" *ngIf="showPasswordModal" (click)="showPasswordModal = false"></div>
+  <div class="modal" *ngIf="showPasswordModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>{{ 'settings.security.changePasswordTitle' | translate }}</h2>
+        <button type="button" class="modal-close" (click)="showPasswordModal = false">×</button>
+      </div>
+
+      <form [formGroup]="passwordForm" class="modal-form">
+        <div class="form-group">
+          <label for="current_pwd">{{ 'settings.security.currentPassword' | translate }} *</label>
+          <input type="password" id="current_pwd" formControlName="current_password" class="form-control"
+            [class.error]="hasError(passwordForm, 'current_password')">
+          <small class="error-text" *ngIf="hasError(passwordForm, 'current_password')">
+            {{ getErrorMessage(passwordForm, 'current_password') }}
+          </small>
         </div>
 
         <div class="form-group">
-          <label for="phone">Phone Number</label>
-          <input
-            id="phone"
-            type="tel"
-            formControlName="phone_number"
-            placeholder="Enter phone number"
-            class="form-control"
-          />
+          <label for="new_pwd">{{ 'settings.security.newPassword' | translate }} *</label>
+          <input type="password" id="new_pwd" formControlName="new_password" class="form-control"
+            [class.error]="hasError(passwordForm, 'new_password')">
+          <small class="error-text" *ngIf="hasError(passwordForm, 'new_password')">
+            {{ getErrorMessage(passwordForm, 'new_password') }}
+          </small>
         </div>
 
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="updateProfile()"
-          [disabled]="!profileForm.valid || saving"
-        >
-          {{ saving ? 'Saving...' : 'Save Profile' }}
-        </button>
+        <div class="form-group">
+          <label for="confirm_pwd">{{ 'settings.security.confirmPassword' | translate }} *</label>
+          <input type="password" id="confirm_pwd" formControlName="confirm_password" class="form-control"
+            [class.error]="hasError(passwordForm, 'confirm_password') || (passwordForm.errors?.['passwordMismatch'] && passwordForm.touched)">
+          <small class="error-text" *ngIf="hasError(passwordForm, 'confirm_password')">
+            {{ getErrorMessage(passwordForm, 'confirm_password') }}
+          </small>
+          <small class="error-text" *ngIf="passwordForm.errors?.['passwordMismatch'] && passwordForm.touched">
+            {{ 'settings.security.passwordMismatch' | translate }}
+          </small>
+        </div>
       </form>
 
-      <div class="member-info">
-        <p>Member since: <strong>{{ formatDate(settings.memberSince) }}</strong></p>
-        <p *ngIf="settings.lastLogin">Last login: <strong>{{ formatDate(settings.lastLogin) }}</strong></p>
-      </div>
-    </div>
-
-    <!-- SECTION 2: Notification Settings -->
-    <div class="settings-section">
-      <div class="section-icon">🔔</div>
-      <h3>Notifications</h3>
-      <p class="section-description">Control how you receive updates</p>
-
-      <div class="settings-toggles">
-        <div class="toggle-item">
-          <div class="toggle-info">
-            <h4>Email Notifications</h4>
-            <p>Receive notifications via email</p>
-          </div>
-          <label class="toggle-switch">
-            <input
-              type="checkbox"
-              [checked]="settings.notifications.email"
-              (change)="toggleEmailNotifications()"
-              [disabled]="saving"
-            />
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-
-        <div class="toggle-item">
-          <div class="toggle-info">
-            <h4>Push Notifications</h4>
-            <p>Receive browser push notifications</p>
-          </div>
-          <label class="toggle-switch">
-            <input
-              type="checkbox"
-              [checked]="settings.notifications.push"
-              (change)="togglePushNotifications()"
-              [disabled]="saving"
-            />
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECTION 3: Appearance -->
-    <div class="settings-section">
-      <div class="section-icon">🎨</div>
-      <h3>Appearance</h3>
-      <p class="section-description">Customize how the app looks</p>
-
-      <div class="settings-toggles">
-        <div class="toggle-item">
-          <div class="toggle-info">
-            <h4>Dark Mode</h4>
-            <p>Use dark theme for reduced eye strain</p>
-          </div>
-          <label class="toggle-switch">
-            <input
-              type="checkbox"
-              [checked]="settings.theme.darkMode"
-              (change)="toggleDarkMode()"
-              [disabled]="saving"
-            />
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECTION 4: Privacy -->
-    <div class="settings-section">
-      <div class="section-icon">🔒</div>
-      <h3>Privacy</h3>
-      <p class="section-description">Control your profile visibility</p>
-
-      <div class="settings-toggles">
-        <div class="toggle-item">
-          <div class="toggle-info">
-            <h4>Public Profile</h4>
-            <p>Allow other users to view your profile</p>
-          </div>
-          <label class="toggle-switch">
-            <input
-              type="checkbox"
-              [checked]="settings.privacy.profileVisibility"
-              (change)="toggleProfileVisibility()"
-              [disabled]="saving"
-            />
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <!-- SECTION 5: Language -->
-    <div class="settings-section">
-      <div class="section-icon">🌍</div>
-      <h3>Language</h3>
-      <p class="section-description">Choose your preferred language</p>
-
-      <div class="language-options">
-        <button
-          *ngFor="let lang of languages"
-          type="button"
-          class="language-btn"
-          [class.active]="settings.language === lang"
-          (click)="updateLanguage(lang)"
-          [disabled]="saving"
-        >
-          {{ lang }}
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="showPasswordModal = false">{{ 'common.cancel' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="changePassword()" 
+          [disabled]="passwordForm.invalid || savingPassword">
+          <span *ngIf="!savingPassword">{{ 'settings.security.changePasswordButton' | translate }}</span>
+          <span *ngIf="savingPassword">{{ 'settings.profile.saving' | translate }}...</span>
         </button>
       </div>
-    </div>
-
-    <!-- SECTION 6: Security -->
-    <div class="settings-section">
-      <div class="section-icon">🔐</div>
-      <h3>Security</h3>
-      <p class="section-description">Manage your account security</p>
-
-      <div class="security-buttons">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          (click)="showPasswordModal = true"
-          [disabled]="saving"
-        >
-          Change Password
-        </button>
-      </div>
-    </div>
-
-    <!-- SECTION 7: Account Management -->
-    <div class="settings-section danger">
-      <div class="section-icon danger-icon">⚠️</div>
-      <h3>Account Management</h3>
-      <p class="section-description">Dangerous zone - Proceed with caution</p>
-
-      <button
-        type="button"
-        class="btn btn-danger"
-        (click)="showDeleteModal = true"
-        [disabled]="saving"
-      >
-        Delete Account
-      </button>
     </div>
   </div>
 
-  <!-- Change Password Modal -->
-  <div *ngIf="showPasswordModal" class="modal-overlay" (click)="showPasswordModal = false">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <h3>🔐 Change Password</h3>
-      <form [formGroup]="passwordForm">
+  <!-- DELETE ACCOUNT CONFIRMATION MODAL -->
+  <div class="modal-backdrop" *ngIf="showDeleteModal" (click)="showDeleteModal = false"></div>
+  <div class="modal danger-modal" *ngIf="showDeleteModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🗑️ {{ 'settings.delete.deleteAccountTitle' | translate }}</h2>
+        <button type="button" class="modal-close" (click)="showDeleteModal = false">×</button>
+      </div>
+
+      <div class="delete-confirmation">
+        <p><strong>{{ 'settings.delete.areYouSure' | translate }}</strong></p>
+        <p>{{ 'settings.delete.permanentAction' | translate }}</p>
+        <ul class="delete-warning-list">
+          <li>✗ {{ 'settings.delete.deleteTaskInfo' | translate }}</li>
+          <li>✗ {{ 'settings.delete.deleteProfileInfo' | translate }}</li>
+          <li>✗ {{ 'settings.delete.deleteMessagesInfo' | translate }}</li>
+          <li>✗ {{ 'settings.delete.cannotRecoverData' | translate }}</li>
+        </ul>
+      </div>
+
+      <form [formGroup]="deleteAccountForm" class="modal-form">
         <div class="form-group">
-          <label for="current_password">Current Password</label>
-          <input
-            id="current_password"
-            type="password"
-            formControlName="current_password"
-            placeholder="Enter current password"
-            class="form-control"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="new_password">New Password</label>
-          <input
-            id="new_password"
-            type="password"
-            formControlName="new_password"
-            placeholder="Enter new password (min 6 chars)"
-            class="form-control"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="confirm_password">Confirm Password</label>
-          <input
-            id="confirm_password"
-            type="password"
-            formControlName="confirm_password"
-            placeholder="Confirm new password"
-            class="form-control"
-          />
-        </div>
-
-        <div *ngIf="passwordForm.errors?.['passwordMismatch']" class="error-text">
-          Passwords do not match
-        </div>
-
-        <div class="modal-buttons">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            (click)="showPasswordModal = false"
-            [disabled]="saving"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            class="btn btn-primary"
-            (click)="changePassword()"
-            [disabled]="!passwordForm.valid || saving"
-          >
-            {{ saving ? 'Updating...' : 'Change Password' }}
-          </button>
+          <label for="delete_pwd">{{ 'settings.delete.enterPasswordConfirm' | translate }} *</label>
+          <input type="password" id="delete_pwd" formControlName="password" class="form-control"
+            [class.error]="hasError(deleteAccountForm, 'password')">
+          <small class="error-text" *ngIf="hasError(deleteAccountForm, 'password')">
+            {{ getErrorMessage(deleteAccountForm, 'password') }}
+          </small>
         </div>
       </form>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="showDeleteModal = false">{{ 'common.cancel' | translate }}</button>
+        <button type="button" class="btn btn-danger" (click)="deleteAccountConfirm()" 
+          [disabled]="deleteAccountForm.invalid || deletingAccount">
+          <span *ngIf="!deletingAccount">{{ 'settings.delete.permanentlyDeleteButton' | translate }}</span>
+          <span *ngIf="deletingAccount">{{ 'settings.profile.saving' | translate }}...</span>
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Delete Account Modal -->
-  <div *ngIf="showDeleteModal" class="modal-overlay" (click)="showDeleteModal = false">
-    <div class="modal danger-modal" (click)="$event.stopPropagation()">
-      <h3>⚠️ Delete Account</h3>
-      <p>This action cannot be undone. All your data will be permanently deleted.</p>
-
-      <form [formGroup]="deleteForm">
-        <div class="form-group">
-          <label for="delete_password">Confirm Your Password</label>
-          <input
-            id="delete_password"
-            type="password"
-            formControlName="password"
-            placeholder="Enter your password"
-            class="form-control"
-          />
-        </div>
-
-        <div class="modal-buttons">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            (click)="showDeleteModal = false"
-            [disabled]="saving"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            class="btn btn-danger"
-            (click)="deleteAccount()"
-            [disabled]="!deleteForm.valid || saving"
-          >
-            {{ saving ? 'Deleting...' : 'Delete Account' }}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
 </div>
+

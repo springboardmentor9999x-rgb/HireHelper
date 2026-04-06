@@ -1,0 +1,91 @@
+Test case No	Test case Scenario	Test Input	Expected Output	Actual Output	Result
+AUTHENTICATION	AUTHENTICATION	AUTHENTICATION	AUTHENTICATION	AUTHENTICATION	AUTHENTICATION
+A1	Valid user login with correct credentials	Email: user@test.com, Password: Test@123	Login successful, user redirected to dashboard	Login successful, user redirected to dashboard	Pass
+A2	Login with invalid email format	Email: invalidemail, Password: Test@123	Error message: "Invalid email format"	Error message: "Invalid email format"	Pass
+A3	Login with incorrect password	Email: user@test.com, Password: WrongPass	Error message: "Invalid credentials"	Error message: "Invalid credentials"	Pass
+A4	Login with non-existent email account	Email: nonexistent@test.com, Password: Test@123	Error message: "User account not found"	Error message: "User account not found"	Pass
+A5	Login with empty email field	Email: (empty), Password: Test@123	Error message: "Email is required"	Error message: "Email is required"	Pass
+A6	Login with empty password field	Email: user@test.com, Password: (empty)	Error message: "Password is required"	Error message: "Password is required"	Pass
+A7	User registration with valid data	Email: newuser@test.com, Password: Secure@123, Name: John Doe	Account created successfully, confirmation email sent	Account created successfully, confirmation email sent	Pass
+A8	Registration with existing email	Email: user@test.com, Password: Secure@123, Name: Jane Doe	Error message: "Email already registered"	Email validation passed, account created (BUG)	Fail
+A9	Registration with weak password	Email: newuser@test.com, Password: 123, Name: John Doe	Error message: "Password must be at least 8 characters with uppercase, lowercase, numbers, and special characters"	Error message: "Password must be at least 8 characters with uppercase, lowercase, numbers, and special characters"	Pass
+A10	OTP verification with correct code	OTP: 123456	OTP verified, user logged in	OTP verified, user logged in	Pass
+A11	OTP verification with incorrect code	OTP: 999999	Error message: "Invalid OTP"	Error message: "Invalid OTP"	Pass
+A12	OTP verification with expired OTP	OTP: 123456 (after 10 minutes)	Error message: "OTP has expired, request new code"	Error message: "OTP has expired, request new code"	Pass
+A13	Forgot password request	Email: user@test.com	Password reset email sent successfully	Password reset email sent successfully	Pass
+A14	Forgot password with non-existent email	Email: notfound@test.com	No error message (security), password reset email sent message	No error message (security), password reset email sent message	Pass
+FEED	FEED	FEED	FEED	FEED	FEED
+F1	View feed with multiple posts/tasks	Action: Open Feed page	Feed displays 10 latest tasks with all details	Feed displays 10 latest tasks with all details	Pass
+F2	Filter feed by category	Filter: "Development" category	Shows only development-related tasks	Shows only development-related tasks	Pass
+F3	Search tasks by keyword	Search: "urgent"	Returns all tasks containing "urgent" in title or description	Returns all tasks containing "urgent" in title or description	Pass
+F4	Pagination - Load next page	Click: Next button on page 1	Feed displays tasks 11-20	Feed displays tasks 11-20	Pass
+F5	Feed with no results after applying filters	Filter: "category" with no matching tasks	Message: "No tasks found"	No UI response, blank feed (UX issue)	Fail
+F6	Search with special characters	Search: "@#$%"	Error message: "Invalid search characters" or no results	Query executed, returns 500 error	Fail
+F7	Infinite scroll - Automatic load more	Scroll to bottom of feed	Next set of 10 tasks automatically loaded	Next set of 10 tasks automatically loaded	Pass
+F8	Sort feed by date (newest first)	Sort: Newest first	Tasks displayed in descending date order	Tasks displayed in descending date order	Pass
+F9	Feed network error handling	Network unavailable while loading	Error message: "Unable to load feed, please check connection"	Blank page, no error message (UX issue)	Fail
+F10	View task details from feed	Click on task item	Detailed task view opens with all information	Detailed task view opens with all information	Pass
+MYTASK	MYTASK	MYTASK	MYTASK	MYTASK	MYTASK
+MT1	Create new task with valid data	Title: "Fix bug #123", Desc: "Description", Priority: High, Due: 2026-05-01	Task created successfully, appears in My Tasks	Task created successfully, appears in My Tasks	Pass
+MT2	Create task with empty title	Title: (empty), Desc: "Description"	Error message: "Task title is required"	Error message: "Task title is required"	Pass
+MT3	Create task with past due date	Title: "Old Task", Due: 2026-03-01	Error message: "Due date cannot be in the past"	Task created with past due date	Fail
+MT4	Edit existing task	Task ID: T123, Update: Priority from Medium to High	Task updated successfully	Task updated successfully	Pass
+MT5	Delete task confirmation	Task ID: T123	Confirmation dialog appears: "Are you sure?"	Confirmation dialog appears: "Are you sure?"	Pass
+MT6	Delete task - Cancel operation	Task ID: T123, Click Cancel	Task remains in list	Task remains in list	Pass
+MT7	Delete task - Confirm deletion	Task ID: T123, Click Confirm	Task removed from My Tasks list	Task removed from My Tasks list	Pass
+MT8	Mark task as complete	Task ID: T456	Task status changes to Completed, moved to completed section	Task status changes to Completed, moved to completed section	Pass
+MT9	Reopen a completed task	Task ID: T456 (Completed)	Task status changes to In Progress	Task status changes to In Progress	Pass
+MT10	Create task with very long title	Title: (500 characters)	Error message: "Title must be less than 100 characters" or truncated	Title truncated to 100 characters, no error shown	Fail
+MT11	Bulk delete multiple tasks	Select: 5 tasks, Click Delete	Confirmation: "Delete 5 tasks?", all deleted after confirm	Confirmation: "Delete 5 tasks?", all deleted after confirm	Pass
+MT12	Task list filter by status	Filter: "In Progress"	Shows only In Progress tasks	Shows only In Progress tasks	Pass
+MYREQUEST	MYREQUEST	MYREQUEST	MYREQUEST	MYREQUEST	MYREQUEST
+MR1	Send request to connect with user	Recipient: user@test.com, Message: "Let's collaborate"	Request sent successfully, appears in Pending Requests	Request sent successfully, appears in Pending Requests	Pass
+MR2	Send request with empty message	Recipient: user@test.com, Message: (empty)	Error message: "Message is required"	Error message: "Message is required"	Pass
+MR3	Send request to self	Recipient: currentuser@test.com, Message: "Hello"	Error message: "Cannot send request to yourself"	Request rejected silently, no user feedback	Fail
+MR4	Send request to already connected user	To user already in contacts, Message: "Hi"	Error message: "Already connected with this user"	Request sent, creates duplicate	Fail
+MR5	Accept pending request	Request ID: R123, Click Accept	Request marked as Accepted, user added to contacts	Request marked as Accepted, user added to contacts	Pass
+MR6	Reject pending request	Request ID: R123, Click Reject	Request marked as Rejected, removed from pending	Request marked as Rejected, removed from pending	Pass
+MR7	Cancel sent request	Request ID: R456 (Status: Pending), Click Cancel	Request cancelled and removed from Sent Requests	Request cancelled and removed from Sent Requests	Pass
+MR8	View request details	Request ID: R123	Shows sender info, timestamp, message, action buttons	Shows sender info, timestamp, message, action buttons	Pass
+MR9	Request with attachment file	Recipient: user@test.com, File: document.pdf	Request sent with attachment, file accessible to recipient	Request sent with attachment, file accessible to recipient	Pass
+MR10	Accept request from blocked user	Request from blocked user, Click Accept	Error message: "Cannot accept request from blocked user"	Error message: "Cannot accept request from blocked user"	Pass
+MR11	Send bulk requests	Select 3 recipients, Send message to all	Requests sent to all 3 recipients	Requests sent to all 3 recipients	Pass
+NOTIFICATION	NOTIFICATION	NOTIFICATION	NOTIFICATION	NOTIFICATION	NOTIFICATION
+N1	View notification list	Action: Open Notifications	All notifications displayed with timestamp	All notifications displayed with timestamp	Pass
+N2	Receive new notification	Event: Someone accepts request	Notification appears in list with badge count	Notification appears in list with badge count	Pass
+N3	Mark notification as read	Notification ID: N123, Click Read	Notification status changes to Read, badge color changes	Notification status changes to Read, badge color changes	Pass
+N4	Mark all notifications as read	Click "Mark All as Read"	All notifications marked as Read	All notifications marked as Read	Pass
+N5	Delete single notification	Notification ID: N456, Click Delete	Notification removed from list	Notification removed from list	Pass
+N6	Delete all notifications	Click "Delete All"	Confirmation dialog, all deleted after confirm	Confirmation dialog, all deleted after confirm	Pass
+N7	Filter notifications by type	Filter: "Task Assignments"	Shows only task-related notifications	Shows only task-related notifications	Pass
+N8	Notification with broken link	Notification with invalid resource link, Click	Page shows 404 error	Page shows 404 error	Pass
+N9	Real-time notification delivery	Event triggered in another session	Notification appears instantly on this device	Notification appears after 5-8 second delay	Fail
+N10	Notification sound/alert setting	Enable notifications, Sound: ON	Sound plays on new notification	Sound plays on new notification	Pass
+N11	Push notification on mobile	App in background, Event triggered	Push notification displayed on device	Not received (API error)	Fail
+N12	Notification pagination	More than 50 notifications, Load more	Pagination working, loads next batch	Pagination working, loads next batch	Pass
+PROFILE	PROFILE	PROFILE	PROFILE	PROFILE	PROFILE
+P1	View user profile	Click on profile icon	Displays user avatar, name, email, bio, skills	Displays user avatar, name, email, bio, skills	Pass
+P2	Edit profile name	Current: "John Doe", New: "John Smith"	Name updated and saved successfully	Name updated and saved successfully	Pass
+P3	Edit profile with special characters	Name: "José María O'Brien"	Name saved correctly with special characters	Name saved correctly with special characters	Pass
+P4	Update profile email	New Email: newemail@test.com	Confirmation email sent to new email	Confirmation email sent to new email	Pass
+P5	Change profile email to existing email	New Email: already_used@test.com	Error message: "Email already in use"	Error message: "Email already in use"	Pass
+P6	Upload profile picture	File: image.jpg (2MB)	Image uploaded, thumbnail displayed in profile	Image uploaded, thumbnail displayed in profile	Pass
+P7	Upload profile picture - Invalid format	File: document.pdf	Error message: "Only image formats (JPG, PNG) allowed"	Error message: "Only image formats (JPG, PNG) allowed"	Pass
+P8	Upload profile picture - Too large	File: large_image.jpg (50MB)	Error message: "File size must be less than 5MB"	File uploaded without size validation	Fail
+P9	Add skills to profile	Skills: ["JavaScript", "React", "Node.js"]	Skills added and saved to profile	Skills added and saved to profile	Pass
+P10	Add duplicate skill	Skills in profile: ["JavaScript"], Add: "JavaScript"	Error message: "Skill already exists" or silently ignored	Skill added twice, creating duplicate (BUG)	Fail
+P11	View other user's profile	User ID: U456	Shows public profile without edit buttons	Shows public profile without edit buttons	Pass
+P12	Update profile bio	Bio: "Senior Developer" (150 characters)	Bio updated successfully	Bio updated successfully	Pass
+SETTINGS	SETTINGS	SETTINGS	SETTINGS	SETTINGS	SETTINGS
+S1	Access Settings page	Click: Settings in menu	Settings page loads with all options	Settings page loads with all options	Pass
+S2	Toggle email notifications ON	Setting: Email Notifications, Switch: ON	Setting saved, confirmation displayed	Setting saved, confirmation displayed	Pass
+S3	Toggle email notifications OFF	Setting: Email Notifications, Switch: OFF	Setting saved, no more emails received	Setting saved, no more emails received	Pass
+S4	Change language preference	Language: "Spanish"	UI language changes to Spanish immediately	UI language changes to Spanish immediately	Pass
+S5	Save language with unsupported language	Language: Invalid value	Error message: "Invalid language selection"	Error message: "Invalid language selection"	Pass
+S6	Update notification frequency	Frequency: "Weekly"	Setting saved, notifications sent weekly	Setting saved, notifications sent weekly	Pass
+S7	Enable two-factor authentication	Enable 2FA, Method: SMS	2FA enabled, SMS code verification required on next login	2FA enabled, SMS code verification required on next login	Pass
+S8	Disable two-factor authentication	Disable 2FA, Current Password: Test@123	2FA disabled after password confirmation	2FA disabled after password confirmation	Pass
+S9	Change password in settings	Old Password: Test@123, New: Secure@456	Password changed, user logged out and must re-login	Password changed, user logged out and must re-login	Pass
+S10	Change password with incorrect old password	Old Password: Wrong@123, New: Secure@456	Error message: "Current password is incorrect"	Error message: "Current password is incorrect"	Pass
+S11	Export user data	Click: Export Data	ZIP file downloaded with all user data	ZIP file downloaded with all user data	Pass
+S12	Delete account	Action: Delete Account, Confirm: Yes, Password: Test@123	Account marked for deletion, data archived, user logged out	Account deleted permanently after 30 days	Pass

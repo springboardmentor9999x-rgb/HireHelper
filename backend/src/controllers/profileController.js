@@ -25,6 +25,8 @@ const profileController = {
           last_name, 
           email, 
           phone_number, 
+          bio,
+          profile_picture,
           created_at
         FROM users
         WHERE id = $1
@@ -59,39 +61,50 @@ const profileController = {
 
   /**
    * PUT /api/profile/update
-   * Update user profile (first_name, last_name, phone_number)
+   * Update user profile (first_name, last_name, phone_number, bio, profile_picture)
    */
   updateProfile: async (req, res) => {
     try {
       const userId = req.user.id;
-      const { first_name, last_name, phone_number } = req.body;
+      const { first_name, last_name, phone_number, bio, profile_picture } = req.body;
+
+      console.log('📥 [Profile] Update request for user:', userId);
+      console.log('📥 [Profile] Payload:', { first_name, last_name, phone_number, bio: bio ? 'provided' : 'not provided', profile_picture: profile_picture ? 'provided' : 'not provided' });
 
       // Validation
-      if (!first_name && !last_name && !phone_number) {
+      if (!first_name && !last_name && !phone_number && !bio && !profile_picture) {
+        console.log('⚠️ [Profile] No fields provided for update');
         return res.status(HTTP_CODES.BAD_REQUEST).json({
           success: false,
           message: 'At least one field is required to update',
         });
       }
 
-      if (first_name && first_name.trim().length < 2) {
+      if (first_name && typeof first_name === 'string' && first_name.trim().length < 2) {
         return res.status(HTTP_CODES.BAD_REQUEST).json({
           success: false,
           message: 'First name must be at least 2 characters',
         });
       }
 
-      if (last_name && last_name.trim().length < 2) {
+      if (last_name && typeof last_name === 'string' && last_name.trim().length < 2) {
         return res.status(HTTP_CODES.BAD_REQUEST).json({
           success: false,
           message: 'Last name must be at least 2 characters',
         });
       }
 
-      if (phone_number && phone_number.trim().length < 10) {
+      if (phone_number && typeof phone_number === 'string' && phone_number.trim().length < 10) {
         return res.status(HTTP_CODES.BAD_REQUEST).json({
           success: false,
           message: 'Phone number must be at least 10 characters',
+        });
+      }
+
+      if (bio && typeof bio === 'string' && bio.length > 500) {
+        return res.status(HTTP_CODES.BAD_REQUEST).json({
+          success: false,
+          message: 'Bio must not exceed 500 characters',
         });
       }
 
@@ -100,19 +113,44 @@ const profileController = {
       const values = [];
       let paramCount = 1;
 
-      if (first_name) {
+      if (first_name && typeof first_name === 'string' && first_name.trim()) {
         updates.push(`first_name = $${paramCount++}`);
         values.push(first_name.trim());
       }
 
-      if (last_name) {
+      if (last_name && typeof last_name === 'string' && last_name.trim()) {
         updates.push(`last_name = $${paramCount++}`);
         values.push(last_name.trim());
       }
 
-      if (phone_number) {
+      if (phone_number && typeof phone_number === 'string' && phone_number.trim()) {
         updates.push(`phone_number = $${paramCount++}`);
         values.push(phone_number.trim());
+      }
+
+      if (bio && typeof bio === 'string') {
+        updates.push(`bio = $${paramCount++}`);
+        values.push(bio || null);
+      }
+
+      if (profile_picture && typeof profile_picture === 'string') {
+        // Validate profile_picture isn't too large (roughly check if base64 is reasonable)
+        if (profile_picture.length > 2000000) { // ~2MB base64 limit
+          return res.status(HTTP_CODES.BAD_REQUEST).json({
+            success: false,
+            message: 'Profile picture is too large',
+          });
+        }
+        updates.push(`profile_picture = $${paramCount++}`);
+        values.push(profile_picture);
+      }
+
+      // Ensure at least one field is being updated
+      if (updates.length === 0) {
+        return res.status(HTTP_CODES.BAD_REQUEST).json({
+          success: false,
+          message: 'No valid fields provided to update',
+        });
       }
 
       values.push(userId);
@@ -121,25 +159,31 @@ const profileController = {
         UPDATE users
         SET ${updates.join(', ')}
         WHERE id = $${paramCount}
-        RETURNING id, first_name, last_name, email, phone_number, created_at
+        RETURNING id, first_name, last_name, email, phone_number, bio, profile_picture, created_at
       `;
+
+      console.log('📝 [Profile] Built query with updates:', updates);
 
       const result = await pool.query(query, values);
 
       if (result.rows.length === 0) {
+        console.log('❌ [Profile] User not found:', userId);
         return res.status(HTTP_CODES.NOT_FOUND).json({
           success: false,
           message: 'User not found',
         });
       }
 
-      res.json({
+      console.log('✅ [Profile] Profile updated successfully for user:', userId);
+
+      res.status(HTTP_CODES.OK).json({
         success: true,
         message: 'Profile updated successfully',
         data: result.rows[0],
       });
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error('❌ [Profile] Error updating profile:', error.message);
+      console.error('❌ [Profile] Stack trace:', error.stack);
       res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: 'Failed to update profile',

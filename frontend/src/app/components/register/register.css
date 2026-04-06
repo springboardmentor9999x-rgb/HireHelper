@@ -118,7 +118,7 @@ label {
 .login-btn {
   width: 100%;
   padding: 14px 24px;
-  background: linear-gradient(135deg, #1e3a5f 0%, #2bb673 100%);
+  background: linear-gradient(135deg, #00A8E8 0%, #00C9FF 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -129,12 +129,12 @@ label {
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  box-shadow: 0 4px 12px rgba(43, 182, 115, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 168, 232, 0.3);
 }
 
 .login-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(43, 182, 115, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 168, 232, 0.4);
 }
 
 .login-btn:active:not(:disabled) {

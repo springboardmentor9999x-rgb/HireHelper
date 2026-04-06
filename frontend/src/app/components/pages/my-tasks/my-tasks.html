@@ -73,3 +73,164 @@
     </div>
   </div>
 </div>
+
+<!-- EDIT TASK MODAL -->
+<div *ngIf="showEditModal" class="modal-backdrop" (click)="cancelEdit()"></div>
+<div *ngIf="showEditModal" class="edit-modal">
+  <div class="edit-modal-content">
+    <div class="edit-modal-header">
+      <h2>✏️ Edit Task</h2>
+      <button class="modal-close" (click)="cancelEdit()">×</button>
+    </div>
+
+    <form [formGroup]="editForm" class="edit-form">
+      <!-- Title -->
+      <div class="form-group">
+        <label for="edit-title">Task Title *</label>
+        <input
+          type="text"
+          id="edit-title"
+          formControlName="title"
+          class="form-control"
+          placeholder="Enter task title"
+          [class.is-invalid]="isFieldInvalid('title')"
+        />
+        <small class="error-text" *ngIf="isFieldInvalid('title')">
+          {{ getFieldError('title') }}
+        </small>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="edit-description">Description *</label>
+        <textarea
+          id="edit-description"
+          formControlName="description"
+          class="form-control"
+          placeholder="Enter task description"
+          rows="4"
+          [class.is-invalid]="isFieldInvalid('description')"
+        ></textarea>
+        <small class="error-text" *ngIf="isFieldInvalid('description')">
+          {{ getFieldError('description') }}
+        </small>
+      </div>
+
+      <!-- Category -->
+      <div class="form-group">
+        <label for="edit-category">Category *</label>
+        <select
+          id="edit-category"
+          formControlName="category"
+          class="form-control"
+          [class.is-invalid]="isFieldInvalid('category')"
+        >
+          <option value="" disabled selected>-- Select a category --</option>
+          <option *ngFor="let cat of taskCategories" [value]="cat">{{ cat }}</option>
+        </select>
+        <small class="error-text" *ngIf="isFieldInvalid('category')">
+          {{ getFieldError('category') }}
+        </small>
+      </div>
+
+      <!-- Location -->
+      <div class="form-group">
+        <label for="edit-location">Location *</label>
+        <input
+          type="text"
+          id="edit-location"
+          formControlName="location"
+          class="form-control"
+          placeholder="Enter location"
+          [class.is-invalid]="isFieldInvalid('location')"
+        />
+        <small class="error-text" *ngIf="isFieldInvalid('location')">
+          {{ getFieldError('location') }}
+        </small>
+      </div>
+
+      <!-- Budget -->
+      <div class="form-group">
+        <label for="edit-budget">Budget (Optional)</label>
+        <input
+          type="number"
+          id="edit-budget"
+          formControlName="budget"
+          class="form-control"
+          placeholder="Enter budget"
+          step="0.01"
+        />
+      </div>
+
+      <!-- Start Time -->
+      <div class="form-group">
+        <label for="edit-start-time">Start Time *</label>
+        <input
+          type="datetime-local"
+          id="edit-start-time"
+          formControlName="start_time"
+          class="form-control"
+          [class.is-invalid]="isFieldInvalid('start_time')"
+        />
+        <small class="error-text" *ngIf="isFieldInvalid('start_time')">
+          {{ getFieldError('start_time') }}
+        </small>
+      </div>
+
+      <!-- End Time -->
+      <div class="form-group">
+        <label for="edit-end-time">End Time (Optional)</label>
+        <input
+          type="datetime-local"
+          id="edit-end-time"
+          formControlName="end_time"
+          class="form-control"
+        />
+      </div>
+
+      <!-- Image Upload -->
+      <div class="form-group">
+        <label for="edit-image">Task Image (Optional)</label>
+        <input
+          type="file"
+          id="edit-image"
+          accept="image/*"
+          (change)="onImageSelected($event)"
+          class="form-control"
+        />
+        <small class="help-text" *ngIf="selectedImage">
+          📸 New image selected: {{ selectedImage.name }}
+        </small>
+        <small class="help-text" *ngIf="!selectedImage && editingTask?.image">
+          📸 Current image: {{ editingTask?.image }}
+        </small>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" class="alert alert-error">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="saveTask()"
+          [disabled]="editForm.invalid || submitting"
+        >
+          <span *ngIf="!submitting">💾 Save Changes</span>
+          <span *ngIf="submitting">Saving...</span>
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="cancelEdit()"
+          [disabled]="submitting"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+

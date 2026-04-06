@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
@@ -15,6 +16,7 @@ interface Task {
   end_time?: string;
   budget?: number;
   location?: string;
+  image?: string;
   created_at: string;
   updated_at: string;
 }
@@ -31,7 +33,7 @@ interface MyTasksResponse {
   templateUrl: './my-tasks.html',
   styleUrls: ['./my-tasks.css'],
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class MyTasksComponent implements OnInit {
   tasks: Task[] = [];
@@ -39,10 +41,47 @@ export class MyTasksComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
 
+  // Task categories
+  taskCategories = [
+    'Cleaning',
+    'Electrical',
+    'Plumbing',
+    'Carpentry',
+    'Painting',
+    'Appliance Repair',
+    'HVAC & AC Service',
+    'Home Maintenance',
+    'Gardening',
+    'Moving & Relocation',
+    'Pest Control',
+    'Personal Assistance',
+    'IT & Tech Support',
+    'Delivery Services',
+    'Other'
+  ];
+
+  // Edit modal state
+  showEditModal = false;
+  editingTask: Task | null = null;
+  editForm: FormGroup;
+  submitting = false;
+  selectedImage: File | null = null;
+
   constructor(
     private http: HttpClient,
-    private router: Router
-  ) {}
+    private router: Router,
+    private fb: FormBuilder
+  ) {
+    this.editForm = this.fb.group({
+      title: ['', [Validators.required, Validators.minLength(3)]],
+      description: ['', [Validators.required, Validators.minLength(10)]],
+      category: ['', Validators.required],
+      location: ['', Validators.required],
+      budget: [''],
+      start_time: ['', Validators.required],
+      end_time: ['']
+    });
+  }
 
   ngOnInit() {
     this.loadTasks();
@@ -84,6 +123,125 @@ export class MyTasksComponent implements OnInit {
     });
   }
 
+  // Edit task - open modal with task data
+  editTask(taskId: number) {
+    const task = this.tasks.find(t => t.id === taskId);
+    if (task) {
+      this.editingTask = task;
+      this.editForm.patchValue({
+        title: task.title,
+        description: task.description,
+        category: task.category,
+        location: task.location,
+        budget: task.budget || '',
+        start_time: task.start_time,
+        end_time: task.end_time
+      });
+      this.selectedImage = null;
+      this.showEditModal = true;
+    }
+  }
+
+  // Save edited task
+  saveTask() {
+    if (!this.editingTask) return;
+    
+    if (this.editForm.invalid) {
+      this.errorMessage = 'Please fill in all required fields correctly';
+      return;
+    }
+
+    this.submitting = true;
+    const taskId = this.editingTask.id;
+    const apiUrl = `${environment.apiUrl}/tasks/${taskId}`;
+
+    // Create FormData for multipart upload
+    const formData = new FormData();
+    
+    formData.append('title', this.editForm.value.title);
+    formData.append('description', this.editForm.value.description);
+    formData.append('category', this.editForm.value.category);
+    formData.append('location', this.editForm.value.location);
+    
+    if (this.editForm.value.budget) {
+      formData.append('budget', parseFloat(this.editForm.value.budget).toString());
+    }
+    if (this.editForm.value.start_time) {
+      formData.append('start_time', this.editForm.value.start_time);
+    }
+    if (this.editForm.value.end_time) {
+      formData.append('end_time', this.editForm.value.end_time);
+    }
+    
+    // Add image only if new image selected
+    if (this.selectedImage) {
+      formData.append('image', this.selectedImage, this.selectedImage.name);
+    }
+
+    this.http.put<any>(apiUrl, formData).subscribe({
+      next: (response) => {
+        this.submitting = false;
+        if (response.success) {
+          this.successMessage = '✅ Task updated successfully!';
+          this.showEditModal = false;
+          this.editingTask = null;
+          this.loadTasks();
+        }
+      },
+      error: (error) => {
+        this.submitting = false;
+        console.error('Error updating task:', error);
+        this.errorMessage = error.error?.message || 'Failed to update task';
+      }
+    });
+  }
+
+  // Cancel edit
+  cancelEdit() {
+    this.showEditModal = false;
+    this.editingTask = null;
+    this.selectedImage = null;
+    this.editForm.reset();
+  }
+
+  // Handle image selection
+  onImageSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedImage = file;
+      console.log('Image selected:', file.name);
+    }
+  }
+
+  // Delete task
+  deleteTask(taskId: number) {
+    if (!confirm('Are you sure you want to delete this task?')) {
+      return;
+    }
+
+    this.loading = true;
+    const apiUrl = `${environment.apiUrl}/tasks/${taskId}`;
+
+    this.http.delete<any>(apiUrl).subscribe({
+      next: (response) => {
+        this.loading = false;
+        if (response.success) {
+          this.successMessage = '✅ Task deleted successfully!';
+          this.tasks = this.tasks.filter(t => t.id !== taskId);
+        }
+      },
+      error: (error) => {
+        this.loading = false;
+        console.error('Error deleting task:', error);
+        this.errorMessage = error.error?.message || 'Failed to delete task';
+      }
+    });
+  }
+
+  addNewTask() {
+    this.router.navigate(['/dashboard/add-task']);
+  }
+
   formatDate(date: string | undefined): string {
     if (!date) return 'N/A';
     const parsedDate = new Date(date);
@@ -100,110 +258,28 @@ export class MyTasksComponent implements OnInit {
   }
 
   getCategoryColor(category: string): string {
-    const categoryColors: { [key: string]: string } = {
-      development: '#0066FF',
-      design: '#9933FF',
-      writing: '#E60B99',
-      marketing: '#FF9900',
-      consulting: '#00CC66',
-      other: '#666666',
+    const colors: { [key: string]: string } = {
+      'design': '#FF6B6B',
+      'development': '#4ECDC4',
+      'writing': '#45B7D1',
+      'marketing': '#FFA07A',
+      'other': '#95E1D3'
     };
-    return categoryColors[category?.toLowerCase()] || '#666666';
+    return colors[category.toLowerCase()] || '#95E1D3';
   }
 
-  deleteTask(taskId: number) {
-    if (!confirm('Are you sure you want to delete this task?')) {
-      return;
-    }
-
-    this.loading = true;
-    const apiUrl = `${environment.apiUrl}/tasks/${taskId}`;
-
-    this.http.delete<{ success: boolean; message: string }>(apiUrl).subscribe({
-      next: (response) => {
-        this.loading = false;
-        if (response.success) {
-          this.tasks = this.tasks.filter(t => t.id !== taskId);
-          this.successMessage = 'Task deleted successfully';
-          setTimeout(() => {
-            this.successMessage = '';
-          }, 3000);
-        } else {
-          this.errorMessage = response.message || 'Failed to delete task';
-        }
-      },
-      error: (error: any) => {
-        this.loading = false;
-        console.error('Error deleting task:', error);
-        if (error.status === 401) {
-          this.errorMessage = 'Your session has expired. Please login again.';
-        } else if (error.status === 403) {
-          this.errorMessage = 'You do not have permission to delete this task.';
-        } else {
-          this.errorMessage = error.error?.message || 'Failed to delete task. Please try again.';
-        }
-      },
-    });
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.editForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
-  editTask(taskId: number) {
-    const task = this.tasks.find(t => t.id === taskId);
-    if (!task) {
-      this.errorMessage = 'Task not found';
-      return;
-    }
+  getFieldError(fieldName: string): string {
+    const field = this.editForm.get(fieldName);
+    if (!field || !field.errors) return '';
 
-    // Show edit prompt with task details
-    const newTitle = prompt('Edit Title:', task.title);
-    if (newTitle === null) return; // User cancelled
-
-    const newDescription = prompt('Edit Description:', task.description);
-    if (newDescription === null) return; // User cancelled
-
-    if (!newTitle.trim() || !newDescription.trim()) {
-      this.errorMessage = 'Title and description are required';
-      return;
-    }
-
-    this.loading = true;
-    const apiUrl = `${environment.apiUrl}/tasks/${taskId}`;
-    const updateData = {
-      title: newTitle.trim(),
-      description: newDescription.trim(),
-    };
-
-    this.http.put<{ success: boolean; message: string }>(apiUrl, updateData).subscribe({
-      next: (response) => {
-        this.loading = false;
-        if (response.success) {
-          const index = this.tasks.findIndex(t => t.id === taskId);
-          if (index > -1) {
-            this.tasks[index].title = newTitle.trim();
-            this.tasks[index].description = newDescription.trim();
-          }
-          this.successMessage = 'Task updated successfully';
-          setTimeout(() => {
-            this.successMessage = '';
-          }, 3000);
-        } else {
-          this.errorMessage = response.message || 'Failed to update task';
-        }
-      },
-      error: (error: any) => {
-        this.loading = false;
-        console.error('Error updating task:', error);
-        if (error.status === 401) {
-          this.errorMessage = 'Your session has expired. Please login again.';
-        } else if (error.status === 403) {
-          this.errorMessage = 'You do not have permission to update this task.';
-        } else {
-          this.errorMessage = error.error?.message || 'Failed to update task. Please try again.';
-        }
-      },
-    });
-  }
-
-  addNewTask() {
-    this.router.navigate(['/dashboard/add-task']);
+    if (field.errors['required']) return `${fieldName} is required`;
+    if (field.errors['minlength']) return `${fieldName} must be at least ${field.errors['minlength'].requiredLength} characters`;
+    
+    return 'Invalid input';
   }
 }

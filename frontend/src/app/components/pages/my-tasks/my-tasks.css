@@ -332,6 +332,186 @@
   cursor: not-allowed;
 }
 
+/* ============ Edit Modal ============ */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.edit-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  max-height: 90vh;
+  overflow-y: auto;
+  width: 90%;
+  max-width: 600px;
+}
+
+.edit-modal-content {
+  padding: var(--spacing-2xl);
+}
+
+.edit-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-2xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 2px solid var(--gray-200);
+}
+
+.edit-modal-header h2 {
+  color: var(--gray-900);
+  font-size: var(--font-size-xl);
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: var(--gray-400);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-smooth);
+}
+
+.modal-close:hover {
+  color: var(--gray-900);
+  background: var(--gray-100);
+  border-radius: 4px;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+  color: var(--gray-700);
+  font-size: var(--font-size-sm);
+}
+
+.form-group .form-control {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-family: inherit;
+  transition: all var(--transition-smooth);
+  background: white;
+}
+
+.form-group .form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(43, 182, 115, 0.1);
+}
+
+.form-group .form-control.is-invalid {
+  border-color: #EF4444;
+  background: #FEE2E2;
+}
+
+.form-group .form-control.is-invalid:focus {
+  border-color: #DC2626;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.error-text {
+  color: #DC2626;
+  font-size: var(--font-size-xs);
+  margin-top: 4px;
+}
+
+.help-text {
+  color: var(--gray-500);
+  font-size: var(--font-size-xs);
+  margin-top: 4px;
+}
+
+.alert {
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+  font-size: var(--font-size-sm);
+}
+
+.alert.alert-error {
+  background: #FEE2E2;
+  color: #991B1B;
+  border-left: 4px solid #EF4444;
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--gray-200);
+}
+
+.btn {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  transition: all var(--transition-smooth);
+  flex: 1;
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(43, 182, 115, 0.2);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(43, 182, 115, 0.4);
+}
+
+.btn-secondary {
+  background: var(--gray-200);
+  color: var(--gray-900);
+  box-shadow: none;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--gray-300);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* ============ Responsive Design ============ */
 @media (max-width: 768px) {
   .my-tasks-container {
@@ -354,6 +534,19 @@
   .task-meta {
     grid-template-columns: 1fr;
   }
+
+  .edit-modal {
+    width: 95%;
+    max-width: none;
+  }
+
+  .edit-modal-content {
+    padding: var(--spacing-lg);
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 480px) {
@@ -372,6 +565,20 @@
   .task-status {
     padding: var(--spacing-xs) var(--spacing-sm);
     font-size: var(--font-size-sm);
+  }
+
+  .edit-modal {
+    max-height: 95vh;
+    width: 100%;
+    max-width: none;
+  }
+
+  .edit-modal-content {
+    padding: var(--spacing-md);
+  }
+
+  .edit-modal-header h2 {
+    font-size: var(--font-size-lg);
   }
 }
 

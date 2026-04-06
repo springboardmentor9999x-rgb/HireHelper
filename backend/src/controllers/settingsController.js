@@ -25,6 +25,8 @@ const settingsController = {
           last_name,
           email,
           phone_number,
+          bio,
+          profile_picture,
           notification_email,
           notification_push,
           dark_mode,
@@ -51,24 +53,36 @@ const settingsController = {
         success: true,
         message: 'Settings retrieved successfully',
         data: {
-          id: user.id,
-          firstName: user.first_name,
-          lastName: user.last_name,
-          email: user.email,
-          phoneNumber: user.phone_number,
-          notifications: {
-            email: user.notification_email,
-            push: user.notification_push,
+          profile: {
+            first_name: user.first_name,
+            last_name: user.last_name,
+            email: user.email,
+            phone_number: user.phone_number,
+            bio: user.bio,
+            profile_picture: user.profile_picture,
+            created_at: user.created_at,
           },
-          theme: {
-            darkMode: user.dark_mode,
-          },
-          language: user.language,
           privacy: {
-            profileVisibility: user.profile_visibility,
+            show_profile_in_feed: user.profile_visibility,
+            allow_messages: true, // Default for now
+            show_phone_to_requesters: user.profile_visibility,
+            email_notifications: user.notification_email,
           },
-          lastLogin: user.last_login,
-          memberSince: user.created_at,
+          language: {
+            current: user.language || 'English',
+          },
+          appearance: {
+            dark_mode: user.dark_mode || false,
+          },
+          notifications: {
+            task_requests: user.notification_push || false,
+            task_updates: user.notification_push || false,
+            announcements: user.notification_email || false,
+          },
+          security: {
+            last_login: user.last_login,
+            created_at: user.created_at,
+          },
         },
       });
     } catch (error) {
@@ -82,27 +96,128 @@ const settingsController = {
   },
 
   /**
+   * PUT /api/settings/profile
+   * Update user profile information
+   */
+  updateProfile: async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const { first_name, last_name, phone_number, bio, profile_picture } = req.body;
+
+      // Validation
+      if (!first_name || first_name.trim().length < 2) {
+        return res.status(HTTP_CODES.BAD_REQUEST).json({
+          success: false,
+          message: 'First name must be at least 2 characters',
+        });
+      }
+
+      if (!last_name || last_name.trim().length < 2) {
+        return res.status(HTTP_CODES.BAD_REQUEST).json({
+          success: false,
+          message: 'Last name must be at least 2 characters',
+        });
+      }
+
+      if (phone_number && phone_number.replace(/\D/g, '').length < 10) {
+        return res.status(HTTP_CODES.BAD_REQUEST).json({
+          success: false,
+          message: 'Phone number must be at least 10 digits',
+        });
+      }
+
+      const query = `
+        UPDATE users 
+        SET 
+          first_name = $2,
+          last_name = $3,
+          phone_number = COALESCE($4, phone_number),
+          bio = COALESCE($5, bio),
+          profile_picture = COALESCE($6, profile_picture)
+        WHERE id = $1
+        RETURNING 
+          id,
+          first_name,
+          last_name,
+          email,
+          phone_number,
+          bio,
+          profile_picture,
+          created_at
+      `;
+
+      const result = await pool.query(query, [
+        userId,
+        first_name,
+        last_name,
+        phone_number || null,
+        bio || null,
+        profile_picture || null
+      ]);
+
+      if (result.rows.length === 0) {
+        return res.status(HTTP_CODES.NOT_FOUND).json({
+          success: false,
+          message: 'User not found',
+        });
+      }
+
+      const user = result.rows[0];
+
+      res.status(HTTP_CODES.OK).json({
+        success: true,
+        message: 'Profile updated successfully',
+        data: {
+          id: user.id,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          email: user.email,
+          phone_number: user.phone_number,
+          bio: user.bio,
+          profile_picture: user.profile_picture,
+          created_at: user.created_at
+        },
+      });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      res.status(HTTP_CODES.SERVER_ERROR).json({
+        success: false,
+        message: 'Failed to update profile',
+        error: error.message,
+      });
+    }
+  },
+
+  /**
    * PUT /api/settings/notifications
    * Update notification preferences
    */
   updateNotifications: async (req, res) => {
     try {
       const userId = req.user.id;
-      const { notification_email, notification_push } = req.body;
+      const {
+        task_requests,
+        task_updates,
+        announcements,
+        notification_email,
+        notification_push
+      } = req.body;
 
       const query = `
         UPDATE users 
         SET 
-          notification_email = COALESCE($2, notification_email),
-          notification_push = COALESCE($3, notification_push)
+          notification_push = COALESCE($2, notification_push),
+          notification_email = COALESCE($3, notification_email)
         WHERE id = $1
         RETURNING id, notification_email, notification_push
       `;
 
       const result = await pool.query(query, [
         userId,
-        notification_email !== undefined ? notification_email : null,
-        notification_push !== undefined ? notification_push : null,
+        // Use task_requests/task_updates as notification_push
+        task_requests !== undefined ? task_requests : (task_updates !== undefined ? task_updates : null),
+        // Use announcements or notification_email
+        announcements !== undefined ? announcements : (notification_email !== undefined ? notification_email : null)
       ]);
 
       if (result.rows.length === 0) {
@@ -117,8 +232,9 @@ const settingsController = {
         message: 'Notification settings updated successfully',
         data: {
           notifications: {
-            email: result.rows[0].notification_email,
-            push: result.rows[0].notification_push,
+            task_requests: result.rows[0].notification_push,
+            task_updates: result.rows[0].notification_push,
+            announcements: result.rows[0].notification_email,
           },
         },
       });
@@ -127,6 +243,57 @@ const settingsController = {
       res.status(HTTP_CODES.SERVER_ERROR).json({
         success: false,
         message: 'Failed to update notification settings',
+        error: error.message,
+      });
+    }
+  },
+
+  /**
+   * PUT /api/settings/appearance
+   * Update appearance settings (dark mode) - alias for updateTheme
+   */
+  updateAppearance: async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const { dark_mode } = req.body;
+
+      if (dark_mode === undefined) {
+        return res.status(HTTP_CODES.BAD_REQUEST).json({
+          success: false,
+          message: 'dark_mode field is required',
+        });
+      }
+
+      const query = `
+        UPDATE users 
+        SET dark_mode = $2
+        WHERE id = $1
+        RETURNING id, dark_mode
+      `;
+
+      const result = await pool.query(query, [userId, dark_mode]);
+
+      if (result.rows.length === 0) {
+        return res.status(HTTP_CODES.NOT_FOUND).json({
+          success: false,
+          message: 'User not found',
+        });
+      }
+
+      res.status(HTTP_CODES.OK).json({
+        success: true,
+        message: 'Appearance settings updated successfully',
+        data: {
+          appearance: {
+            dark_mode: result.rows[0].dark_mode,
+          },
+        },
+      });
+    } catch (error) {
+      console.error('Error updating appearance:', error);
+      res.status(HTTP_CODES.SERVER_ERROR).json({
+        success: false,
+        message: 'Failed to update appearance settings',
         error: error.message,
       });
     }
@@ -199,7 +366,7 @@ const settingsController = {
         });
       }
 
-      const validLanguages = ['English', 'Spanish', 'Hindi'];
+      const validLanguages = ['English', 'Telugu', 'Hindi'];
       if (!validLanguages.includes(language)) {
         return res.status(HTTP_CODES.BAD_REQUEST).json({
           success: false,
@@ -247,23 +414,27 @@ const settingsController = {
   updatePrivacy: async (req, res) => {
     try {
       const userId = req.user.id;
-      const { profile_visibility } = req.body;
-
-      if (profile_visibility === undefined) {
-        return res.status(HTTP_CODES.BAD_REQUEST).json({
-          success: false,
-          message: 'profile_visibility field is required',
-        });
-      }
+      const {
+        show_profile_in_feed,
+        allow_messages,
+        show_phone_to_requesters,
+        email_notifications
+      } = req.body;
 
       const query = `
         UPDATE users 
-        SET profile_visibility = $2
+        SET 
+          profile_visibility = COALESCE($2, profile_visibility),
+          notification_email = COALESCE($3, notification_email)
         WHERE id = $1
-        RETURNING id, profile_visibility
+        RETURNING id, profile_visibility, notification_email
       `;
 
-      const result = await pool.query(query, [userId, profile_visibility]);
+      const result = await pool.query(query, [
+        userId,
+        show_profile_in_feed !== undefined ? show_profile_in_feed : null,
+        email_notifications !== undefined ? email_notifications : null
+      ]);
 
       if (result.rows.length === 0) {
         return res.status(HTTP_CODES.NOT_FOUND).json({
@@ -277,7 +448,10 @@ const settingsController = {
         message: 'Privacy settings updated successfully',
         data: {
           privacy: {
-            profileVisibility: result.rows[0].profile_visibility,
+            show_profile_in_feed: result.rows[0].profile_visibility,
+            allow_messages: true,
+            show_phone_to_requesters: result.rows[0].profile_visibility,
+            email_notifications: result.rows[0].notification_email,
           },
         },
       });

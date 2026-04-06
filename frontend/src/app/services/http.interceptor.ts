@@ -20,11 +20,24 @@ export class HttpTokenInterceptor implements HttpInterceptor {
 
     let authReq = req;
     if (token) {
-      authReq = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // For FormData, don't set Content-Type header (let browser handle it with boundary)
+      const isFormData = req.body instanceof FormData;
+      
+      if (isFormData) {
+        // Clone without modifying headers for FormData
+        authReq = req.clone({
+          setHeaders: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } else {
+        // For regular requests, set Authorization header
+        authReq = req.clone({
+          setHeaders: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
     }
 
     return next.handle(authReq).pipe(

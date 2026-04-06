@@ -1,0 +1,139 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "clear": "Clear",
+    "loading": "Loading...",
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "required": "This field is required"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account, privacy, and preferences",
+    "loadingSettings": "Loading settings...",
+    "tabs": {
+      "profile": "Profile",
+      "privacy": "Privacy",
+      "language": "Language",
+      "appearance": "Appearance",
+      "notifications": "Notifications",
+      "security": "Security",
+      "delete": "Delete Account"
+    },
+    "profile": {
+      "title": "Profile Settings",
+      "description": "Update your personal information",
+      "profilePicture": "Profile Picture",
+      "noPictureSelected": "No picture selected",
+      "chooseFile": "Choose File",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "phone": "Phone Number",
+      "bio": "Bio",
+      "bioPlaceholder": "Tell us about yourself...",
+      "bioCharCount": "characters",
+      "saveProfile": "Save Profile",
+      "clear": "Clear",
+      "saving": "Saving...",
+      "updated": "Profile updated successfully ✓"
+    },
+    "privacy": {
+      "title": "Privacy Settings",
+      "description": "Control who can see your information",
+      "showProfile": "Show Profile in Feed",
+      "showProfileDesc": "Allow your profile to be visible in community feed",
+      "allowMessages": "Allow Direct Messages",
+      "allowMessagesDesc": "Let other users send you direct messages",
+      "emailNotifications": "Email Notifications",
+      "emailNotificationsDesc": "Receive important updates via email",
+      "save": "Save Privacy Settings",
+      "updated": "Privacy settings saved ✓"
+    },
+    "language": {
+      "title": "Language Preferences",
+      "description": "Choose your preferred language",
+      "label": "Language",
+      "save": "Save Language",
+      "autoUpdate": "Language preference updated automatically",
+      "updated": "Language changed to"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "description": "Customize how the application looks",
+      "darkMode": "Dark Mode",
+      "darkModeDesc": "Use dark theme to reduce eye strain",
+      "lightModePreview": "Light Mode Preview",
+      "darkModePreview": "Dark Mode Preview",
+      "lightMode": "Light Mode",
+      "enabled": "enabled ✓"
+    },
+    "notifications": {
+      "title": "Notification Preferences",
+      "description": "Choose what notifications you want to receive",
+      "taskRequests": "Task Requests",
+      "taskRequestsDesc": "Notify me when someone requests my services",
+      "taskUpdates": "Task Updates",
+      "taskUpdatesDesc": "Notify me about changes to my tasks",
+      "announcements": "Announcements",
+      "announcementsDesc": "Receive important platform announcements",
+      "updated": "Notification preferences updated ✓"
+    },
+    "security": {
+      "title": "Security & Password",
+      "description": "Manage your account security",
+      "changePassword": "Change Password",
+      "changePasswordDesc": "Update your password regularly for security",
+      "lastLogin": "Last Login",
+      "accountCreated": "Account Created",
+      "password": "Change Password",
+      "changed": "Password changed successfully ✓"
+    },
+    "delete": {
+      "title": "Delete Account",
+      "description": "Permanently delete your account and all data",
+      "warning": "⚠️ Warning: This action cannot be undone. All your data, tasks, and history will be permanently deleted.",
+      "button": "Delete My Account",
+      "confirm": "Are you sure you want to delete your account?",
+      "permanent": "This action is permanent and cannot be undone.",
+      "warnings": [
+        "All your tasks will be deleted",
+        "All your profile information will be removed",
+        "All your messages and history will be erased",
+        "You won't be able to recover your data"
+      ],
+      "password": "Enter your password to confirm",
+      "deleteButton": "Permanently Delete Account",
+      "deleting": "Deleting...",
+      "deleted": "Account deleted. Redirecting to login..."
+    }
+  },
+  "modals": {
+    "changePassword": "Change Password",
+    "close": "Close",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "passwordMismatch": "Passwords do not match",
+    "deleteAccount": "Delete Account"
+  },
+  "errors": {
+    "fillRequired": "Please fill all required fields correctly",
+    "failed": "Failed",
+    "updateProfile": "Failed to update profile",
+    "loadProfile": "Failed to load profile",
+    "savePrivacy": "Failed to save privacy settings",
+    "saveNotifications": "Failed to update notifications",
+    "changeLanguage": "Failed to change language",
+    "updateAppearance": "Failed to update appearance",
+    "changePassword": "Failed to change password",
+    "deleteAccount": "Failed to delete account",
+    "passwordRequired": "Password is required"
+  },
+  "validation": {
+    "minLength": "Minimum 2 characters required",
+    "maxLength": "Maximum 500 characters allowed"
+  }
+}
