@@ -14,7 +14,7 @@
                 <li>
                     <a routerLink="/dashboard/notifications" routerLinkActive="active" style="display: flex; justify-content: space-between; align-items: center;">
                         {{ labels.notificationsTitle || 'Notifications' }}
-                        <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+                        <span class="notification-dot" *ngIf="unreadCount > 0" style="width: 10px; height: 10px; background-color: var(--danger, #ff4d4f); border-radius: 50%; display: inline-block;"></span>
                     </a>
                 </li>
                 <li style="margin-top: 15px;"><a routerLink="/dashboard/add-task" routerLinkActive="active" class="add-task-btn">{{ labels.postTask || '+ Post a Task' }}</a></li>
