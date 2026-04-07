@@ -88,4 +88,13 @@ export class TaskService {
             })
         );
     }
+
+    updateTaskStatus(id: number, status?: string): Observable<{ success: boolean, task: Task }> {
+        return this.http.patch<{ success: boolean, task: Task }>(`${this.apiUrl}/${id}/status`, status ? { status } : {}).pipe(
+            catchError(err => {
+                console.error('TaskService: Error in updateTaskStatus', err);
+                return throwError(() => err);
+            })
+        );
+    }
 }

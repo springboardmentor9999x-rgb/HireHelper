@@ -1,4 +1,5 @@
 require('dotenv').config();
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
@@ -7,6 +8,8 @@ const requestRoutes = require('./routes/requests');
 const notificationRoutes = require('./routes/notifications');
 const publicRoutes = require('./routes/public');
 const chatRoutes = require('./routes/chat');
+const userRoutes = require('./routes/users');
+const ratingRoutes = require('./routes/ratings');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { initTable } = require('./models/taskModel');
@@ -42,6 +45,14 @@ io.on('connection', (socket) => {
     socket.join(`user_${userId}`);
     console.log(`👤 Socket ${socket.id} joined user_${userId}`);
   });
+  
+  socket.on('typing_start', ({ requestId, userName }) => {
+    socket.to(`chat_${requestId}`).emit('user_typing', { requestId, userName, isTyping: true });
+  });
+
+  socket.on('typing_stop', ({ requestId }) => {
+    socket.to(`chat_${requestId}`).emit('user_typing', { requestId, isTyping: false });
+  });
 
   socket.on('disconnect', () => {
     console.log(`🔌 Client disconnected: ${socket.id}`);
@@ -52,6 +63,10 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(helmet()); // Secure HTTP headers
+
+// Serve uploaded files
+app.use('/uploads', express.static('uploads'));
+
 
 app.use(cors({
   origin: ['http://localhost:4200', 'http://127.0.0.1:4200'],
@@ -90,6 +105,8 @@ app.use('/api/requests', requestRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/public', publicRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/ratings', ratingRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -104,6 +121,10 @@ app.use((err, req, res, next) => {
 
 async function startServer() {
   try {
+    // Ensure upload directories exist
+    fs.mkdirSync('uploads/profiles', { recursive: true });
+    console.log('📁 Upload directories ready');
+
     console.log('⏳ Initializing database tables...');
     await initTable();
     await initRequestTable();

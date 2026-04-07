@@ -30,10 +30,20 @@
     justify-content: space-between;
 }
 
-.header-info {
+.user-info-clickable {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0.4rem 0.8rem;
+    margin-left: -0.8rem;
+    border-radius: 12px;
+}
+
+.user-info-clickable:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateX(4px);
 }
 
 .user-avatar {
@@ -42,10 +52,11 @@
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-weight: 700; color: white;
+    box-shadow: 0 4px 12px rgba(108, 71, 255, 0.3);
 }
 
-.header-info h3 { font-size: 1rem; font-weight: 700; color: white; margin: 0; }
-.header-info p { font-size: 0.75rem; color: rgba(255, 255, 255, 0.4); margin: 0; }
+.user-details h3 { font-size: 1rem; font-weight: 700; color: white; margin: 0; }
+.user-details p { font-size: 0.75rem; color: rgba(255, 255, 255, 0.4); margin: 0; }
 
 .btn-close {
     background: transparent; border: none; color: rgba(255, 255, 255, 0.3);
@@ -129,6 +140,33 @@
     width: 24px; height: 24px;
     border: 2px solid rgba(255, 255, 255, 0.1); border-top-color: #6c47ff;
     border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+
+/* Typing indicator */
+.typing-indicator-bubble {
+    background: rgba(255, 255, 255, 0.07);
+    padding: 0.8rem 1rem;
+    border-radius: 18px;
+    border-bottom-left-radius: 4px;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    width: fit-content;
+}
+
+.typing-indicator-bubble span {
+    width: 6px; height: 6px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.typing-indicator-bubble span:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator-bubble span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1.0); }
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }

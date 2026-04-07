@@ -11,8 +11,19 @@ const initMessageTable = async () => {
                     request_id INTEGER NOT NULL REFERENCES requests(id) ON DELETE CASCADE,
                     sender_id  INTEGER NOT NULL REFERENCES users(id),
                     content    TEXT NOT NULL,
+                    is_read    BOOLEAN DEFAULT FALSE,
                     created_at TIMESTAMPTZ DEFAULT NOW()
                 )
+            `);
+            
+            // Ensure is_read column exists if table was already created
+            await client.query(`
+                DO $$ 
+                BEGIN 
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='messages' AND column_name='is_read') THEN
+                        ALTER TABLE messages ADD COLUMN is_read BOOLEAN DEFAULT FALSE;
+                    END IF;
+                END $$;
             `);
             console.log('✅ messages table ready');
         } finally {
@@ -46,6 +57,27 @@ const Message = {
             [requestId]
         );
         return result.rows;
+    },
+
+    markAsRead: async (requestId, userId) => {
+        const result = await pool.query(
+            `UPDATE messages 
+             SET is_read = TRUE 
+             WHERE request_id = $1 AND sender_id != $2 AND is_read = FALSE
+             RETURNING *`,
+            [requestId, userId]
+        );
+        return result.rows;
+    },
+
+    getUnreadCount: async (requestId, userId) => {
+        const result = await pool.query(
+            `SELECT COUNT(*) as count 
+             FROM messages 
+             WHERE request_id = $1 AND sender_id != $2 AND is_read = FALSE`,
+            [requestId, userId]
+        );
+        return parseInt(result.rows[0].count);
     }
 };
 

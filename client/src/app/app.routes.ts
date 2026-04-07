@@ -5,6 +5,7 @@ import { SignupComponent } from './signup/signup.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { authGuard } from './guards/auth.guard';
+import { AboutUsComponent } from './about-us/about-us.component';
 
 // Dashboard page components
 import { FeedComponent } from './dashboard/pages/feed/feed.component';
@@ -22,6 +23,7 @@ export const routes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'signup', component: SignupComponent },
     { path: 'forgot-password', component: ForgotPasswordComponent },
+    { path: 'about', component: AboutUsComponent },
     {
         path: 'dashboard',
         component: DashboardComponent,

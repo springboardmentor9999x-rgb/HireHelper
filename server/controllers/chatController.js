@@ -80,9 +80,31 @@ const chatController = {
             }
 
             const messages = await Message.findByRequestId(requestId);
+            
+            // Mark as read when history is fetched
+            await Message.markAsRead(requestId, userId);
+            
             res.status(200).json({ success: true, messages });
         } catch (err) {
             console.error('Error fetching chat history:', err);
+            res.status(500).json({ success: false, message: 'Internal server error' });
+        }
+    },
+
+    markAsRead: async (req, res) => {
+        try {
+            const { requestId } = req.params;
+            const userId = req.user.id;
+
+            await Message.markAsRead(requestId, userId);
+            
+            // Notify other user via socket that messages were read (optional but good for blue ticks)
+            const io = req.app.get('socketio');
+            io.to(`chat_${requestId}`).emit('messages_read', { requestId, userId });
+
+            res.status(200).json({ success: true });
+        } catch (err) {
+            console.error('Error marking messages as read:', err);
             res.status(500).json({ success: false, message: 'Internal server error' });
         }
     }

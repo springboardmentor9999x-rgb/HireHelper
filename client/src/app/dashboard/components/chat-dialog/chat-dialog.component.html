@@ -2,11 +2,11 @@
     <div class="chat-container glass" (click)="$event.stopPropagation()">
         <!-- Header -->
         <div class="chat-header">
-            <div class="header-info">
-                <div class="user-avatar">{{ otherUserName?.charAt(0)?.toUpperCase() }}</div>
-                <div>
-                    <h3>{{ otherUserName }}</h3>
-                    <p>{{ taskTitle }}</p>
+            <div class="user-info-clickable" (click)="onHeaderClick()" title="View user profile">
+                <div class="user-avatar">{{ otherUserName.charAt(0).toUpperCase() }}</div>
+                <div class="user-details">
+                    <h3 class="other-user-name">{{ otherUserName }}</h3>
+                    <p class="task-title-breadcrumb">{{ taskTitle }}</p>
                 </div>
             </div>
             <button class="btn-close" (click)="onClose()">
@@ -34,13 +34,21 @@
                             </div>
                         </div>
                     }
+                    
+                    @if (otherUserTyping) {
+                        <div class="message-wrapper">
+                            <div class="typing-indicator-bubble">
+                                <span></span><span></span><span></span>
+                            </div>
+                        </div>
+                    }
                 </div>
             }
         </div>
 
         <!-- Input Area -->
         <div class="chat-input-area">
-            <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" 
+            <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" (input)="onTyping()"
                 placeholder="Type a message..." class="chat-input">
             <button class="btn-send" (click)="sendMessage()" [disabled]="!newMessage.trim()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

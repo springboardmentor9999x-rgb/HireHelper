@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angula
 import { CommonModule } from '@angular/common';
 import { RequestService, Request } from '../../../services/request.service';
 import { ChatDialogComponent } from '../../components/chat-dialog/chat-dialog.component';
+import { ProfileDialogComponent } from '../../components/profile-dialog/profile-dialog.component';
 import { AuthService } from '../../../services/auth.service';
 import { ChatService } from '../../../services/chat.service';
 import { Subscription } from 'rxjs';
@@ -9,7 +10,7 @@ import { Subscription } from 'rxjs';
 @Component({
     selector: 'app-my-requests',
     standalone: true,
-    imports: [CommonModule, ChatDialogComponent],
+    imports: [CommonModule, ChatDialogComponent, ProfileDialogComponent],
     templateUrl: './my-requests.component.html',
     styleUrls: ['./my-requests.component.css']
 })
@@ -23,13 +24,20 @@ export class MyRequestsComponent implements OnInit, OnDestroy {
     loading = true;
     error: string | null = null;
     currentUserId = this.authService.getUser()?.id || 0;
+    currentUserName = this.authService.getUser()?.name || 'User';
     private notificationSubscription?: Subscription;
+    private messageSubscription?: Subscription;
 
     // Chat State
     chatOpen = false;
     selectedRequestId = 0;
     selectedTaskTitle = '';
     selectedUserName = '';
+    selectedOtherUserId = 0;
+    
+    // Profile State
+    profileOpen = false;
+    selectedProfileUserId = 0;
 
     ngOnInit(): void {
         this.fetchMyRequests();
@@ -38,13 +46,24 @@ export class MyRequestsComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.notificationSubscription?.unsubscribe();
+        this.messageSubscription?.unsubscribe();
     }
 
     setupRealTimeUpdates(): void {
         this.notificationSubscription = this.chatService.onNewNotification().subscribe((notification) => {
-            // Refetch if my request was accepted or rejected
             if (notification.type === 'request_accepted' || notification.type === 'request_rejected') {
                 this.fetchMyRequests();
+            }
+        });
+
+        // Listen for new messages to update unread badge in real-time
+        this.messageSubscription = this.chatService.onNewMessage().subscribe((msg) => {
+            if (!this.chatOpen || this.selectedRequestId !== msg.request_id) {
+                const req = this.requests.find(r => r.id === msg.request_id);
+                if (req && msg.sender_id !== this.currentUserId) {
+                    req.unread_count = (req.unread_count || 0) + 1;
+                    this.cdr.detectChanges();
+                }
             }
         });
     }
@@ -76,16 +95,27 @@ export class MyRequestsComponent implements OnInit, OnDestroy {
         if (!req.id) return;
         this.selectedRequestId = req.id;
         this.selectedTaskTitle = req.task_title || 'Task Details';
-        // For helper, the "other user" is whoever owns the task.
-        // The Request object might not have the owner's name directly, but I can improve the backend API or just use a placeholder.
-        // Wait, Request findByUserId joins with tasks. I should check if Request object has task user name.
-        this.selectedUserName = 'Task Owner'; 
+        this.selectedUserName = req.owner_name || 'Task Owner'; 
+        this.selectedOtherUserId = req.owner_id || 0;
         this.chatOpen = true;
+        req.unread_count = 0; // Clear locally
         this.cdr.detectChanges();
     }
 
     closeChat(): void {
         this.chatOpen = false;
+        this.cdr.detectChanges();
+    }
+
+    openProfile(userId: number | undefined): void {
+        if (!userId) return;
+        this.selectedProfileUserId = userId;
+        this.profileOpen = true;
+        this.cdr.detectChanges();
+    }
+
+    closeProfile(): void {
+        this.profileOpen = false;
         this.cdr.detectChanges();
     }
 }

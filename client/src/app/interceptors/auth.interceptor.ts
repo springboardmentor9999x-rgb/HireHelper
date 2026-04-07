@@ -1,20 +1,29 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-    console.log(`[AuthInterceptor] Intercepting request: ${req.method} ${req.url}`);
-    
-    // Check if window is defined to ensure we are in a browser environment
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    console.log(`[AuthInterceptor] Token found: ${!!token}`);
 
     if (token) {
         req = req.clone({
             setHeaders: { Authorization: `Bearer ${token}` }
         });
-        console.log(`[AuthInterceptor] Added Authorization header`);
-    } else {
-        console.warn(`[AuthInterceptor] No token found in localStorage`);
     }
 
-    return next(req);
+    const authService = inject(AuthService);
+    const router = inject(Router);
+
+    return next(req).pipe(
+        catchError((err: HttpErrorResponse) => {
+            if (err.status === 401) {
+                // Token expired or invalid — force logout
+                authService.logout();
+                router.navigate(['/login']);
+            }
+            return throwError(() => err);
+        })
+    );
 };

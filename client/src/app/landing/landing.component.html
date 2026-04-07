@@ -3,59 +3,173 @@
     <div class="bg-blob blob-1"></div>
     <div class="bg-blob blob-2"></div>
     <div class="bg-blob blob-3"></div>
-    <div class="bg-blob blob-4"></div>
     <div class="grid-overlay"></div>
 
-    <!-- ═══════════ NAVBAR ═══════════ -->
-    <nav class="navbar" id="navbar">
+    <!-- ════ Nav ════ -->
+    <nav class="navbar" [class.scrolled]="isNavbarScrolled()">
         <div class="nav-inner">
             <a routerLink="/" class="nav-brand">
                 <div class="brand-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M20 7H4C2.9 7 2 7.9 2 9V19C2 20.1 2.9 21 4 21H20C21.1 21 22 20.1 22 19V9C22 7.9 21.1 7 20 7Z"
-                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M16 21V5C16 3.9 15.1 3 14 3H10C8.9 3 8 3.9 8 5V21" stroke="currentColor"
-                            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 7H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     </svg>
                 </div>
                 <span class="brand-name">HireHelper</span>
             </a>
             <div class="nav-links">
-                <a routerLink="/login" class="nav-link" id="nav-login">Log in</a>
-                <a routerLink="/signup" class="nav-btn" id="nav-signup">Get Started</a>
+                <a routerLink="/about" class="nav-link">About Us</a>
+                <button class="theme-toggle" (click)="toggleTheme()" [title]="themeService.isDarkMode() ? 'Switch to Light' : 'Switch to Dark'">
+                    @if (themeService.isDarkMode()) {
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    } @else {
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    }
+                </button>
+                <a routerLink="/login" class="nav-link">Log in</a>
+                <a routerLink="/signup" class="nav-btn magnetic-btn">Get Started</a>
             </div>
         </div>
     </nav>
 
-    <!-- ═══════════ HERO ═══════════ -->
-    <section class="hero" id="hero">
+    <!-- ════ Hero ════ -->
+    <section class="hero">
         <div class="hero-badge reveal-on-scroll">
             <span class="badge-dot"></span>
-            <span>Built for modern teams</span>
+            <span>Version 2.0 is live</span>
         </div>
         <h1 class="hero-title reveal-on-scroll">
-            Streamline your<br>
-            <span class="gradient-text">hiring workflow</span>
+            Manage tasks with<br>
+            <span class="gradient-text">effortless precision</span>
         </h1>
         <p class="hero-subtitle reveal-on-scroll">
-            Post tasks, find talent, and manage requests — all in one
-            beautifully simple platform designed for teams that move fast.
+            The all-in-one workspace for high-velocity teams. Post tasks, track requests, 
+            and chat with experts — all within a premium, adaptive interface.
         </p>
         <div class="hero-actions reveal-on-scroll">
-            <a routerLink="/signup" class="btn-primary shimmer" id="hero-get-started">
-                <span>Start for free</span>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" />
-                    <polyline points="12 5 19 12 12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" />
-                </svg>
+            <a routerLink="/signup" class="btn-primary shimmer magnetic-btn">
+                <span>Start Building</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
-            <a routerLink="/login" class="btn-secondary" id="hero-login">
-                <span>Sign in</span>
+            <a routerLink="/login" class="btn-secondary magnetic-btn">
+                <span>Watch Product Demo</span>
             </a>
         </div>
 
+        <!-- 3D Mockup -->
+        <div class="mockup-container reveal-on-scroll">
+            <div class="dashboard-mockup">
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=2426" alt="Dashboard Mockup" class="mockup-img">
+            </div>
+        </div>
+    </section>
+
+    <!-- ════ Trusted By ════ -->
+    <section class="trusted-section reveal-on-scroll">
+        <span class="trusted-label">Trusted by innovative teams worldwide</span>
+        <div class="logo-grid">
+            <svg class="trust-logo" viewBox="0 0 120 40" fill="currentColor"><path d="M10 10h100v20H10z" opacity="0.1"/><text x="50%" y="25" text-anchor="middle" font-size="12" font-weight="900">NEXUS</text></svg>
+            <svg class="trust-logo" viewBox="0 0 120 40" fill="currentColor"><circle cx="20" cy="20" r="10" opacity="0.1"/><text x="110" y="25" text-anchor="end" font-size="12" font-weight="900">ORBIT</text></svg>
+            <svg class="trust-logo" viewBox="0 0 120 40" fill="currentColor"><path d="M0 0l20 40 20-40z" opacity="0.1" transform="translate(10,5)"/><text x="110" y="25" text-anchor="end" font-size="12" font-weight="900">VORTEX</text></svg>
+            <svg class="trust-logo" viewBox="0 0 120 40" fill="currentColor"><rect width="30" height="30" rx="4" opacity="0.1" transform="translate(10,5)"/><text x="110" y="25" text-anchor="end" font-size="12" font-weight="900">PRISM</text></svg>
+        </div>
+    </section>
+
+    <!-- ════ Stats ════ -->
+    <div class="stats-bar reveal-on-scroll">
+        <div class="stat-item">
+            <div class="stat-val">{{ displayStats.users }}</div>
+            <div class="stat-lbl">Active Users</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-val">{{ displayStats.tasks }}</div>
+            <div class="stat-lbl">Tasks Posted</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-val">{{ displayStats.completed }}</div>
+            <div class="stat-lbl">Completed Tasks</div>
+        </div>
+    </div>
+
+    <!-- ════ How It Works (Vertical) ════ -->
+    <section class="process-section">
+        <div class="section-hdr reveal-on-scroll">
+            <h2>Streamlined Workflow</h2>
+            <p>Go from task to completion in three simple steps.</p>
+        </div>
+        
+        <div class="process-line"></div>
+
+        <div class="process-item reveal-on-scroll">
+            <div class="process-content">
+                <span class="process-step-num">01</span>
+                <h3>Post a Task</h3>
+                <p>Define your requirements and budget. Our platform matches you with the best available talent instantly.</p>
+            </div>
+            <div class="process-icon-wrap">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </div>
+        </div>
+
+        <div class="process-item reveal-on-scroll">
+            <div class="process-content">
+                <span class="process-step-num">02</span>
+                <h3>Collaborate in Real-time</h3>
+                <p>Chat with applicants, review portfolios, and manage requests through our premium glassmorphic dashboard.</p>
+            </div>
+            <div class="process-icon-wrap">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-13.5 8.38 8.38 0 0 1 3.8.9L21 3.5l-1.1 4.3z"/></svg>
+            </div>
+        </div>
+
+        <div class="process-item reveal-on-scroll">
+            <div class="process-content">
+                <span class="process-step-num">03</span>
+                <h3>Secure Completion</h3>
+                <p>Release payments only when you're satisfied. Rated and reviewed expertise at your fingertips.</p>
+            </div>
+            <div class="process-icon-wrap">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- ════ Features (Bento) ════ -->
+    <section class="features-section">
+        <div class="section-hdr reveal-on-scroll">
+            <h2>Everything you need</h2>
+            <p>Thoughtfully designed to keep you focused on what matters.</p>
+        </div>
+        
+        <div class="bento-grid">
+            <div class="bento-item item-large reveal-on-scroll">
+                <div class="bento-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <h3>Real-time Messaging</h3>
+                <p>Connect instantly with task experts through our integrated secure chat system.</p>
+            </div>
+            <div class="bento-item reveal-on-scroll">
+                <div class="bento-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <h3>Smart Scheduling</h3>
+                <p>Never miss a deadline with automated reminders and priority tracking.</p>
+            </div>
+            <div class="bento-item reveal-on-scroll">
+                <div class="bento-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <h3>Trusted Payments</h3>
+                <p>Secure transactions with built-in dispute resolution and escrow protection.</p>
+            </div>
+            <div class="bento-item item-large reveal-on-scroll">
+                <div class="bento-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                </div>
+                <h3>Adaptive Dashboard</h3>
+                <p>A workspace that learns your habits and organizes your tasks dynamically.</p>
+            </div>
+        </div>
     </section>
 </div>

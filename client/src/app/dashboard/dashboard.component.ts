@@ -5,6 +5,7 @@ import { AuthService } from '../services/auth.service';
 import { NotificationService } from '../services/notification.service';
 import { AppNotificationService } from '../services/app-notification.service';
 import { ChatService } from '../services/chat.service';
+import { ThemeService } from '../services/theme.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -17,6 +18,7 @@ export class DashboardComponent implements OnInit {
     sidebarOpen = signal(false);
     userName = '';
     userInitial = '';
+    userPicture: string | null = null;
     unreadCount = signal(0);
 
     constructor(
@@ -24,12 +26,14 @@ export class DashboardComponent implements OnInit {
         private router: Router,
         private notificationService: NotificationService,
         private appNotificationService: AppNotificationService,
-        private chatService: ChatService
+        private chatService: ChatService,
+        public themeService: ThemeService
     ) {
-        const user = this.authService.getUser();
+        const user = this.authService.getUser() as any;
         if (user) {
             this.userName = user.name;
             this.userInitial = user.name.charAt(0).toUpperCase();
+            this.userPicture = user.picture_url ? `http://localhost:5000${user.picture_url}` : null;
             
             // Join personal notification room
             this.chatService.joinUser(user.id);
@@ -68,5 +72,9 @@ export class DashboardComponent implements OnInit {
     logout(): void {
         this.authService.logout();
         this.router.navigate(['/login']);
+    }
+
+    toggleTheme(): void {
+        this.themeService.toggleTheme();
     }
 }

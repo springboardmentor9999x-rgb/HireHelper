@@ -57,7 +57,7 @@ const Task = {
             `SELECT t.*, 
                     EXISTS (SELECT 1 FROM requests r WHERE r.task_id = t.id AND r.user_id = $1) as has_requested
              FROM tasks t
-             WHERE t.user_id != $1 AND t.status != 'COMPLETED'
+             WHERE t.user_id != $1 AND UPPER(TRIM(t.status)) = 'OPEN'
              ORDER BY t.created_at DESC`,
             [excludeUserId]
         );

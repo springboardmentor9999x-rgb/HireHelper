@@ -50,9 +50,11 @@ const Request = {
 
     findByUserId: async (userId) => {
         const result = await pool.query(
-            `SELECT r.*, t.title as task_title 
+            `SELECT r.*, t.title as task_title, t.user_id as owner_id, u.name as owner_name,
+               (SELECT COUNT(*) FROM messages m WHERE m.request_id = r.id AND m.sender_id != $1 AND m.is_read = FALSE) as unread_count
              FROM requests r
              JOIN tasks t ON r.task_id = t.id
+             JOIN users u ON t.user_id = u.id
              WHERE r.user_id = $1
              ORDER BY r.created_at DESC`,
             [userId]
@@ -62,7 +64,7 @@ const Request = {
 
     findByTaskId: async (taskId) => {
         const result = await pool.query(
-            `SELECT r.*, u.name as user_name, u.email as user_email
+            `SELECT r.*, u.name as user_name, u.email as user_email, u.phone as user_phone
              FROM requests r
              JOIN users u ON r.user_id = u.id
              WHERE r.task_id = $1
@@ -90,7 +92,8 @@ const Request = {
 
     findByTaskOwnerId: async (ownerId) => {
         const result = await pool.query(
-            `SELECT r.*, t.title as task_title, u.name as user_name, u.email as user_email
+            `SELECT r.*, t.title as task_title, u.name as user_name, u.email as user_email, u.phone as user_phone,
+               (SELECT COUNT(*) FROM messages m WHERE m.request_id = r.id AND m.sender_id != $1 AND m.is_read = FALSE) as unread_count
              FROM requests r
              JOIN tasks t ON r.task_id = t.id
              JOIN users u ON r.user_id = u.id

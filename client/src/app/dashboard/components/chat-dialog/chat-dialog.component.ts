@@ -17,13 +17,19 @@ export class ChatDialogComponent implements OnInit, OnDestroy, AfterViewChecked 
     @Input() requestId!: number;
     @Input() taskTitle!: string;
     @Input() otherUserName!: string;
+    @Input() otherUserId!: number;
     @Input() currentUserId!: number;
+    @Input() currentUserName!: string;
     @Output() close = new EventEmitter<void>();
+    @Output() openProfile = new EventEmitter<number>();
 
     messages: ChatMessage[] = [];
     newMessage = '';
     loading = true;
+    otherUserTyping = false;
     private messageSubscription?: Subscription;
+    private typingSubscription?: Subscription;
+    private typingTimeout?: any;
 
     @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
@@ -34,6 +40,7 @@ export class ChatDialogComponent implements OnInit, OnDestroy, AfterViewChecked 
 
     ngOnDestroy(): void {
         this.messageSubscription?.unsubscribe();
+        this.typingSubscription?.unsubscribe();
     }
 
     ngAfterViewChecked(): void {
@@ -47,6 +54,8 @@ export class ChatDialogComponent implements OnInit, OnDestroy, AfterViewChecked 
                     this.messages = res.messages;
                 }
                 this.loading = false;
+                // Mark already fetched messages as read
+                this.markMessagesAsRead();
             },
             error: (err) => {
                 console.error('Error loading history:', err);
@@ -56,19 +65,38 @@ export class ChatDialogComponent implements OnInit, OnDestroy, AfterViewChecked 
     }
 
     setupRealTimeUpdates(): void {
-        // Join the specific chat room
         this.chatService.joinChat(this.requestId);
 
-        // Listen for new messages
         this.messageSubscription = this.chatService.onNewMessage().subscribe((message) => {
             if (message.request_id === this.requestId) {
-                // Avoid duplicating if we sent it ourselves and refreshed (though we won't refresh anymore)
                 if (!this.messages.some(m => m.id === message.id)) {
                     this.messages = [...this.messages, message];
+                    this.scrollToBottom();
+                    
+                    // Mark as read immediately if chat is open
+                    this.markMessagesAsRead();
+                }
+            }
+        });
+
+        // Listen for typing status
+        this.typingSubscription = this.chatService.onTypingStatus().subscribe((data) => {
+            if (data.requestId === this.requestId) {
+                this.otherUserTyping = data.isTyping;
+                if (data.isTyping) {
                     this.scrollToBottom();
                 }
             }
         });
+    }
+
+    onTyping(): void {
+        this.chatService.sendTypingStatus(this.requestId, this.currentUserName, true);
+        
+        if (this.typingTimeout) clearTimeout(this.typingTimeout);
+        this.typingTimeout = setTimeout(() => {
+            this.chatService.sendTypingStatus(this.requestId, this.currentUserName, false);
+        }, 3000);
     }
 
     sendMessage(): void {
@@ -76,10 +104,13 @@ export class ChatDialogComponent implements OnInit, OnDestroy, AfterViewChecked 
 
         const content = this.newMessage;
         this.newMessage = '';
+        
+        // Stop typing status immediately
+        this.chatService.sendTypingStatus(this.requestId, '', false);
+        if (this.typingTimeout) clearTimeout(this.typingTimeout);
 
         this.chatService.sendMessage(this.requestId, content).subscribe({
             next: (res) => {
-                // No need to refresh messages here, the socket event will handle it
                 if (!res.success) {
                     console.error('Failed to send message:', res.message);
                 }
@@ -87,6 +118,12 @@ export class ChatDialogComponent implements OnInit, OnDestroy, AfterViewChecked 
             error: (err) => {
                 console.error('Error sending message:', err);
             }
+        });
+    }
+
+    private markMessagesAsRead(): void {
+        this.chatService.markAsRead(this.requestId).subscribe({
+            error: (err) => console.error('Error marking as read:', err)
         });
     }
 
@@ -98,5 +135,11 @@ export class ChatDialogComponent implements OnInit, OnDestroy, AfterViewChecked 
 
     onClose(): void {
         this.close.emit();
+    }
+
+    onHeaderClick(): void {
+        if (this.otherUserId) {
+            this.openProfile.emit(this.otherUserId);
+        }
     }
 }

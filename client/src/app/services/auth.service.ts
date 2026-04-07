@@ -11,6 +11,8 @@ export interface LoginResponse {
         name: string;
         email: string;
         phone?: string;
+        bio?: string;
+        picture_url?: string;
     };
 }
 
@@ -64,8 +66,14 @@ export class AuthService {
         return this.http.put<{ success: boolean, message: string }>(`${this.apiUrl}/change-password`, { currentPassword, newPassword });
     }
 
-    updateProfile(name: string): Observable<{ success: boolean, message: string, name: string }> {
-        return this.http.put<{ success: boolean, message: string, name: string }>(`${this.apiUrl}/update-profile`, { name });
+    updateProfile(name: string, bio?: string): Observable<{ success: boolean, message: string, name: string, bio: string, picture_url: string }> {
+        return this.http.put<{ success: boolean, message: string, name: string, bio: string, picture_url: string }>(`${this.apiUrl}/update-profile`, { name, bio });
+    }
+
+    uploadProfilePicture(file: File): Observable<{ success: boolean, message: string, picture_url: string }> {
+        const formData = new FormData();
+        formData.append('avatar', file);
+        return this.http.post<{ success: boolean, message: string, picture_url: string }>(`${this.apiUrl}/upload-avatar`, formData);
     }
 
     // ── Session ───────────────────────────────────────────────────────────────

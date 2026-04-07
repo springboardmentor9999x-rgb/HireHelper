@@ -1,0 +1,69 @@
+<div class="modal-backdrop" (click)="onClose()">
+  <div class="modal rating-modal" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header">
+      <h2 class="modal-title">Rate the Helper</h2>
+      <p class="modal-subtitle">How was your experience with the task: <strong>{{ taskTitle }}</strong>?</p>
+      <button class="close-btn" (click)="onClose()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="star-rating">
+        <div class="stars-container" (mouseleave)="onLeave()">
+          @for (i of [1, 2, 3, 4, 5]; track i) {
+            <div class="star-wrapper" 
+                 (mouseenter)="onHover(i)" 
+                 (click)="setScore(i)">
+              <svg width="40" height="40" viewBox="0 0 24 24" 
+                   [attr.fill]="(hoverScore || score) >= i ? '#fbbf24' : 'none'" 
+                   [attr.stroke]="(hoverScore || score) >= i ? '#fbbf24' : '#475569'"
+                   class="star-icon">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          }
+        </div>
+        <p class="score-label">
+          @if (score === 1) { Poor }
+          @else if (score === 2) { Fair }
+          @else if (score === 3) { Good }
+          @else if (score === 4) { Very Good }
+          @else if (score === 5) { Excellent }
+          @else { Select a rating }
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label for="comment">Tell us more (Optional)</label>
+        <textarea id="comment" 
+                  [(ngModel)]="comment" 
+                  placeholder="Share your thoughts about the helper's performance..."
+                  rows="4"></textarea>
+      </div>
+
+      @if (error) {
+        <div class="error-msg">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          {{ error }}
+        </div>
+      }
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="onClose()">Cancel</button>
+      <button class="btn-submit" (click)="onSubmit()" [disabled]="submitting || score === 0">
+        @if (submitting) {
+          <span class="spinner-small"></span>
+          Submitting...
+        } @else {
+          Submit Rating
+        }
+      </button>
+    </div>
+
+  </div>
+</div>

@@ -17,13 +17,22 @@ export interface ChatMessage {
 })
 export class ChatService {
     private http = inject(HttpClient);
-    private apiUrl = '/api/chat';
+    private apiUrl = typeof window !== 'undefined' 
+        ? `${window.location.protocol}//${window.location.hostname}:5000/api/chat`
+        : 'http://localhost:5000/api/chat';
+        
     private socket: Socket;
     private messageSubject = new Subject<ChatMessage>();
+    private typingSubject = new BehaviorSubject<{ requestId: number; userName: string; isTyping: boolean }>({ requestId: 0, userName: '', isTyping: false });
+    private messagesReadSubject = new Subject<{ requestId: number; userId: number }>();
 
     constructor() {
-        // Initialize socket connection
-        this.socket = io('http://localhost:5000', {
+        // Initialize socket connection using the same host as the API but port 5000
+        const socketUrl = typeof window !== 'undefined' 
+            ? `${window.location.protocol}//${window.location.hostname}:5000`
+            : 'http://localhost:5000';
+            
+        this.socket = io(socketUrl, {
             withCredentials: true,
             autoConnect: true
         });
@@ -36,6 +45,16 @@ export class ChatService {
         // Listen for new notifications
         this.socket.on('new_notification', (notification: any) => {
             this.notificationSubject.next(notification);
+        });
+
+        // Listen for typing status
+        this.socket.on('user_typing', (data: any) => {
+            this.typingSubject.next(data);
+        });
+
+        // Listen for read status
+        this.socket.on('messages_read', (data: any) => {
+            this.messagesReadSubject.next(data);
         });
 
         this.socket.on('connect', () => console.log('🛡️ Chat Socket connected'));
@@ -52,6 +71,10 @@ export class ChatService {
         return this.http.get<{ success: boolean; messages: ChatMessage[] }>(`${this.apiUrl}/${requestId}`);
     }
 
+    markAsRead(requestId: number): Observable<any> {
+        return this.http.post(`${this.apiUrl}/${requestId}/read`, {});
+    }
+
     joinChat(requestId: number) {
         this.socket.emit('join_chat', requestId);
     }
@@ -60,11 +83,27 @@ export class ChatService {
         this.socket.emit('join_user', userId);
     }
 
+    sendTypingStatus(requestId: number, userName: string, isTyping: boolean) {
+        if (isTyping) {
+            this.socket.emit('typing_start', { requestId, userName });
+        } else {
+            this.socket.emit('typing_stop', { requestId });
+        }
+    }
+
     onNewMessage(): Observable<ChatMessage> {
         return this.messageSubject.asObservable();
     }
 
     onNewNotification(): Observable<any> {
         return this.notificationSubject.asObservable();
+    }
+
+    onTypingStatus(): Observable<any> {
+        return this.typingSubject.asObservable();
+    }
+
+    onMessagesRead(): Observable<any> {
+        return this.messagesReadSubject.asObservable();
     }
 }

@@ -1,0 +1,112 @@
+<div class="about-page">
+    <!-- Animated background (blobs & grid) -->
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    <div class="bg-blob blob-3"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- ════ Nav ════ -->
+    <nav class="navbar" [class.scrolled]="isNavbarScrolled()">
+        <div class="nav-inner">
+            <a routerLink="/" class="nav-brand">
+                <div class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 7H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <span class="brand-name">HireHelper</span>
+            </a>
+            <div class="nav-links">
+                <a routerLink="/" class="nav-link">Home</a>
+                <button class="theme-toggle" (click)="toggleTheme()" [title]="themeService.isDarkMode() ? 'Switch to Light' : 'Switch to Dark'">
+                    @if (themeService.isDarkMode()) {
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    } @else {
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    }
+                </button>
+                <a routerLink="/login" class="nav-link">Log in</a>
+                <a routerLink="/signup" class="nav-btn magnetic-btn">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ═══════════ HERO SECTION ═══════════ -->
+    <header class="about-hero">
+        <div class="hero-badge reveal-on-scroll">
+            <span class="badge-dot"></span>
+            <span>Est. 2024</span>
+        </div>
+        <h1 class="hero-title reveal-on-scroll">
+            Our <span class="gradient-text">Mission</span>
+        </h1>
+        <p class="hero-subtitle reveal-on-scroll">
+            HireHelper was built with a simple goal: To bridge the gap between people with tasks and local talent who can do them. We believe in the power of local communities and the people who make them thrive.
+        </p>
+    </header>
+
+    <!-- ═══════════ STORY SECTION ═══════════ -->
+    <section class="section">
+        <div class="content-container">
+            <div class="glass-card story-card reveal-on-scroll">
+                <div class="card-content">
+                    <h2 class="section-title">The HireHelper Story</h2>
+                    <p class="section-text">
+                        In an increasingly digital world, we often forget the helping hands right next door. HireHelper started as a small project to help neighbors find each other for simple daily tasks. From moving furniture to technical software help, our platform has grown into a vibrant ecosystem of trust and cooperation.
+                    </p>
+                    <p class="section-text">
+                        Today, we are more than just a task board. We are a space where local helpers build their reputations and hirers find reliable assistance, all while maintaining a premium, modern experience.
+                    </p>
+                </div>
+                <div class="card-graphic">
+                    <div class="orb-container">
+                        <div class="floating-orb orb-1"></div>
+                        <div class="floating-orb orb-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ VALUES SECTION ═══════════ -->
+    <section class="section values-section">
+        <div class="content-container">
+            <h2 class="center-title reveal-on-scroll">Our Values</h2>
+            <div class="values-grid">
+                <div class="value-card glass-card reveal-on-scroll">
+                    <div class="value-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <h3>Trust First</h3>
+                    <p>We prioritize security and trust in every interaction. Our rating system ensures high-quality help.</p>
+                </div>
+                <div class="value-card glass-card reveal-on-scroll" style="transition-delay: 0.1s;">
+                    <div class="value-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    </div>
+                    <h3>Efficiency</h3>
+                    <p>Time is valuable. We've built tools like real-time notifications to get tasks done faster.</p>
+                </div>
+                <div class="value-card glass-card reveal-on-scroll" style="transition-delay: 0.2s;">
+                    <div class="value-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <h3>Community</h3>
+                    <p>We believe in supporting local talent and helping neighbors succeed together.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ CTA SECTION ═══════════ -->
+    <section class="cta-section">
+        <div class="cta-inner glass-card reveal-on-scroll">
+            <h2 class="cta-title">Ready to get started?</h2>
+            <p class="cta-subtitle">Join thousands of others and simplify your life today.</p>
+            <div class="cta-actions">
+                <a routerLink="/signup" class="btn-primary shimmer magnetic-btn">Join HireHelper</a>
+            </div>
+        </div>
+    </section>
+</div>

@@ -102,7 +102,8 @@ exports.getFeed = async (req, res) => {
 
     try {
         const tasks = await Task.getFeed(userId);
-        console.log(`[DEBUG] getFeed: exclude_user_id=${req.user.id}, found=${tasks.length} tasks`);
+        console.log(`[DEBUG] getFeed: exclude_user_id=${userId}, found=${tasks.length} tasks`);
+        tasks.forEach(t => console.log(`Task ID: ${t.id}, Status: ${t.status}, Title: ${t.title}`));
         return res.json({
             success: true,
             tasks
@@ -223,5 +224,46 @@ exports.completeTask = async (req, res) => {
     } catch (err) {
         console.error('Complete task error:', err.message);
         return res.status(500).json({ success: false, message: 'Server error while completing task' });
+    }
+};
+
+// Status cycle: OPEN → ASSIGNED → CLOSED → OPEN
+const STATUS_CYCLE = ['OPEN', 'ASSIGNED', 'CLOSED'];
+
+exports.updateTaskStatus = async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user?.id;
+    const { status } = req.body; // explicit status, OR cycle if not provided
+
+    if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+
+    try {
+        const task = await Task.findById(id);
+        if (!task) return res.status(404).json({ success: false, message: 'Task not found' });
+
+        if (task.user_id !== userId) {
+            return res.status(403).json({ success: false, message: 'You can only change status of your own tasks' });
+        }
+
+        let nextStatus;
+        if (status) {
+            // Explicit status provided
+            const allowed = ['OPEN', 'ASSIGNED', 'CLOSED', 'COMPLETED'];
+            if (!allowed.includes(status.toUpperCase())) {
+                return res.status(400).json({ success: false, message: 'Invalid status value' });
+            }
+            nextStatus = status.toUpperCase();
+        } else {
+            // Cycle to next status
+            const current = (task.status || 'OPEN').toUpperCase();
+            const idx = STATUS_CYCLE.indexOf(current);
+            nextStatus = idx === -1 ? 'OPEN' : STATUS_CYCLE[(idx + 1) % STATUS_CYCLE.length];
+        }
+
+        const updatedTask = await Task.updateStatus(id, nextStatus);
+        return res.json({ success: true, task: updatedTask });
+    } catch (err) {
+        console.error('Update task status error:', err.message);
+        return res.status(500).json({ success: false, message: 'Server error while updating status' });
     }
 };

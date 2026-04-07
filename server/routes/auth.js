@@ -18,9 +18,27 @@ const initAuthSchema = async () => {
             ALTER TABLE users
               ADD COLUMN IF NOT EXISTS phone          VARCHAR(30),
               ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT false,
-              ADD COLUMN IF NOT EXISTS phone_verified BOOLEAN NOT NULL DEFAULT false
+              ADD COLUMN IF NOT EXISTS phone_verified BOOLEAN NOT NULL DEFAULT false,
+              ADD COLUMN IF NOT EXISTS bio            TEXT,
+              ADD COLUMN IF NOT EXISTS picture_url    TEXT,
+              ADD COLUMN IF NOT EXISTS rating_avg     NUMERIC DEFAULT 0,
+              ADD COLUMN IF NOT EXISTS rating_count   INTEGER DEFAULT 0
         `);
         console.log('✅ users table schema up to date');
+
+        // Ratings table
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS ratings (
+                id         SERIAL PRIMARY KEY,
+                task_id    INTEGER NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+                rater_id   INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                ratee_id   INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                score      INTEGER NOT NULL CHECK (score >= 1 AND score <= 5),
+                comment    TEXT,
+                created_at TIMESTAMPTZ DEFAULT NOW()
+            )
+        `);
+        console.log('✅ ratings table ready');
 
         // Password reset tokens table
         await client.query(`
@@ -374,5 +392,8 @@ router.put('/change-password', authMiddleware, authController.changePassword);
 
 // ─── PUT /api/auth/update-profile (protected) ──────────────────────────────────
 router.put('/update-profile', authMiddleware, authController.updateProfile);
+
+// ─── POST /api/auth/upload-avatar (protected) ─────────────────────────────────
+router.post('/upload-avatar', authMiddleware, authController.uploadAvatarMiddleware, authController.uploadAvatar);
 
 module.exports = { router, initAuthSchema };

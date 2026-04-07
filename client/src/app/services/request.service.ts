@@ -12,6 +12,12 @@ export interface Request {
     task_title?: string;
     user_name?: string;
     user_email?: string;
+    user_phone?: string;
+    owner_name?: string;
+    owner_id?: number;
+    owner_email?: string;
+    owner_phone?: string;
+    unread_count?: number;
 }
 
 @Injectable({
