@@ -10,7 +10,8 @@ export const routes: Routes = [
     {
         path: 'dashboard',
         loadChildren: () => import('./features/dashboard/dashboard.module').then(m => m.DashboardModule),
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        canActivateChild: [authGuard as any]
     },
     { path: 'arc', component: ArcAppComponent, canActivate: [authGuard] },
     { path: '', redirectTo: '/login', pathMatch: 'full' },
