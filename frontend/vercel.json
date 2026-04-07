@@ -1,0 +1,14 @@
+{
+  "buildCommand": "npm run build -- --configuration production",
+  "outputDirectory": "dist/frontend/browser",
+  "installCommand": "npm install --legacy-peer-deps",
+  "env": {
+    "CI": "true"
+  },
+  "routes": [
+    {
+      "src": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
