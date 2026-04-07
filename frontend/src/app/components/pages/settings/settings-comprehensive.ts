@@ -59,7 +59,6 @@ export class SettingsComprehensiveComponent implements OnInit, OnDestroy {
     this.profileForm = this.fb.group({
       first_name: ['', [Validators.required, Validators.minLength(2)]],
       last_name: ['', [Validators.required, Validators.minLength(2)]],
-      phone_number: ['', this.phoneValidator()],
       bio: ['', Validators.maxLength(500)],
       profile_picture: ['']
     });
@@ -129,7 +128,6 @@ export class SettingsComprehensiveComponent implements OnInit, OnDestroy {
             this.profileForm.patchValue({
               first_name: response.data.first_name || '',
               last_name: response.data.last_name || '',
-              phone_number: response.data.phone_number || '',
               bio: response.data.bio || '',
               profile_picture: response.data.profile_picture || ''
             });
@@ -239,7 +237,6 @@ export class SettingsComprehensiveComponent implements OnInit, OnDestroy {
     const payload = {
       first_name: this.profileForm.value.first_name || '',
       last_name: this.profileForm.value.last_name || '',
-      phone_number: this.profileForm.value.phone_number || '',
       bio: this.profileForm.value.bio || '',
       profile_picture: this.profileForm.value.profile_picture || ''
     };
@@ -257,7 +254,6 @@ export class SettingsComprehensiveComponent implements OnInit, OnDestroy {
             this.profileForm.patchValue({
               first_name: response.data.first_name || '',
               last_name: response.data.last_name || '',
-              phone_number: response.data.phone_number || '',
               bio: response.data.bio || '',
               profile_picture: response.data.profile_picture || ''
             }, { emitEvent: false });
@@ -268,7 +264,6 @@ export class SettingsComprehensiveComponent implements OnInit, OnDestroy {
                 ...this.settings.profile,
                 first_name: response.data.first_name,
                 last_name: response.data.last_name,
-                phone_number: response.data.phone_number,
                 bio: response.data.bio,
                 profile_picture: response.data.profile_picture
               };
@@ -475,14 +470,6 @@ export class SettingsComprehensiveComponent implements OnInit, OnDestroy {
   /**
    * Custom validators
    */
-  phoneValidator() {
-    return (control: any) => {
-      if (!control.value) return null;
-      const isValid = /^\d{10,}$/.test(control.value.replace(/\D/g, ''));
-      return isValid ? null : { invalidPhone: true };
-    };
-  }
-
   passwordMatchValidator() {
     return (group: FormGroup) => {
       const password = group.get('new_password')?.value;

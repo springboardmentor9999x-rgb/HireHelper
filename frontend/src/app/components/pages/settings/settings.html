@@ -95,15 +95,6 @@
           </div>
 
           <div class="form-group">
-            <label for="phone_number">{{ 'settings.profile.phoneNumber' | translate }}</label>
-            <input type="tel" id="phone_number" formControlName="phone_number" class="form-control"
-              [class.error]="hasError(profileForm, 'phone_number')">
-            <small class="error-text" *ngIf="hasError(profileForm, 'phone_number')">
-              {{ getErrorMessage(profileForm, 'phone_number') }}
-            </small>
-          </div>
-
-          <div class="form-group">
             <label for="bio">{{ 'settings.profile.bio' | translate }}</label>
             <textarea id="bio" formControlName="bio" class="form-control" rows="4" [placeholder]="'settings.profile.bioPlaceholder' | translate"></textarea>
             <small class="help-text">{{ profileForm.value.bio?.length || 0 }}/500 characters</small>

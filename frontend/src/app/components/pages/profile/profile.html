@@ -51,7 +51,7 @@
 
       <div class="info-group">
         <label>Phone Number</label>
-        <p class="info-value">{{ profile.phone_number || 'Not set' }}</p>
+        <p class="info-value">{{ profile.phone_number || 'Not set' }} <span class="locked-badge">🔒 Fixed</span></p>
       </div>
 
       <div class="info-group">
@@ -100,22 +100,6 @@
           <div *ngIf="isFieldInvalid('last_name')" class="error-text">
             <span *ngIf="f['last_name'].errors?.['required']">Last name is required</span>
             <span *ngIf="f['last_name'].errors?.['minlength']">Minimum 2 characters</span>
-          </div>
-        </div>
-
-        <!-- Phone Number -->
-        <div class="form-group">
-          <label for="phone_number">Phone Number *</label>
-          <input
-            id="phone_number"
-            type="tel"
-            formControlName="phone_number"
-            class="form-control"
-            [class.error]="isFieldInvalid('phone_number')"
-          />
-          <div *ngIf="isFieldInvalid('phone_number')" class="error-text">
-            <span *ngIf="f['phone_number'].errors?.['required']">Phone number is required</span>
-            <span *ngIf="f['phone_number'].errors?.['minlength']">Minimum 10 characters</span>
           </div>
         </div>
 

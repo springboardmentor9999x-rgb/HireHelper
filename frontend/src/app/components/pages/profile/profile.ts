@@ -25,7 +25,6 @@ export class ProfileComponent implements OnInit {
     this.profileForm = this.fb.group({
       first_name: ['', [Validators.required, Validators.minLength(2)]],
       last_name: ['', [Validators.required, Validators.minLength(2)]],
-      phone_number: ['', [Validators.required, Validators.minLength(10)]],
     });
   }
 
@@ -48,7 +47,6 @@ export class ProfileComponent implements OnInit {
           this.profileForm.patchValue({
             first_name: response.data.first_name,
             last_name: response.data.last_name,
-            phone_number: response.data.phone_number,
           });
         } else {
           this.errorMessage = 'Failed to load profile';
@@ -70,7 +68,6 @@ export class ProfileComponent implements OnInit {
       this.profileForm.reset({
         first_name: this.profile?.first_name,
         last_name: this.profile?.last_name,
-        phone_number: this.profile?.phone_number,
       });
     }
     this.editing = !this.editing;
@@ -93,7 +90,6 @@ export class ProfileComponent implements OnInit {
     const formData = {
       first_name: this.profileForm.get('first_name')?.value,
       last_name: this.profileForm.get('last_name')?.value,
-      phone_number: this.profileForm.get('phone_number')?.value,
     };
 
     this.profileService.updateProfile(formData).subscribe({

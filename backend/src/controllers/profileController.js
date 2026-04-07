@@ -66,13 +66,13 @@ const profileController = {
   updateProfile: async (req, res) => {
     try {
       const userId = req.user.id;
-      const { first_name, last_name, phone_number, bio, profile_picture } = req.body;
+      const { first_name, last_name, bio, profile_picture } = req.body;
 
       console.log('📥 [Profile] Update request for user:', userId);
-      console.log('📥 [Profile] Payload:', { first_name, last_name, phone_number, bio: bio ? 'provided' : 'not provided', profile_picture: profile_picture ? 'provided' : 'not provided' });
+      console.log('📥 [Profile] Payload:', { first_name, last_name, bio: bio ? 'provided' : 'not provided', profile_picture: profile_picture ? 'provided' : 'not provided' });
 
       // Validation
-      if (!first_name && !last_name && !phone_number && !bio && !profile_picture) {
+      if (!first_name && !last_name && !bio && !profile_picture) {
         console.log('⚠️ [Profile] No fields provided for update');
         return res.status(HTTP_CODES.BAD_REQUEST).json({
           success: false,
@@ -91,13 +91,6 @@ const profileController = {
         return res.status(HTTP_CODES.BAD_REQUEST).json({
           success: false,
           message: 'Last name must be at least 2 characters',
-        });
-      }
-
-      if (phone_number && typeof phone_number === 'string' && phone_number.trim().length < 10) {
-        return res.status(HTTP_CODES.BAD_REQUEST).json({
-          success: false,
-          message: 'Phone number must be at least 10 characters',
         });
       }
 
@@ -121,11 +114,6 @@ const profileController = {
       if (last_name && typeof last_name === 'string' && last_name.trim()) {
         updates.push(`last_name = $${paramCount++}`);
         values.push(last_name.trim());
-      }
-
-      if (phone_number && typeof phone_number === 'string' && phone_number.trim()) {
-        updates.push(`phone_number = $${paramCount++}`);
-        values.push(phone_number.trim());
       }
 
       if (bio && typeof bio === 'string') {

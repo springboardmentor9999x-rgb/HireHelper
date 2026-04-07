@@ -3,6 +3,7 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+require('dotenv').config();
 
 const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require('./src/routes/userRoutes');
@@ -14,11 +15,29 @@ const requestRoutes = require('./src/routes/requestRoutes');
 
 const app = express();
 
-app.use(cors({
-  origin: 'http://localhost:4300',
+// CORS Configuration - Allow both development and production URLs
+const allowedOrigins = [
+  'http://localhost:4300',           // Development frontend
+  'http://localhost:3000',           // Alternative development port
+  'https://hirehelper-nymu.vercel.app'  // Production frontend
+];
+
+const corsOptions = {
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
-  optionsSuccessStatus: 200
-}));
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 
 // Order is critical: Apply JSON first, then specific routes with multer
 app.use(express.json({ limit: '50mb' }));
