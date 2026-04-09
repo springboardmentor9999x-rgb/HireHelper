@@ -1,55 +1,102 @@
-<div class="page-shell">
-  <div class="page-topbar">
-    <button class="back-btn" (click)="goBack()">← Back</button>
+<div class="requests-page">
+  <div class="requests-header">
+    <div class="title-section">
+      <button class="back-btn" (click)="goBack()">← Back</button>
+      <p class="subtitle">Manage incoming helper requests</p>
+      <h1>Incoming Requests</h1>
+      <p class="desc">
+        Accept or reject people who want to help with your posted tasks.
+      </p>
+    </div>
 
-    <div class="page-title-wrap">
-      <h2>Incoming Requests</h2>
-      <p>Accept or reject people who want to help with your tasks.</p>
+    <div class="summary-card">
+      <span>Total Requests</span>
+      <h2>{{ requests.length }}</h2>
+      <p>Waiting for action</p>
     </div>
   </div>
 
-  <div *ngIf="loading" class="glass-card empty-state">
-    Loading requests...
+  <div *ngIf="loading" class="state-card">
+    <div class="loader"></div>
+    <p>Loading requests...</p>
   </div>
 
-  <div *ngIf="!loading && errorMessage" class="glass-card empty-state">
-    {{ errorMessage }}
+  <div *ngIf="!loading && requests.length === 0" class="empty-state-box">
+    <div class="empty-emoji">📩</div>
+    <h2>No Incoming Requests</h2>
+    <p>{{ message || 'No one has requested your tasks yet.' }}</p>
   </div>
 
-  <div *ngIf="!loading && requests.length === 0" class="glass-card empty-state">
-    No incoming requests found.
-  </div>
+  <div class="request-grid" *ngIf="!loading && requests.length > 0">
+    <div class="request-card" *ngFor="let req of requests">
+      <div class="request-top">
+        <div class="user-box">
+          <div class="avatar">{{ getInitials(req) }}</div>
 
-  <div class="grid-cards" *ngIf="!loading && requests.length > 0">
-    <div class="glass-card" *ngFor="let req of requests">
-      <div class="premium-card-title">
-        <h3>{{ req.first_name }} {{ req.last_name }}</h3>
-        <span
-          class="badge"
-          [ngClass]="{
-            'pending': req.status === 'PENDING',
-            'accepted': req.status === 'ACCEPTED',
-            'rejected': req.status === 'REJECTED'
-          }"
-        >
-          {{ req.status }}
+          <div class="user-info">
+            <h3>{{ getFullName(req) }}</h3>
+            <p>{{ req.email || 'Email not available' }}</p>
+          </div>
+        </div>
+
+        <span class="status-badge" [ngClass]="getStatusClass(req.status)">
+          {{ req.status || 'PENDING' }}
         </span>
       </div>
 
-      <div class="top-chip">{{ req.task_title }}</div>
-
-      <p class="info-row"><strong>Email:</strong> {{ req.email }}</p>
-      <p class="info-row"><strong>Phone:</strong> {{ req.number }}</p>
-      <p class="info-row"><strong>Location:</strong> {{ req.loc || 'Not specified' }}</p>
-      <p class="info-row"><strong>Task Status:</strong> {{ req.task_status }}</p>
-
-      <div class="card-actions" *ngIf="req.status === 'PENDING' && req.task_status !== 'ASSIGNED'">
-        <button class="success-btn" (click)="updateStatus(req.id, 'ACCEPTED')">Accept</button>
-        <button class="danger-btn" (click)="updateStatus(req.id, 'REJECTED')">Reject</button>
+      <div class="request-content">
+        <h2>{{ req.title || 'Task Request' }}</h2>
+        <p class="task-desc">
+          {{ req.description || 'No description available.' }}
+        </p>
       </div>
 
-      <div class="card-actions" *ngIf="req.task_status === 'ASSIGNED'">
-        <span class="badge assigned">Assigned</span>
+      <div class="request-meta">
+        <div class="meta-box">
+          <span>Location</span>
+          <strong>{{ req.loc || req.Loc || req.location || 'Not specified' }}</strong>
+        </div>
+
+        <div class="meta-box">
+          <span>Budget</span>
+          <strong>₹{{ req.budget || 'N/A' }}</strong>
+        </div>
+
+        <div class="meta-box full">
+          <span>Requested For</span>
+          <strong>{{ req.created_at ? (req.created_at | date:'medium') : 'Recently' }}</strong>
+        </div>
+      </div>
+
+      <div class="action-row" *ngIf="(req.status || '').toUpperCase() === 'PENDING'">
+        <button
+          class="accept-btn"
+          (click)="updateRequest(req.id, 'ACCEPTED')"
+          [disabled]="actionLoadingId === req.id"
+        >
+          {{ actionLoadingId === req.id ? 'Processing...' : 'Accept' }}
+        </button>
+
+        <button
+          class="reject-btn"
+          (click)="updateRequest(req.id, 'REJECTED')"
+          [disabled]="actionLoadingId === req.id"
+        >
+          {{ actionLoadingId === req.id ? 'Processing...' : 'Reject' }}
+        </button>
+      </div>
+
+      <div class="final-state" *ngIf="(req.status || '').toUpperCase() !== 'PENDING'">
+        <button
+          class="done-btn"
+          [ngClass]="{
+            'accepted-btn': (req.status || '').toUpperCase() === 'ACCEPTED',
+            'rejected-btn': (req.status || '').toUpperCase() === 'REJECTED'
+          }"
+          disabled
+        >
+          {{ req.status }}
+        </button>
       </div>
     </div>
   </div>

@@ -1,0 +1,113 @@
+<div class="settings-page">
+  <div class="settings-header">
+    <div class="title-section">
+      <button class="back-btn" (click)="goBack()">← Back</button>
+      <p class="subtitle">Manage your account</p>
+      <h1>Profile Settings</h1>
+      <p class="desc">
+        Update your personal details and change your password securely.
+      </p>
+    </div>
+
+    <div class="summary-card">
+      <span>Account</span>
+      <h2>Secure</h2>
+      <p>Profile & password</p>
+    </div>
+  </div>
+
+  <div class="settings-grid">
+    <div class="settings-card">
+      <h2>Profile Information</h2>
+
+      <form [formGroup]="settingsForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" formControlName="first_name" />
+          <small class="field-error" *ngIf="submitted && f['first_name'].errors?.['required']">
+            First name is required
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" formControlName="last_name" />
+          <small class="field-error" *ngIf="submitted && f['last_name'].errors?.['required']">
+            Last name is required
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="text" formControlName="number" />
+          <small class="field-error" *ngIf="submitted && f['number'].errors?.['required']">
+            Phone number is required
+          </small>
+          <small class="field-error" *ngIf="submitted && f['number'].errors?.['pattern']">
+            Phone number must be exactly 10 digits
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Profile Picture URL</label>
+          <input type="text" formControlName="profile_picture" />
+        </div>
+
+        <button type="submit" class="primary-btn" [disabled]="settingsForm.invalid">
+          Save Changes
+        </button>
+      </form>
+
+      <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
+      <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+
+      <div class="preview" *ngIf="settingsForm.get('profile_picture')?.value">
+        <img [src]="settingsForm.get('profile_picture')?.value" alt="Profile Preview" />
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h2>Change Password</h2>
+
+      <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+        <div class="form-group">
+          <label>Current Password</label>
+          <input type="password" formControlName="currentPassword" />
+          <small class="field-error" *ngIf="passwordSubmitted && pf['currentPassword'].errors?.['required']">
+            Current password is required
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>New Password</label>
+          <input type="password" formControlName="newPassword" />
+          <small class="field-error" *ngIf="passwordSubmitted && pf['newPassword'].errors?.['required']">
+            New password is required
+          </small>
+          <small class="field-error" *ngIf="passwordSubmitted && pf['newPassword'].errors?.['minlength']">
+            New password must be at least 6 characters
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Confirm New Password</label>
+          <input type="password" formControlName="confirmPassword" />
+          <small class="field-error" *ngIf="passwordSubmitted && pf['confirmPassword'].errors?.['required']">
+            Confirm password is required
+          </small>
+        </div>
+
+        <small class="field-error" *ngIf="passwordSubmitted && passwordForm.value.newPassword !== passwordForm.value.confirmPassword">
+          New password and confirm password must match
+        </small>
+
+        <button type="submit" class="primary-btn">
+          Update Password
+        </button>
+      </form>
+
+      <p class="success" *ngIf="passwordSuccessMsg">{{ passwordSuccessMsg }}</p>
+      <p class="error" *ngIf="passwordErrorMsg">{{ passwordErrorMsg }}</p>
+    </div>
+  </div>
+</div>

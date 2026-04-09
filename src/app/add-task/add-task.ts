@@ -30,6 +30,9 @@ export class AddTaskComponent {
       picture: ['']
     });
   }
+  goBack(): void {
+  window.history.back();
+}
 
   onSubmit() {
 

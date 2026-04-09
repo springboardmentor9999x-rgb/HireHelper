@@ -47,36 +47,43 @@
         <input
           id="number"
           type="text"
-          placeholder="Enter mobile number"
+          placeholder="Enter 10-digit mobile number"
           [(ngModel)]="number"
           name="number"
+          maxlength="10"
+          inputmode="numeric"
           required
+          (input)="onNumberInput($event)"
         >
       </div>
 
       <div class="input-group">
         <label for="email">Email Address</label>
         <input
-          id="email"
-          type="email"
-          placeholder="Enter email"
-          [(ngModel)]="email"
-          name="email"
-          required
-        >
+  id="email"
+  type="email"
+  placeholder="Enter email"
+  [(ngModel)]="email"
+  name="email"
+  required
+  (input)="onEmailInput($event)"
+>
       </div>
 
       <div class="input-group">
-        <label for="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          placeholder="Enter password"
-          [(ngModel)]="password"
-          name="password"
-          required
-        >
-      </div>
+  <label for="password">Password</label>
+  <input
+    id="password"
+    type="password"
+    placeholder="Enter password"
+    [(ngModel)]="password"
+    name="password"
+    required
+  >
+  <small class="hint-text">
+    Password must be at least 8 characters with uppercase, lowercase, number, and special character.
+  </small>
+</div>
 
       <button type="submit" class="register-btn">
         Register

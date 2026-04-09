@@ -9,7 +9,7 @@ import { FeedComponent } from './feed/feed';
 import { VerifyComponent } from './verify/verify';
 import { MyRequestsComponent } from './my-requests/my-requests';
 import { RequestsComponent } from './requests/requests';
-
+import { SettingsComponent } from './settings/settings';
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: Login },
@@ -20,6 +20,6 @@ export const routes: Routes = [
   { path: 'my-tasks', component: MyTasksComponent, canActivate: [AuthGuard] },
   { path: 'feed', component: FeedComponent, canActivate: [AuthGuard] },
     { path: 'my-requests', component: MyRequestsComponent },
-  { path: 'requests', component: RequestsComponent }
-  
+  { path: 'requests', component: RequestsComponent },
+  { path: 'settings', component: SettingsComponent }
 ];

@@ -1,62 +1,92 @@
-<div class="page-shell">
-  <div class="page-topbar">
+<div class="feed-page">
+  <div class="feed-header">
+    <div class="title-section">
+  <button class="back-btn" (click)="goBack()">← Back</button>
+  <p class="subtitle">Explore opportunities</p>
+  <h1>Task Feed</h1>
+  <p class="desc">
+    Explore tasks posted by other users and send your request to help.
+  </p>
+</div>
 
-
-    <div class="page-title-wrap">
-      <h2>Task Feed</h2>
-      <p>Explore tasks posted by other users and send your request.</p>
+    <div class="summary-card">
+      <span>Total Tasks</span>
+      <h2>{{ tasks.length }}</h2>
+      <p>Available for request</p>
     </div>
   </div>
 
-  <div *ngIf="loading" class="glass-card empty-state">
-    Loading tasks...
+  <div *ngIf="loading" class="state-card">
+    <div class="loader"></div>
+    <p>Loading tasks...</p>
   </div>
 
-  <div *ngIf="!loading && tasks.length === 0" class="glass-card empty-state">
-    No tasks available.
+  <div *ngIf="!loading && tasks.length === 0" class="state-card">
+    <div class="empty-icon">📭</div>
+    <h3>No tasks available</h3>
+    <p>{{ message }}</p>
   </div>
 
-  <div class="grid-cards" *ngIf="!loading && tasks.length > 0">
-    <div class="glass-card" *ngFor="let task of tasks">
-      <div class="premium-card-title">
-        <h3>{{ task.title }}</h3>
+  <div class="task-grid" *ngIf="!loading && tasks.length > 0">
+    <div class="task-card" *ngFor="let task of tasks">
+      <div class="task-top">
+        <div class="user-box">
+          <div class="avatar">
+            {{ getInitials(task) }}
+          </div>
 
-        <span class="badge assigned" *ngIf="task.status === 'ASSIGNED'">
-          ASSIGNED
-        </span>
+          <div class="user-info">
+            <h3>{{ getFullName(task) }}</h3>
+            <p>{{ task.email || 'Email not available' }}</p>
+          </div>
+        </div>
 
-        <span class="badge pending" *ngIf="task.status !== 'ASSIGNED'">
-          {{ task.status }}
+        <span class="status-badge" [ngClass]="getStatusClass(task.status)">
+          {{ task.status || 'OPEN' }}
         </span>
       </div>
 
-      <div class="top-chip">
-        Helper Task
+      <div class="task-content">
+        <h2>{{ task.title }}</h2>
+        <p class="task-desc">
+          {{ task.description || 'No description available for this task.' }}
+        </p>
       </div>
 
-      <p class="info-row">
-        <strong>Description:</strong> {{ task.description || 'No description' }}
-      </p>
+      <div class="task-meta">
+        <div class="meta-box">
+          <span>Location</span>
+          <strong>{{ task.loc || task.Loc || task.location || 'Not specified' }}</strong>
+        </div>
 
-      <p class="info-row">
-        <strong>Location:</strong> {{ task.loc || 'Not specified' }}
-      </p>
+        <div class="meta-box">
+          <span>Budget</span>
+          <strong>₹{{ task.budget || 'N/A' }}</strong>
+        </div>
 
-      <p class="info-row">
-        <strong>Budget:</strong> ₹{{ task.budget || 'N/A' }}
-      </p>
+        <div class="meta-box full">
+          <span>Start Time</span>
+          <strong>{{ task.start_time | date:'medium' }}</strong>
+        </div>
+      </div>
 
-      <p class="info-row">
-        <strong>Start:</strong> {{ task.start_time | date:'medium' }}
-      </p>
-
-      <div class="card-actions">
+      <div class="task-actions">
         <button
-          class="primary-btn"
-          (click)="sendRequest(task.id)"
-          [disabled]="task.status === 'ASSIGNED'">
-          Request
-        </button>
+  class="request-btn"
+  [class.sent]="task.request_sent"
+  (click)="sendRequest(task.id)"
+  [disabled]="task.status === 'ASSIGNED' || task.request_sent || requestLoadingId === task.id"
+>
+  {{
+    requestLoadingId === task.id
+      ? 'Sending...'
+      : task.request_sent
+      ? 'Requested Already'
+      : task.status === 'ASSIGNED'
+      ? 'Assigned'
+      : 'Send Request'
+  }}
+</button>
       </div>
     </div>
   </div>

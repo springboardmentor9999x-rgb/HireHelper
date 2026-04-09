@@ -1,65 +1,83 @@
-<div class="page-shell">
-  <div class="page-topbar">
-    
+<div class="mytasks-page">
+  <div class="mytasks-header">
+    <div class="title-section">
+      <button class="back-btn" (click)="goBack()">← Back</button>
+      <p class="subtitle">Manage your posted work</p>
+      <h1>My Tasks</h1>
+      <p class="desc">
+        Track all tasks you have posted, monitor their status, and manage them easily.
+      </p>
+    </div>
 
-    <div class="page-title-wrap">
-      <h2>My Tasks</h2>
-      <p>View and manage all tasks posted by you.</p>
+    <div class="summary-card">
+      <span>Total Tasks</span>
+      <h2>{{ tasks.length }}</h2>
+      <p>Your active task list</p>
     </div>
   </div>
 
-  <div *ngIf="loading" class="glass-card empty-state">
-    Loading your tasks...
+  <div *ngIf="loading" class="state-card">
+    <div class="loader"></div>
+    <p>Loading your tasks...</p>
   </div>
 
-  <div *ngIf="!loading && message" class="glass-card empty-state">
-    {{ message }}
+  <div *ngIf="!loading && tasks.length === 0" class="empty-state-box">
+    <div class="empty-emoji">📋</div>
+    <h2>No Tasks Yet</h2>
+    <p>
+      You have not created any tasks yet.
+      Start by posting your first task.
+    </p>
+    <button class="empty-btn" routerLink="/add-task">
+      + Add Task
+    </button>
   </div>
 
-  <div class="grid-cards" *ngIf="!loading && tasks.length > 0">
-    <div class="glass-card" *ngFor="let task of tasks">
-      <div class="premium-card-title">
-        <h3>{{ task.title }}</h3>
+  <div class="task-grid" *ngIf="!loading && tasks.length > 0">
+    <div class="task-card" *ngFor="let task of tasks">
+      <div class="task-top">
+        <div>
+          <h2>{{ task.title }}</h2>
+          <p class="task-desc">
+            {{ task.description || 'No description available for this task.' }}
+          </p>
+        </div>
 
-        <span
-          class="badge"
-          [ngClass]="{
-            'pending': task.status === 'OPEN' || task.status === 'PENDING',
-            'assigned': task.status === 'ASSIGNED',
-            'accepted': task.status === 'COMPLETED'
-          }"
-        >
-          {{ task.status }}
+        <span class="status-badge" [ngClass]="getStatusClass(task.status)">
+          {{ task.status || 'OPEN' }}
         </span>
       </div>
 
-      <div class="top-chip">
-        Your Posted Task
+      <div class="task-meta">
+        <div class="meta-box">
+          <span>Location</span>
+          <strong>{{ task.loc || task.Loc || task.location || 'Not specified' }}</strong>
+        </div>
+
+        <div class="meta-box">
+          <span>Budget</span>
+          <strong>₹{{ task.budget || 'N/A' }}</strong>
+        </div>
+
+        <div class="meta-box">
+          <span>Category</span>
+          <strong>{{ task.category || 'General' }}</strong>
+        </div>
+
+        <div class="meta-box">
+          <span>Status</span>
+          <strong>{{ task.status || 'OPEN' }}</strong>
+        </div>
+
+        <div class="meta-box full">
+          <span>Start Time</span>
+          <strong>{{ task.start_time | date:'medium' }}</strong>
+        </div>
       </div>
 
-      <p class="info-row">
-        <strong>Description:</strong> {{ task.description || 'No description' }}
-      </p>
-
-      <p class="info-row">
-        <strong>Location:</strong> {{ task.loc || task.location || 'Not specified' }}
-      </p>
-
-      <p class="info-row">
-        <strong>Budget:</strong> ₹{{ task.budget || 'N/A' }}
-      </p>
-
-      <p class="info-row">
-        <strong>Start:</strong> {{ task.start_time | date:'medium' }}
-      </p>
-
-      <p class="info-row" *ngIf="task.end_time">
-        <strong>End:</strong> {{ task.end_time | date:'medium' }}
-      </p>
-
-      <p class="info-row" *ngIf="task.category">
-        <strong>Category:</strong> {{ task.category }}
-      </p>
+      <div class="task-actions">
+        <button class="secondary-btn">View Details</button>
+      </div>
     </div>
   </div>
 </div>

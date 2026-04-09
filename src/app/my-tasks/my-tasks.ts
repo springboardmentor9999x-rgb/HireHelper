@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-my-tasks',
@@ -24,8 +24,8 @@ export class MyTasksComponent implements OnInit {
   }
 
   goBack(): void {
-    window.history.back();
-  }
+  window.history.back();
+} 
 
   loadMyTasks(): void {
     const token = localStorage.getItem('token');
@@ -47,23 +47,33 @@ export class MyTasksComponent implements OnInit {
 
     this.http.get<any>('http://localhost:5000/api/tasks/my', { headers }).subscribe({
       next: (res) => {
-        console.log('My Tasks response:', res);
+        console.log('My tasks response:', res);
 
         this.tasks = res?.tasks || [];
         this.loading = false;
 
         if (this.tasks.length === 0) {
-          this.message = 'No tasks found';
+          this.message = 'No tasks created yet';
         }
 
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('My Tasks error:', err);
+        console.error('My tasks error:', err);
         this.loading = false;
-        this.message = err.error?.message || 'Error loading my tasks';
+        this.message = 'Error loading your tasks';
         this.cdr.detectChanges();
       }
     });
+  }
+
+  getStatusClass(status: string): string {
+    const s = (status || '').toUpperCase();
+
+    if (s === 'OPEN') return 'open';
+    if (s === 'ASSIGNED') return 'assigned';
+    if (s === 'PENDING') return 'pending';
+
+    return 'default';
   }
 }

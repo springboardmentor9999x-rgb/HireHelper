@@ -14,6 +14,7 @@ export class FeedComponent implements OnInit {
   tasks: any[] = [];
   loading = true;
   message = '';
+  requestLoadingId: number | null = null;
 
   constructor(
     private http: HttpClient,
@@ -52,6 +53,7 @@ export class FeedComponent implements OnInit {
         console.log('Feed response:', res);
 
         this.tasks = res?.tasks || [];
+
         this.loading = false;
 
         if (this.tasks.length === 0) {
@@ -72,14 +74,66 @@ export class FeedComponent implements OnInit {
   }
 
   sendRequest(taskId: number): void {
-    this.authService.requestTask(taskId).subscribe({
-      next: (res) => {
-        alert(res.message || 'Request sent successfully');
-      },
-      error: (err) => {
-        console.error('Request send error:', err);
-        alert(err.error?.message || 'Failed to send request');
+  const selectedTask = this.tasks.find(task => task.id === taskId);
+
+  if (!selectedTask || selectedTask.request_sent || selectedTask.status === 'ASSIGNED') {
+    return;
+  }
+
+  this.requestLoadingId = taskId;
+  this.cdr.detectChanges();
+
+  this.authService.requestTask(taskId).subscribe({
+    next: (res) => {
+      alert(res.message || 'Request sent successfully');
+
+      this.tasks = this.tasks.map(task =>
+        task.id === taskId
+          ? { ...task, request_sent: true }
+          : task
+      );
+
+      this.requestLoadingId = null;
+      this.cdr.detectChanges();
+    },
+    error: (err) => {
+      console.error('Request send error:', err);
+
+      if (err.error?.message?.toLowerCase().includes('already')) {
+        this.tasks = this.tasks.map(task =>
+          task.id === taskId
+            ? { ...task, request_sent: true }
+            : task
+        );
       }
-    });
+
+      alert(err.error?.message || 'Failed to send request');
+      this.requestLoadingId = null;
+      this.cdr.detectChanges();
+    }
+  });
+}
+
+  getInitials(task: any): string {
+    const first = task.first_name?.charAt(0)?.toUpperCase() || '';
+    const last = task.last_name?.charAt(0)?.toUpperCase() || '';
+    const initials = `${first}${last}`.trim();
+
+    return initials || 'U';
+  }
+
+  getFullName(task: any): string {
+    const fullName = `${task.first_name || ''} ${task.last_name || ''}`.trim();
+    return fullName || 'Unknown User';
+  }
+
+  getStatusClass(status: string): string {
+    const s = (status || '').toUpperCase();
+
+    if (s === 'OPEN') return 'open';
+    if (s === 'ASSIGNED') return 'assigned';
+    if (s === 'PENDING') return 'pending';
+
+    return 'default';
   }
 }

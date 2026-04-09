@@ -25,9 +25,36 @@ export class Register {
     private location: Location
   ) {}
 
+  onNumberInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let value = input.value.replace(/\D/g, '');
+
+    if (value.length > 10) {
+      value = value.slice(0, 10);
+    }
+
+    this.number = value;
+    input.value = value;
+  }
+
   registerUser() {
     if (!this.first_name || !this.last_name || !this.email || !this.password || !this.number) {
       this.errorMsg = 'All fields are required';
+      return;
+    }
+
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phoneRegex.test(this.number.trim())) {
+      this.errorMsg = 'Please enter a valid 10-digit mobile number';
+      return;
+    }
+
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.#^_+\-])[A-Za-z\d@$!%*?&.#^_+\-]{8,}$/;
+
+    if (!passwordRegex.test(this.password)) {
+      this.errorMsg =
+        'Password must be at least 8 characters and include uppercase, lowercase, number, and special character';
       return;
     }
 
@@ -49,6 +76,15 @@ export class Register {
       }
     });
   }
+  onEmailInput(event: Event) {
+  const input = event.target as HTMLInputElement;
+
+  // spaces remove karo
+  let value = input.value.replace(/\s/g, '');
+
+  this.email = value;
+  input.value = value;
+}
 
   goBack() {
     this.location.back();
