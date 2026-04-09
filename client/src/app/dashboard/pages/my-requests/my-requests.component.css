@@ -2,6 +2,63 @@
 
 .page { max-width: 1100px; margin: 0 auto; animation: fadeUp 0.4s ease; }
 
+/* ─── Tab Bar ───────────────── */
+.tab-bar {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--surface-1);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 0.5rem;
+    margin-bottom: 2.5rem;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.tab-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 1.25rem;
+    background: transparent;
+    border: none;
+    border-radius: 12px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-item:hover:not(.active) {
+    color: var(--text-main);
+    background: var(--surface-2);
+}
+
+.tab-item.active {
+    background: var(--card-bg);
+    color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 0 0 1px var(--card-border);
+}
+
+.tab-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    background: var(--surface-2);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--text-muted);
+}
+
+.tab-item.active .tab-count {
+    background: rgba(108, 71, 255, 0.15);
+    color: var(--primary);
+}
+
 /* ─── Grid ────────────────── */
 .requests-grid {
     display: grid;

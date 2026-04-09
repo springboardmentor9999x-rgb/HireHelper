@@ -67,58 +67,49 @@
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--card-border);
     border-radius: 24px;
-    padding: 1.75rem;
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    box-shadow: var(--card-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    transition: all 0.4s cubic-bezier(0.2, 0, 0.2, 1);
+    gap: 1.25rem;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
     animation: fadeUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
-.task-card:nth-child(1) { animation-delay: 0.05s; }
-.task-card:nth-child(2) { animation-delay: 0.1s; }
-.task-card:nth-child(3) { animation-delay: 0.15s; }
-.task-card:nth-child(4) { animation-delay: 0.2s; }
-
-.task-card:hover {
-    transform: translateY(-8px) scale(1.01);
+.task-card:hover { 
+    transform: translateY(-8px); 
     border-color: var(--primary);
-    box-shadow: 0 32px 64px -16px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
 }
 
-/* ─── Task image ─────────────────────── */
-.task-image {
-    margin: -1.75rem -1.75rem 1.5rem;
-    border-radius: 24px 24px 0 0;
-    overflow: hidden;
-    height: 180px;
-    position: relative;
+.task-image { height: 160px; border-radius: 16px; overflow: hidden; margin-bottom: 0.5rem; }
+.task-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s; }
+.task-card:hover .task-image img { transform: scale(1.1); }
+
+.task-owner-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
 }
 
-.task-image img {
-    width: 100%; height: 100%; object-fit: cover;
-    transition: transform 0.6s cubic-bezier(0.2, 0, 0.2, 1);
+.owner-avatar {
+    width: 40px; height: 40px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 800; overflow: hidden;
 }
+.owner-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-.task-card:hover .task-image img { transform: scale(1.08); }
+.owner-details { flex: 1; }
+.owner-name { font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin: 0; }
+.task-date { font-size: 0.75rem; color: var(--text-muted); margin: 0; }
 
-/* ─── Task Header ────────────────────── */
-.task-header {
-    display: flex; justify-content: space-between;
-    align-items: center; margin-bottom: 1rem;
-}
-
-.status-badge {
-    display: inline-flex; align-items: center;
-    padding: 0.3rem 0.85rem;
-    border-radius: 20px;
-    font-size: 0.72rem; font-weight: 800;
-    text-transform: uppercase; letter-spacing: 0.08em;
-    background: rgba(16, 185, 129, 0.12); color: var(--success);
+.status-badge { 
+    font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
+    padding: 0.25rem 0.65rem; border-radius: 20px;
+    background: rgba(16, 185, 129, 0.1); color: var(--success);
     border: 1px solid rgba(16, 185, 129, 0.2);
 }
-
-.task-date { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; }
 
 /* ─── Task Body ──────────────────────── */
 .task-title {

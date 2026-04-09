@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TaskService, Task } from '../../../services/task.service';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
     selector: 'app-edit-task',
@@ -17,6 +18,7 @@ export class EditTaskComponent implements OnInit {
     private router = inject(Router);
     private route = inject(ActivatedRoute);
     private cdr = inject(ChangeDetectorRef);
+    private toastService = inject(ToastService);
 
     taskForm: FormGroup = this.fb.group({
         title: ['', [Validators.required, Validators.minLength(3)]],
@@ -99,15 +101,16 @@ export class EditTaskComponent implements OnInit {
         this.taskService.updateTask(this.taskId, this.taskForm.value).subscribe({
             next: (response) => {
                 if (response.success) {
+                    this.toastService.success('Task updated successfully!');
                     this.router.navigate(['/dashboard/my-tasks']);
                 } else {
-                    this.error = 'Failed to update task. Please try again.';
+                    this.toastService.error('Failed to update task.');
                     this.loading.set(false);
                 }
             },
             error: (err) => {
-                console.error('Error updating task', err);
-                this.error = 'Failed to update task. Please try again.';
+                const msg = err.error?.message || 'Failed to update task. Please try again.';
+                this.toastService.error(msg);
                 this.loading.set(false);
             }
         });

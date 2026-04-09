@@ -33,7 +33,9 @@ export class DashboardComponent implements OnInit {
         if (user) {
             this.userName = user.name;
             this.userInitial = user.name.charAt(0).toUpperCase();
-            this.userPicture = user.picture_url ? `http://localhost:5000${user.picture_url}` : null;
+            this.userPicture = user.picture_url && user.picture_url.startsWith('http') 
+                ? user.picture_url 
+                : (user.picture_url ? `http://localhost:5000${user.picture_url}` : null);
             
             // Join personal notification room
             this.chatService.joinUser(user.id);

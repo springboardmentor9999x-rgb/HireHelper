@@ -71,11 +71,19 @@ html, body {
 body {
     background: var(--bg-main);
     background-image:
-        radial-gradient(ellipse at 20% 50%, var(--bg-gradient-1) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 20%, var(--bg-gradient-2) 0%, transparent 50%),
-        radial-gradient(ellipse at 60% 80%, var(--bg-gradient-3) 0%, transparent 50%);
+        radial-gradient(circle at 20% 30%, var(--bg-gradient-1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, var(--bg-gradient-2) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, var(--bg-gradient-3) 0%, transparent 70%);
+    background-size: 150% 150%;
     background-attachment: fixed;
-    transition: background 0.3s ease, color 0.3s ease;
+    animation: bgFlow 60s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.5s ease, color 0.3s ease;
+}
+
+@keyframes bgFlow {
+    0%   { background-position: 0% 0%; }
+    50%  { background-position: 100% 100%; }
+    100% { background-position: 0% 100%; }
 }
 
 /* ─── Global Scrollbar ─────────────────────────────── */
@@ -273,7 +281,41 @@ body {
     transform: none !important;
 }
 
-/* ─── Shared Animations ─────────────────────────────── */
+@keyframes shimmer {
+    0%   { background-position: -800px 0; }
+    100% { background-position: 800px 0; }
+}
+
+.skeleton-base {
+    background: linear-gradient(90deg, 
+        var(--surface-1) 25%, 
+        var(--surface-2) 50%, 
+        var(--surface-1) 75%
+    );
+    background-size: 800px 100%;
+    animation: shimmer 2s infinite linear;
+    border-radius: 8px;
+}
+
+.skeleton-card {
+    height: 380px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 24px;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.skeleton-img { height: 160px; width: 100%; border-radius: 16px; }
+.skeleton-title { height: 28px; width: 70%; }
+.skeleton-text { height: 14px; width: 100%; border-radius: 4px; }
+.skeleton-text.short { width: 40%; }
+.skeleton-avatar { width: 44px; height: 44px; border-radius: 14px; }
+.skeleton-btn { height: 42px; width: 100%; border-radius: 14px; }
+
+/* Existing Shared Animations */
 @keyframes fadeUp {
     from { opacity: 0; transform: translateY(14px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -281,9 +323,4 @@ body {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
-}
-
-@keyframes shimmer {
-    0%   { background-position: -400px 0; }
-    100% { background-position: 400px 0; }
 }

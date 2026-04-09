@@ -8,6 +8,7 @@ export interface ChatMessage {
     request_id: number;
     sender_id: number;
     sender_name: string;
+    sender_picture?: string;
     content: string;
     created_at: string;
 }

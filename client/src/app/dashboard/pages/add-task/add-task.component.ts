@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TaskService } from '../../../services/task.service';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
     selector: 'app-add-task',
@@ -15,6 +16,7 @@ export class AddTaskComponent {
     private fb = inject(FormBuilder);
     private taskService = inject(TaskService);
     private router = inject(Router);
+    private toastService = inject(ToastService);
 
     taskForm: FormGroup = this.fb.group({
         title: ['', [Validators.required, Validators.minLength(3)]],
@@ -47,17 +49,19 @@ export class AddTaskComponent {
         this.taskService.createTask(this.taskForm.value).subscribe({
             next: (response) => {
                 if (response.success) {
-                    this.successMessage = '🎉 Task created successfully! Redirecting...';
+                    this.toastService.success('🎉 Task created successfully!');
                     this.loading = false;
-                    setTimeout(() => this.router.navigate(['/dashboard/my-tasks']), 1500);
+                    setTimeout(() => this.router.navigate(['/dashboard/my-tasks']), 1000);
                 } else {
-                    this.error = 'Failed to create task. Please try again.';
+                    this.error = 'Failed to create task.';
+                    this.toastService.error('Failed to create task. Please try again.');
                     this.loading = false;
                 }
             },
             error: (err) => {
-                console.error('AddTaskComponent: Error creating task', err);
-                this.error = 'Failed to create task. Please try again.';
+                const msg = err.error?.message || 'Failed to create task. Please try again.';
+                this.error = msg;
+                this.toastService.error(msg);
                 this.loading = false;
             }
         });

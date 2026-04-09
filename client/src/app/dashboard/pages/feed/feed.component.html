@@ -5,9 +5,19 @@
     </div>
 
     @if (loading) {
-    <div class="loading-state">
-        <div class="spinner-large"></div>
-        <p>Fetching new tasks...</p>
+    <div class="tasks-grid">
+        @for (i of [1,2,3,4,5,6]; track i) {
+            <div class="skeleton-card">
+                <div class="skeleton-img skeleton-base"></div>
+                <div class="skeleton-title skeleton-base"></div>
+                <div class="skeleton-text skeleton-base"></div>
+                <div class="skeleton-text short skeleton-base"></div>
+                <div style="display: flex; gap: 8px; margin-top: auto;">
+                    <div class="skeleton-btn skeleton-base" style="width: 40px; height: 32px;"></div>
+                    <div class="skeleton-btn skeleton-base" style="width: 100px; height: 32px;"></div>
+                </div>
+            </div>
+        }
     </div>
     } @else if (tasks.length === 0) {
     <div class="empty-state">
@@ -24,15 +34,25 @@
     <div class="tasks-grid">
         @for (task of tasks; track task.id) {
         <div class="task-card">
-            @if (task.picture_url) {
             <div class="task-image">
-                <img [src]="task.picture_url" alt="task cover">
+                <img [src]="task.picture_url || 'https://via.placeholder.com/400x200?text=No+Image'" alt="task cover">
             </div>
-            }
 
-            <div class="task-header">
-                <span class="status-badge">{{ task.status }}</span>
-                <span class="task-date">{{ task.created_at | date:'mediumDate' }}</span>
+            <div class="task-owner-info">
+                <div class="owner-avatar">
+                    @if (task.owner_picture) {
+                        <img [src]="task.owner_picture" [alt]="task.owner_name">
+                    } @else {
+                        <span>{{ task.owner_name?.charAt(0)?.toUpperCase() }}</span>
+                    }
+                </div>
+                <div class="owner-details">
+                    <p class="owner-name">{{ task.owner_name }}</p>
+                    <p class="task-date">{{ task.created_at | date:'mediumDate' }}</p>
+                </div>
+                <div class="status-section">
+                    <span class="status-badge">{{ task.status }}</span>
+                </div>
             </div>
 
             <h3 class="task-title">{{ task.title }}</h3>

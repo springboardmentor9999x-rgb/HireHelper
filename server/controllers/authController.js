@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const pool = require('../config/db');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
+const supabase = require('../config/supabase');
 
 exports.changePassword = async (req, res) => {
     const { currentPassword, newPassword } = req.body;
@@ -65,16 +65,8 @@ exports.updateProfile = async (req, res) => {
     }
 };
 
-// ─── Multer configuration ─────────────────────────────────────────────────────
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/profiles/');
-    },
-    filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname).toLowerCase();
-        cb(null, `user_${req.user.id}${ext}`);
-    }
-});
+// ─── Multer configuration (Storage in memory) ─────────────────────────────────
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
     const allowed = ['.jpg', '.jpeg', '.png', '.webp'];
@@ -102,13 +94,40 @@ exports.uploadAvatar = async (req, res) => {
     }
 
     try {
-        const pictureUrl = `/uploads/profiles/${req.file.filename}`;
+        const file = req.file;
+        const ext = path.extname(file.originalname).toLowerCase();
+        const fileName = `user_${userId}_${Date.now()}${ext}`;
+        const filePath = `profile/${fileName}`;
 
-        await pool.query('UPDATE users SET picture_url = $1 WHERE id = $2', [pictureUrl, userId]);
+        // Upload to Supabase Storage
+        const { data, error } = await supabase.storage
+            .from('profile')
+            .upload(filePath, file.buffer, {
+                contentType: file.mimetype,
+                upsert: true
+            });
 
-        return res.json({ success: true, message: 'Profile picture updated', picture_url: pictureUrl });
+        if (error) {
+            console.error('❌ Supabase upload error detail:', {
+                message: error.message,
+                name: error.name,
+                status: error.status,
+                cause: error.cause
+            });
+            return res.status(500).json({ success: false, message: `Failed to upload to storage: ${error.message}` });
+        }
+
+        // Get Public URL
+        const { data: { publicUrl } } = supabase.storage
+            .from('profile')
+            .getPublicUrl(filePath);
+
+        // Update database
+        await pool.query('UPDATE users SET picture_url = $1 WHERE id = $2', [publicUrl, userId]);
+
+        return res.json({ success: true, message: 'Profile picture updated', picture_url: publicUrl });
     } catch (err) {
-        console.error('Upload avatar error:', err.message);
+        console.error('Upload avatar catch error:', err.message);
         return res.status(500).json({ success: false, message: 'Server error while uploading picture' });
     }
 };

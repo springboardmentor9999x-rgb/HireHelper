@@ -17,9 +17,11 @@ export class ChatDialogComponent implements OnInit, OnDestroy, AfterViewChecked 
     @Input() requestId!: number;
     @Input() taskTitle!: string;
     @Input() otherUserName!: string;
+    @Input() otherUserPicture: string | null = null;
     @Input() otherUserId!: number;
     @Input() currentUserId!: number;
     @Input() currentUserName!: string;
+    @Input() currentUserPicture: string | null = null;
     @Output() close = new EventEmitter<void>();
     @Output() openProfile = new EventEmitter<number>();
 
@@ -27,6 +29,12 @@ export class ChatDialogComponent implements OnInit, OnDestroy, AfterViewChecked 
     newMessage = '';
     loading = true;
     otherUserTyping = false;
+
+    getImageUrl(path: string | null | undefined): string | null {
+        if (!path) return null;
+        if (path.startsWith('http')) return path;
+        return `http://localhost:5000${path}`;
+    }
     private messageSubscription?: Subscription;
     private typingSubscription?: Subscription;
     private typingTimeout?: any;

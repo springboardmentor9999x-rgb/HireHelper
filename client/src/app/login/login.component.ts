@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { ToastService } from '../services/toast.service';
 
 @Component({
     selector: 'app-login',
@@ -20,12 +21,19 @@ export class LoginComponent {
     constructor(
         private fb: FormBuilder,
         private authService: AuthService,
-        private router: Router
+        private router: Router,
+        private toastService: ToastService
     ) {
         this.loginForm = this.fb.group({
             email: ['', [Validators.required, Validators.email]],
             password: ['', [Validators.required, Validators.minLength(6)]],
         });
+    }
+
+    ngOnInit(): void {
+        if (this.authService.isLoggedIn()) {
+            this.router.navigate(['/dashboard']);
+        }
     }
 
     togglePassword(): void {
@@ -50,13 +58,14 @@ export class LoginComponent {
             next: (res) => {
                 this.authService.saveSession(res.token, res.user);
                 this.isLoading.set(false);
+                this.toastService.success(`Welcome back, ${res.user.name}!`);
                 this.router.navigate(['/dashboard']);
             },
             error: (err) => {
                 this.isLoading.set(false);
-                this.errorMessage.set(
-                    err.error?.message || 'Login failed. Please try again.'
-                );
+                const msg = err.error?.message || 'Login failed. Please try again.';
+                this.errorMessage.set(msg);
+                this.toastService.error(msg);
             }
         });
     }

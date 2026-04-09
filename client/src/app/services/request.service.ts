@@ -17,6 +17,8 @@ export interface Request {
     owner_id?: number;
     owner_email?: string;
     owner_phone?: string;
+    owner_picture?: string;
+    user_picture?: string;
     unread_count?: number;
 }
 

@@ -15,6 +15,8 @@ export interface Task {
     status?: string;
     created_at?: string;
     has_requested?: boolean;
+    owner_name?: string;
+    owner_picture?: string;
 }
 
 @Injectable({

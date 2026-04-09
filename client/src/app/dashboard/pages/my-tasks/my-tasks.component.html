@@ -26,11 +26,21 @@
     }
   </div>
 
-  <!-- ═══ LOADING ═══ -->
+  <!-- ═══ LOADING SKELETONS ═══ -->
   @if (loading) {
-    <div class="loading-state">
-      <div class="loader-ring"></div>
-      <p>Loading your tasks…</p>
+    <div class="tasks-grid">
+      @for (i of [1,2,3,4]; track i) {
+        <div class="skeleton-card">
+          <div class="skeleton-img skeleton-base"></div>
+          <div class="skeleton-title skeleton-base"></div>
+          <div class="skeleton-text skeleton-base"></div>
+          <div class="skeleton-text short skeleton-base"></div>
+          <div style="display: flex; gap: 8px; margin-top: auto;">
+            <div class="skeleton-btn skeleton-base" style="width: 40px; height: 32px;"></div>
+            <div class="skeleton-btn skeleton-base" style="width: 100px; height: 32px;"></div>
+          </div>
+        </div>
+      }
     </div>
   }
 

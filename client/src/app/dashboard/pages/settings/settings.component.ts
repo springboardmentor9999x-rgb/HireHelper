@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
 import { NotificationService } from '../../../services/notification.service';
+import { ToastService } from '../../../services/toast.service';
 
-const SERVER_BASE = 'http://localhost:5000';
+const API_URL = 'http://localhost:5000/api/auth';
 
 @Component({
     selector: 'app-settings',
@@ -17,6 +18,7 @@ export class SettingsComponent implements OnInit {
     private fb = inject(FormBuilder);
     private authService = inject(AuthService);
     private cdr = inject(ChangeDetectorRef);
+    private toastService = inject(ToastService);
     notificationService = inject(NotificationService);
 
     // Tab state
@@ -67,8 +69,9 @@ export class SettingsComponent implements OnInit {
         });
         this.userName = user?.name || '';
         this.userInitial = this.userName.charAt(0).toUpperCase();
-        this.userPicture = user?.picture_url ? `${SERVER_BASE}${user.picture_url}` : null;
-        if (this.userPicture) {
+        
+        if (user?.picture_url) {
+            this.userPicture = user.picture_url;
             this.avatarPreview = this.userPicture;
         }
     }
@@ -123,24 +126,22 @@ export class SettingsComponent implements OnInit {
 
         this.authService.uploadProfilePicture(this.selectedAvatarFile).subscribe({
             next: (res) => {
-                this.avatarSuccess = true;
-                this.avatarMessage = 'Profile picture updated!';
+                this.toastService.success('Profile picture updated successfully!');
                 this.selectedAvatarFile = null;
                 this.isUploadingAvatar = false;
 
-                // Persist to localStorage
                 const user = this.authService.getUser() as any;
                 if (user) {
                     user.picture_url = res.picture_url;
                     localStorage.setItem('user', JSON.stringify(user));
                 }
-                this.avatarPreview = `${SERVER_BASE}${res.picture_url}?t=${Date.now()}`;
-                this.userPicture = this.avatarPreview;
+                
+                this.userPicture = `${res.picture_url}?t=${Date.now()}`;
+                this.avatarPreview = this.userPicture;
                 this.cdr.detectChanges();
             },
             error: (err) => {
-                this.avatarSuccess = false;
-                this.avatarMessage = err.error?.message || 'Upload failed. Please try again.';
+                this.toastService.error(err.error?.message || 'Upload failed. Please try again.');
                 this.isUploadingAvatar = false;
                 this.cdr.detectChanges();
             }
@@ -155,15 +156,13 @@ export class SettingsComponent implements OnInit {
 
         this.authService.changePassword(currentPassword, newPassword).subscribe({
             next: (res) => {
-                this.passwordSuccess = true;
-                this.passwordMessage = res.message;
+                this.toastService.success('Password updated successfully!');
                 this.passwordForm.reset();
                 this.isSubmittingPassword = false;
                 this.cdr.detectChanges();
             },
             error: (err) => {
-                this.passwordSuccess = false;
-                this.passwordMessage = err.error?.message || 'Error updating password';
+                this.toastService.error(err.error?.message || 'Error updating password');
                 this.isSubmittingPassword = false;
                 this.cdr.detectChanges();
             }
@@ -178,8 +177,7 @@ export class SettingsComponent implements OnInit {
 
         this.authService.updateProfile(name, bio).subscribe({
             next: (res) => {
-                this.profileSuccess = true;
-                this.profileMessage = res.message;
+                this.toastService.success('Profile updated successfully!');
                 this.userName = res.name;
                 this.userInitial = res.name.charAt(0).toUpperCase();
 
@@ -195,8 +193,7 @@ export class SettingsComponent implements OnInit {
                 setTimeout(() => window.location.reload(), 1500);
             },
             error: (err) => {
-                this.profileSuccess = false;
-                this.profileMessage = err.error?.message || 'Error updating profile';
+                this.toastService.error(err.error?.message || 'Error updating profile');
                 this.isSubmittingProfile = false;
                 this.cdr.detectChanges();
             }

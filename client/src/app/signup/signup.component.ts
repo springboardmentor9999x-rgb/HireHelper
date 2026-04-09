@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { ToastService } from '../services/toast.service';
 
 function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.get('password');
@@ -45,7 +46,8 @@ export class SignupComponent {
     constructor(
         private fb: FormBuilder,
         private authService: AuthService,
-        private router: Router
+        private router: Router,
+        private toastService: ToastService
     ) {
         this.signupForm = this.fb.group({
             name: ['', [Validators.required, Validators.minLength(2)]],
@@ -62,6 +64,12 @@ export class SignupComponent {
         this.phoneOtpForm = this.fb.group({
             otp: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]]
         });
+    }
+
+    ngOnInit(): void {
+        if (this.authService.isLoggedIn()) {
+            this.router.navigate(['/dashboard']);
+        }
     }
 
     togglePassword(): void { this.showPassword.update(v => !v); }
@@ -92,11 +100,14 @@ export class SignupComponent {
             next: () => {
                 this.isLoading.set(false);
                 this.currentStep.set('email-otp');
+                this.toastService.info('Verification code sent to your email.');
                 this.startCountdown();
             },
             error: (err) => {
                 this.isLoading.set(false);
-                this.errorMessage.set(err.error?.message || 'Failed to send email OTP.');
+                const msg = err.error?.message || 'Failed to send email OTP.';
+                this.errorMessage.set(msg);
+                this.toastService.error(msg);
             }
         });
     }
@@ -112,23 +123,28 @@ export class SignupComponent {
 
         this.authService.verifyEmailOtp(this.pendingEmail, otp).subscribe({
             next: () => {
-                // Now send phone OTP
+                this.toastService.success('Email verified!');
                 this.authService.sendPhoneOtp(this.pendingPhone).subscribe({
                     next: () => {
                         this.isLoading.set(false);
                         this.emailOtpForm.reset();
                         this.currentStep.set('phone-otp');
+                        this.toastService.info('Verification code sent to your phone.');
                         this.startCountdown();
                     },
                     error: (err) => {
                         this.isLoading.set(false);
-                        this.errorMessage.set(err.error?.message || 'Failed to send phone OTP.');
+                        const msg = err.error?.message || 'Failed to send phone OTP.';
+                        this.errorMessage.set(msg);
+                        this.toastService.error(msg);
                     }
                 });
             },
             error: (err) => {
                 this.isLoading.set(false);
-                this.errorMessage.set(err.error?.message || 'Invalid email OTP.');
+                const msg = err.error?.message || 'Invalid email OTP.';
+                this.errorMessage.set(msg);
+                this.toastService.error(msg);
             }
         });
     }
@@ -144,23 +160,28 @@ export class SignupComponent {
 
         this.authService.verifyPhoneOtp(this.pendingPhone, otp).subscribe({
             next: () => {
-                // Both OTPs verified — create the account
+                this.toastService.success('Phone verified!');
                 const d = this.pendingData!;
                 this.authService.register(d.name, d.email, d.password, d.phone).subscribe({
                     next: (res) => {
                         this.authService.saveSession(res.token, res.user);
                         this.isLoading.set(false);
+                        this.toastService.success(`Welcome to HireHelper, ${res.user.name}!`);
                         this.router.navigate(['/dashboard']);
                     },
                     error: (err) => {
                         this.isLoading.set(false);
-                        this.errorMessage.set(err.error?.message || 'Registration failed.');
+                        const msg = err.error?.message || 'Registration failed.';
+                        this.errorMessage.set(msg);
+                        this.toastService.error(msg);
                     }
                 });
             },
             error: (err) => {
                 this.isLoading.set(false);
-                this.errorMessage.set(err.error?.message || 'Invalid phone OTP.');
+                const msg = err.error?.message || 'Invalid phone OTP.';
+                this.errorMessage.set(msg);
+                this.toastService.error(msg);
             }
         });
     }
@@ -170,8 +191,15 @@ export class SignupComponent {
         if (this.resendCountdown() > 0) return;
         this.errorMessage.set('');
         this.authService.sendEmailOtp(this.pendingEmail).subscribe({
-            next: () => { this.successMsg.set('OTP resent!'); this.startCountdown(); },
-            error: (err) => { this.errorMessage.set(err.error?.message || 'Failed to resend.'); }
+            next: () => { 
+                this.toastService.success('Email OTP resent!');
+                this.startCountdown(); 
+            },
+            error: (err) => { 
+                const msg = err.error?.message || 'Failed to resend.';
+                this.errorMessage.set(msg);
+                this.toastService.error(msg);
+            }
         });
     }
 
@@ -179,8 +207,15 @@ export class SignupComponent {
         if (this.resendCountdown() > 0) return;
         this.errorMessage.set('');
         this.authService.sendPhoneOtp(this.pendingPhone).subscribe({
-            next: () => { this.successMsg.set('OTP resent!'); this.startCountdown(); },
-            error: (err) => { this.errorMessage.set(err.error?.message || 'Failed to resend.'); }
+            next: () => { 
+                this.toastService.success('Phone OTP resent!');
+                this.startCountdown(); 
+            },
+            error: (err) => { 
+                const msg = err.error?.message || 'Failed to resend.';
+                this.errorMessage.set(msg);
+                this.toastService.error(msg);
+            }
         });
     }
 

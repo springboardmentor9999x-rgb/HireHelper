@@ -3,7 +3,11 @@
         <!-- Header -->
         <div class="chat-header">
             <div class="user-info-clickable" (click)="onHeaderClick()" title="View user profile">
-                <div class="user-avatar">{{ otherUserName.charAt(0).toUpperCase() }}</div>
+                @if (getImageUrl(otherUserPicture)) {
+                    <img [src]="getImageUrl(otherUserPicture)" class="user-avatar-img" [alt]="otherUserName">
+                } @else {
+                    <div class="user-avatar">{{ otherUserName.charAt(0).toUpperCase() }}</div>
+                }
                 <div class="user-details">
                     <h3 class="other-user-name">{{ otherUserName }}</h3>
                     <p class="task-title-breadcrumb">{{ taskTitle }}</p>
@@ -28,9 +32,23 @@
                 <div class="message-list">
                     @for (msg of messages; track msg.id) {
                         <div class="message-wrapper" [class.sent]="msg.sender_id === currentUserId">
+                            <div class="sender-avatar-small" *ngIf="msg.sender_id !== currentUserId">
+                                @if (getImageUrl(msg.sender_picture)) {
+                                    <img [src]="getImageUrl(msg.sender_picture)" [alt]="msg.sender_name">
+                                } @else {
+                                    <div class="avatar-initial">{{ msg.sender_name.charAt(0).toUpperCase() }}</div>
+                                }
+                            </div>
                             <div class="message-bubble">
                                 <p class="message-content">{{ msg.content }}</p>
                                 <span class="message-time">{{ msg.created_at | date:'shortTime' }}</span>
+                            </div>
+                            <div class="sender-avatar-small" *ngIf="msg.sender_id === currentUserId">
+                                @if (getImageUrl(currentUserPicture)) {
+                                    <img [src]="getImageUrl(currentUserPicture)" [alt]="msg.sender_name">
+                                } @else {
+                                    <div class="avatar-initial">{{ msg.sender_name.charAt(0).toUpperCase() }}</div>
+                                }
                             </div>
                         </div>
                     }

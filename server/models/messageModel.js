@@ -49,7 +49,7 @@ const Message = {
 
     findByRequestId: async (requestId) => {
         const result = await pool.query(
-            `SELECT m.*, u.name as sender_name
+            `SELECT m.*, u.name as sender_name, u.picture_url as sender_picture
              FROM messages m
              JOIN users u ON m.sender_id = u.id
              WHERE m.request_id = $1

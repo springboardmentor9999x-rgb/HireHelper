@@ -26,7 +26,7 @@
         
         <div class="header-content">
           @if (profile.picture_url) {
-            <img [src]="'http://localhost:5000' + profile.picture_url" alt="profile" class="avatar-large avatar-large-img">
+            <img [src]="profile.picture_url" alt="profile" class="avatar-large avatar-large-img">
           } @else {
             <div class="avatar-large">{{ profile.name.charAt(0).toUpperCase() }}</div>
           }

@@ -306,7 +306,16 @@ router.post('/login', async (req, res) => {
         return res.json({
             message: 'Login successful',
             token,
-            user: { id: user.id, name: user.name, email: user.email },
+            user: { 
+                id: user.id, 
+                name: user.name, 
+                email: user.email,
+                phone: user.phone,
+                bio: user.bio,
+                picture_url: user.picture_url,
+                rating_avg: user.rating_avg,
+                rating_count: user.rating_count
+            },
         });
     } catch (err) {
         console.error('Login error:', err);
@@ -353,7 +362,16 @@ router.post('/register', async (req, res) => {
         return res.status(201).json({
             message: 'Account created successfully',
             token,
-            user: { id: user.id, name: user.name, email: user.email, phone: user.phone },
+            user: { 
+                id: user.id, 
+                name: user.name, 
+                email: user.email, 
+                phone: user.phone,
+                bio: null,
+                picture_url: null,
+                rating_avg: 0,
+                rating_count: 0
+            },
         });
     } catch (err) {
         console.error('Register error | code:', err.code, '| detail:', err.detail);
@@ -374,7 +392,7 @@ const authController = require('../controllers/authController');
 router.get('/me', authMiddleware, async (req, res) => {
     try {
         const result = await pool.query(
-            'SELECT id, name, email, phone, email_verified, phone_verified FROM users WHERE id = $1',
+            'SELECT id, name, email, phone, bio, picture_url, rating_avg, rating_count, email_verified, phone_verified FROM users WHERE id = $1',
             [req.user.id]
         );
         if (result.rows.length === 0)

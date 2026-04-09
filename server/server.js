@@ -62,7 +62,15 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(helmet()); // Secure HTTP headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      "img-src": ["'self'", "data:", "http://localhost:5000", "https://images.unsplash.com", "https://*.supabase.co"],
+      "connect-src": ["'self'", "http://localhost:5000", "ws://localhost:5000", "https://*.supabase.co"]
+    },
+  },
+}));
 
 // Serve uploaded files
 app.use('/uploads', express.static('uploads'));

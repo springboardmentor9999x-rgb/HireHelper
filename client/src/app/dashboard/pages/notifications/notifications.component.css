@@ -12,31 +12,29 @@
     display: flex; 
     justify-content: space-between; 
     align-items: center;
-    margin-bottom: 3rem;
-    position: sticky; 
-    top: 0; 
-    z-index: 100;
+    margin-bottom: 2.5rem;
     padding: 1.5rem 0;
-    background: var(--bg-main);
-    transition: background 0.3s;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .header-content h1 {
-    font-size: 2.5rem; 
-    font-weight: 800; 
-    letter-spacing: -0.05em;
-    background: linear-gradient(135deg, var(--text-main) 0%, var(--text-accent) 100%);
+    font-size: 2.8rem; 
+    font-weight: 900; 
+    letter-spacing: -0.06em;
+    background: linear-gradient(135deg, var(--text-main) 0%, var(--primary) 100%);
     -webkit-background-clip: text; 
     background-clip: text; 
     -webkit-text-fill-color: transparent;
     margin: 0;
+    line-height: 1;
 }
 
 .header-content p { 
     color: var(--text-muted); 
-    font-size: 1rem; 
-    margin-top: 0.4rem; 
-    font-weight: 500;
+    font-size: 1.1rem; 
+    margin-top: 0.6rem; 
+    font-weight: 600;
+    opacity: 0.8;
 }
 
 .btn-mark-all {

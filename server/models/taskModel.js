@@ -55,8 +55,11 @@ const Task = {
     getFeed: async (excludeUserId) => {
         const result = await pool.query(
             `SELECT t.*, 
+                    u.name as owner_name,
+                    u.picture_url as owner_picture,
                     EXISTS (SELECT 1 FROM requests r WHERE r.task_id = t.id AND r.user_id = $1) as has_requested
              FROM tasks t
+             JOIN users u ON t.user_id = u.id
              WHERE t.user_id != $1 AND UPPER(TRIM(t.status)) = 'OPEN'
              ORDER BY t.created_at DESC`,
             [excludeUserId]

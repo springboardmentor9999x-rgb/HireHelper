@@ -4,10 +4,38 @@
         <p>Track the status of tasks you've offered to help with</p>
     </div>
 
+    <!-- ═══ TABS ═══ -->
+    <div class="tab-bar">
+        @for (tab of tabs; track tab.value) {
+            <button class="tab-item" [class.active]="filterTab === tab.value" (click)="setFilter(tab.value)">
+                {{ tab.label }}
+                @if (tab.count > 0) {
+                    <span class="tab-count">{{ tab.count }}</span>
+                }
+            </button>
+        }
+    </div>
+
     @if (loading) {
-    <div class="loading-state">
-        <div class="spinner-lg"></div>
-        <p>Loading your requests...</p>
+    <div class="requests-grid">
+        @for (i of [1,2,3]; track i) {
+        <div class="req-card glass-card-premium" style="height: 180px; display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display:flex; justify-content: space-between; align-items: flex-start;">
+                <div style="display:flex; gap: 1rem; align-items: center;">
+                    <div class="skeleton-avatar skeleton-base" style="width: 44px; height: 44px; border-radius: 12px;"></div>
+                    <div style="display:flex; flex-direction: column; gap: 6px;">
+                        <div class="skeleton-base" style="width: 140px; height: 18px;"></div>
+                        <div class="skeleton-base" style="width: 100px; height: 14px;"></div>
+                    </div>
+                </div>
+                <div class="skeleton-base" style="width: 70px; height: 22px; border-radius: 20px;"></div>
+            </div>
+            <div class="skeleton-base" style="width: 100%; height: 48px; border-radius: 14px; opacity: 0.5;"></div>
+            <div style="margin-top: auto;">
+                <div class="skeleton-btn skeleton-base" style="width: 100%; height: 44px;"></div>
+            </div>
+        </div>
+        }
     </div>
     } @else if (requests.length === 0) {
     <div class="empty-state glass-card">
@@ -20,9 +48,19 @@
         <p>You haven't sent any help requests yet. Check the feed to find tasks!</p>
         <a routerLink="/dashboard/feed" class="btn-gls btn-gls-primary" style="margin-top: 1rem;">Browse Tasks</a>
     </div>
+    } @else if (filteredRequests.length === 0) {
+    <div class="empty-state glass-card">
+        <div class="empty-icon-wrap">
+            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+        </div>
+        <h3>No {{ filterTab === 'ALL' ? '' : filterTab.toLowerCase() + ' ' }}requests</h3>
+        <p>You don't have any sent requests with this status.</p>
+    </div>
     } @else {
     <div class="requests-grid">
-        @for (req of requests; track req.id; let i = $index) {
+        @for (req of filteredRequests; track req.id; let i = $index) {
         <div class="req-card glass-card-premium" [class]="'status-border-' + req.status?.toLowerCase()" [style.--index]="i">
             <div class="card-top">
                 <div class="task-info">
@@ -38,7 +76,13 @@
             </div>
 
             <div class="owner-preview" (click)="openProfile(req.owner_id)">
-                <div class="owner-avatar-mini">{{ req.owner_name?.charAt(0)?.toUpperCase() }}</div>
+                <div class="owner-avatar-mini">
+                    @if (req.owner_picture) {
+                        <img [src]="req.owner_picture" [alt]="req.owner_name">
+                    } @else {
+                        <span>{{ req.owner_name?.charAt(0)?.toUpperCase() }}</span>
+                    }
+                </div>
                 <div class="owner-details">
                     <span class="owner-label">Task Owner</span>
                     <span class="owner-name-val">{{ req.owner_name }}</span>
@@ -91,9 +135,11 @@
         [requestId]="selectedRequestId"
         [taskTitle]="selectedTaskTitle"
         [otherUserName]="selectedUserName"
+        [otherUserPicture]="selectedUserPicture"
         [otherUserId]="selectedOtherUserId"
         [currentUserId]="currentUserId"
         [currentUserName]="currentUserName"
+        [currentUserPicture]="currentUserPicture"
         (close)="closeChat()"
         (openProfile)="openProfile($event)">
     </app-chat-dialog>
