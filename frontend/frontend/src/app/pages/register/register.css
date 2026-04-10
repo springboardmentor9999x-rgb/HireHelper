@@ -1,5 +1,25 @@
 @import '../login/login.css';
 
+.auth-wrapper {
+  padding: 24px;
+  background-image: url('/Loginimages.jpg');
+}
+
+.auth-card {
+  width: min(380px, 100%);
+  padding: 28px 24px;
+}
+
+
+
+
+
+
+
+
+
+
+
 .phone-row {
   display: grid;
   grid-template-columns: 150px 1fr;
